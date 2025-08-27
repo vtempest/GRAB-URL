@@ -2,33 +2,17 @@
 <p align="center">
     <img width="400px" src="https://i.imgur.com/qrQWkeb.png" />
 </p>
+
 <p align="center">
-    <br />
-    <a href="https://npmjs.org/package/grab-api.js">
-        <img src="https://i.imgur.com/ifE8SbX.png"
-            alt="NPM badge" />
-    </a>
-</p>
-<p align="center">
-  <a href="https://discord.gg/SJdBqBz3tV">
-      <img src="https://img.shields.io/discord/1110227955554209923.svg?label=Chat&logo=Discord&colorB=7289da&style=flat"
-            alt="Join Discord" />
-    </a>
-     <a href="https://github.com/vtempest/grab-api/discussions">
-     <img alt="GitHub Stars" src="https://img.shields.io/github/stars/vtempest/grab-api" /></a>
-   <a href="https://npmjs.org/package/grab-api.js">
-    <img alt="NPM Version" src="https://img.shields.io/npm/v/grab-api.js" />
-  </a>
-    <a href="https://github.com/vtempest/grab-API/discussions">
-    <img alt="GitHub Discussions"
-        src="https://img.shields.io/github/discussions/vtempest/grab-API" />
-    </a>
-    <a href="https://github.blog/developer-skills/github/beginners-guide-to-github-creating-a-pull-request/">
-        <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome"/>
-    </a>
-    <a href="https://codespaces.new/vtempest/grab-API">
-    <img src="https://github.com/codespaces/badge.svg" width="150" height="20"/>
-    </a>
+  <a href="https://discord.gg/SJdBqBz3tV"><img src="https://img.shields.io/discord/1110227955554209923.svg?label=Chat&logo=Discord&colorB=7289da&style=flat" alt="Join Discord" /></a>
+     <a href="https://github.com/vtempest/GRAB-URL/discussions">
+     <img alt="GitHub Stars" src="https://img.shields.io/github/stars/vtempest/GRAB-URL" /></a>
+   <a href="https://npmjs.org/package/grab-url"><img alt="NPM Version" src="https://img.shields.io/npm/v/grab-url" /></a>
+    <a href="https://bundlephobia.com/package/grab-url"><img src="https://img.shields.io/bundlephobia/minzip/grab-url" /></a>
+    <a href="https://github.com/vtempest/GRAB-URL/discussions"><img alt="GitHub Discussions"
+        src="https://img.shields.io/github/discussions/vtempest/GRAB-URL" /></a>
+    <a href="https://github.blog/developer-skills/github/beginners-guide-to-github-creating-a-pull-request/"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome"/></a>
+    <a href="https://codespaces.new/vtempest/GRAB-URL"><img src="https://github.com/codespaces/badge.svg" width="150" height="20"/></a>
 </p>
 <h3 align="center">
   <a href="https://grab.js.org"> 📑 Docs (grab.js.org)</a>
@@ -36,19 +20,18 @@
 </h3>
 
 ```
-npm i grab-api.js
+npm i grab-url
 ```
 
 ### GRAB: Generate Request to API from Browser
 
-**GRAB is the FBEST Request Manager: Functionally Brilliant, Elegantly Simple Tool**
-1. **One Function**: 3Kb min, 0 dependencies, minimalist syntax, [more features than top alternatives](https://grab.js.org/guide/Comparisons)
+1.  **GRAB is the FBEST Request Manager: Functionally Brilliant, Elegantly Simple Tool**: One Function, no dependencies,   minimalist syntax, [more features than alternatives](https://grab.js.org/guide/Comparisons)
 2. **Auto-JSON Convert**: Pass parameters and get response or error in JSON, handling other data types as is.
 3. **isLoading Status**: Sets `.isLoading=true` on the pre-initialized response object so you can show a "Loading..." in any framework
 4. **Debug Logging**: Adds global `log()` and prints colored JSON structure, response, timing for requests in test.
 5. **Mock Server Support**: Configure `window.grab.mock` for development and testing environments
 6. **Cancel Duplicates**: Prevent this request if one is ongoing to same path & params, or cancel the ongoing request.
-7. **Timeout & Retry**: Customizable request timeout, default 20s, and auto-retry on error
+7. **Timeout & Retry**: Customizable request timeout, default 30s, and auto-retry on error
 8. **DevTools**: `Ctrl+I` overlays webpage with devtools showing all requests and responses, timing, and JSON structure.
 9. **Request History**: Stores all request and response data in global `grab.log` object
 10. **Pagination Infinite Scroll**: Built-in pagination for infinite scroll to auto-load and merge next result page, with scroll position recovery.
@@ -61,12 +44,12 @@ npm i grab-api.js
 17. **Request Stategies**: [🎯 Examples](https://grab.js.org/guide/Examples) show common stategies like debounce, repeat, proxy, unit tests, interceptors, file upload, etc
 18. **Rate Limiting**: Built-in rate limiting to prevent multi-click cascading responses, require to wait seconds between requests.
 19. **Repeat**: Repeat request this many times, or repeat every X seconds to poll for updates.
-20. **Loading Icons**: Import from `grab-api.js/icons` to get enhanced animated loading icons.
+20. **Loading Icons**: Import from `grab-url/icons` to get enhanced animated loading icons.
 
 ### Examples
 
 ```ts
-import grab from 'grab-api.js';
+import grab from 'grab-url';
 
 let res = $state({}) as {
   results: Array<{title:string}>,
@@ -138,7 +121,7 @@ grab('user').then(log)
 
 ### Comparison of HTTP Request Libraries
 
-| Feature | [GRAB](https://github.com/vtempest/grab-api) | [Axios](https://github.com/axios/axios) | [TanStack Query](https://github.com/TanStack/query) | [SWR](https://github.com/vercel/swr) | [Alova](https://github.com/alovajs/alova) | [SuperAgent](https://github.com/ladjs/superagent) | [Apisauce](https://github.com/infinitered/apisauce) | [Ky](https://github.com/sindresorhus/ky) |
+| Feature | [GRAB](https://github.com/vtempest/GRAB-URL) | [Axios](https://github.com/axios/axios) | [TanStack Query](https://github.com/TanStack/query) | [SWR](https://github.com/vercel/swr) | [Alova](https://github.com/alovajs/alova) | [SuperAgent](https://github.com/ladjs/superagent) | [Apisauce](https://github.com/infinitered/apisauce) | [Ky](https://github.com/sindresorhus/ky) |
 | :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- | 
 | Size | ✅ 3KB | ❌ 13KB | ❌ 39KB | ❌ 4.2KB | ⚠️ 4KB | ❌ 19KB | ❌ 15KB (with axios) | ⚠️ 4KB |
 | Zero Dependencies | ✅ Yes | ❌ No | ❌ No | ❌ No | ✅ Yes | ❌ No | ❌ Needs Axios | ✅ Yes |
@@ -162,3 +145,6 @@ grab('user').then(log)
 **Why fetch things when you can just GRAB?**
 
 **Debugging requests is a bitch. [Make the switch!](https://grab.js.org/guide/Comparisons)**
+
+
+🌟 Star this repo so it will grow and get updates! 

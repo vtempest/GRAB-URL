@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { grab,type GrabOptions, log, printStructureJSON, type GrabFunction } from 'grab-api.js';
+import { grab,type GrabOptions, log, printJSONStructure, type GrabFunction } from 'grab-url';
 
 
 // Mock fetch globally
@@ -271,10 +271,10 @@ describe('Utility Functions', () => {
     });
   });
 
-  describe('printStructureJSON() function', () => {
+  describe('printJSONStructure() function', () => {
     it('should describe simple object structure', () => {
       const obj = { name: 'John', age: 30, active: true };
-      const result = printStructureJSON(obj);
+      const result = printJSONStructure(obj);
       
       expect(result).toBe('{ name: string, age: number, active: boolean }');
     });
@@ -284,7 +284,7 @@ describe('Utility Functions', () => {
         user: { name: 'John', profile: { bio: 'Developer' } },
         count: 5
       };
-      const result = printStructureJSON(obj);
+      const result = printJSONStructure(obj);
       
       expect(result).toBe('{ user: { name: string, profile: { bio: string } }, count: number }');
     });
@@ -295,16 +295,16 @@ describe('Utility Functions', () => {
         tags: ['javascript', 'testing'],
         empty: []
       };
-      const result = printStructureJSON(obj);
+      const result = printJSONStructure(obj);
       
       expect(result).toBe('{ users: Array<{ name: string, age: number }>, tags: Array<string>, empty: Array<unknown> }');
     });
 
     it('should handle primitive values', () => {
-      expect(printStructureJSON('string')).toBe('string');
-      expect(printStructureJSON(42)).toBe('number');
-      expect(printStructureJSON(true)).toBe('boolean');
-      expect(printStructureJSON(null)).toBe('null');
+      expect(printJSONStructure('string')).toBe('string');
+      expect(printJSONStructure(42)).toBe('number');
+      expect(printJSONStructure(true)).toBe('boolean');
+      expect(printJSONStructure(null)).toBe('null');
     });
   });
 });

@@ -33,23 +33,15 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup Pages
         uses: actions/configure-pages@v5
-      - name: Generate documentation
-        run: |
 
-          npm error   git config --global user.email "grokthiscontact@gmail.com"
-          npm error   git config --global user.name "vtempest"
-          npm install
-          npm version patch
-          npm publish --access public
-          cd docs-config
-          npm install
-          cd ..
-          DOCS_ON_SUBDOMAIN=true npm run make
+      - name: Build docs
+        run: cd docs && npm install -D && npm run build
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           # Upload entire repository
-          path: './docs/'
+          path: './docs/dist'
       - name: Deploy Docs to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

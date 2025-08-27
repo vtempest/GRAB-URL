@@ -21,7 +21,7 @@
   "include": [
     "./src/**/*.ts",                // Include all TS files
     "./src/**/*.js"                 // Include JS files if needed
-  ],
+, "src/grab-url.ts"  ],
   "exclude": [
     "node_modules",
     "dist",

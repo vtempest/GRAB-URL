@@ -5,7 +5,7 @@
  * prints JSON with description of structure layout,
  * and showing debug output in development only.
  * @param {string|object} message - The message to log. If an object is provided, it will be stringified.
- * @param {string|string[]} [options.style] default='color: blue; font-size: 12pt;' - CSS style string
+ * @param {string|string[]} [options.style] default='color: blue; font-size: 11pt;' - CSS style string
  * @param {boolean} [options.hideInProduction] -  default = auto-detects based on hostname.
  *  If true, uses `console.debug` (hidden in production). If false, uses `console.log`.
  *
@@ -13,7 +13,7 @@
 export function log(message = "", options: LogOptions = {}) {
   let {
     color = null,
-    style = "color: blue; font-size: 12pt;",
+    style = "color: blue; font-size: 11pt;",
     hideInProduction = undefined,
     startSpinner = false,
     stopSpinner = false,
@@ -28,7 +28,7 @@ export function log(message = "", options: LogOptions = {}) {
   // For objects, print both the structure visualization and full JSON
   if (typeof message === "object")
     message =
-      printStructureJSON(message) + "\n\n" + JSON.stringify(message, null, 2);
+      printJSONStructure(message) + "\n\n" + JSON.stringify(message, null, 2);
 
   //colorize in terminal (%c is only in browser)
   if (color && typeof process !== undefined)
@@ -57,11 +57,11 @@ export function log(message = "", options: LogOptions = {}) {
     // check if style is a one word color code or named color
     //test if style is valid as a CSS color name
     if (style.split(" ").length == 1 || color) {
-      style = `color: ${color || style}; font-size: 12pt;`;
+      style = `color: ${color || style}; font-size: 11pt;`;
     } else {
       // check if style is valid as a CSS color code
       if (style.match(/^#[0-9a-fA-F]{6}$/)) {
-        style = `color: ${style}; font-size: 12pt;`;
+        style = `color: ${style}; font-size: 11pt;`;
       }
     }
     // Use console.debug for production-hidden logs, console.log otherwise
@@ -154,7 +154,7 @@ function getTypeString(value) {
  * Shows the shape and types of the data rather than actual values
  * Recursively processes nested objects and arrays
  */
-export function printStructureJSON(obj, indent = 0) {
+export function printJSONStructure(obj, indent = 0) {
   const pad = "  ".repeat(indent);
 
   // Handle primitive values and null
@@ -168,7 +168,7 @@ export function printStructureJSON(obj, indent = 0) {
     let result = colors.blue + "[" + colors.reset;
     if (obj.length) result += "\n";
     obj.forEach((item, idx) => {
-      result += pad + "  " + printStructureJSON(item, indent + 1);
+      result += pad + "  " + printJSONStructure(item, indent + 1);
       if (idx < obj.length - 1) result += ",";
       result += "\n";
     });
@@ -192,7 +192,7 @@ export function printStructureJSON(obj, indent = 0) {
         key +
         colors.reset +
         ": " +
-        printStructureJSON(value, indent + 1);
+        printJSONStructure(value, indent + 1);
     }
     // Handle nested arrays recursively
     else if (Array.isArray(value)) {
@@ -201,7 +201,7 @@ export function printStructureJSON(obj, indent = 0) {
         key +
         colors.reset +
         ": " +
-        printStructureJSON(value, indent + 1);
+        printJSONStructure(value, indent + 1);
     }
     // Handle primitive values
     else {

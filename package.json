@@ -1,19 +1,20 @@
 {
-  "name": "grab-api.js",
-  "description": "Generate Request to API from Browser",
+  "name": "grab-url",
+  "description": "📥 Generate Request to API from Browser",
   "type": "module",
-  "version": "0.9.130",
+  "version": "0.8.5",
   "author": "vtempest",
-  "license": "MIT",
+  "license": "rights.institute/prosper",
   "repository": {
     "type": "git",
-    "url": "https://github.com/vtempest/GRAB-API"
+    "url": "https://github.com/vtempest/GRAB-URL"
   },
   "main": "./dist/grab-api.cjs.js",
   "types": "./dist/grab-api.d.ts",
   "module": "./dist/grab-api.es.js",
   "bin": {
-    "grab": "./src/grab-cli.js"
+    "grab": "./src/grab-url.js",
+    "grab-url": "./src/grab-url.js"
   },
   "exports": {
     ".": {
@@ -33,17 +34,21 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "src",
+    "src/grab-api.ts",
+    "src/grab-url.ts",
+    "src/icons/cli/spinners.json"
   ],
   "scripts": {
-    "publish:npm": "npm version patch && npm publish --access public",
+    "down": "bun test command.test.js",
     "make": "npm run make:icons; npm run make:docs; npm run make:main",
-    "make:docs": "cd docs-config && npm run make:docs",
-    "make:icons": "npx export-svg-typescript@latest -i ./src/icons -o ./src/icons/index.ts",
+    "make:docs": "cd docs-config && npm run build",
+    "make:icons": "npx export-svg-typescript@latest -i ./src/icons/svg -o ./src/icons/svg/index.ts",
     "make:main": "vite build",
+    "ship": "npx standard-version --release-as patch; npm publish",
     "check": "vitest --ui",
-    "docs": "cd docs-config && npm run docs",
-    "demo": "bun src/grab-cli.js https://raw.githubusercontent.com/vtempest/ai-research-agent/refs/heads/master/packages/ai-research-agent/src/wordlists/dictionary-index-152k.json"
+    "docs": "cd docs-config && npm run docs"
   },
   "devDependencies": {
     "@vitest/ui": "^3.1.4",
@@ -65,5 +70,14 @@
     "mock-api",
     "fetch",
     "http"
-  ]
+  ],
+  "dependencies": {
+    "@types/node": "^24.2.1",
+    "chalk": "^5.4.1",
+    "cli-progress": "^3.12.0",
+    "cli-spinners": "^3.2.0",
+    "cli-table3": "^0.6.5",
+    "node-global-key-listener": "^0.3.0",
+    "ora": "^8.2.0"
+  }
 }

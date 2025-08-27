@@ -8,8 +8,8 @@ export default defineConfig({
       insertTypesEntry: true,
       include: [
         'src/**/*.ts',
-        'src/icons/index.ts',
-        'src/icons/index.d.ts'
+        'src/icons/svg/index.ts',
+        'src/icons/svg/index.d.ts'
       ],
       outDir: 'dist',
       rollupTypes: true,

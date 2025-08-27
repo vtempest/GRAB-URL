@@ -32,3 +32,13 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 
 # Finder (MacOS) folder config
 .DS_Store
+
+.docusaurus/
+bun.lock*
+create-api-docs/docs
+test-downloads/
+test/test-downloads
+.source/
+.next/
+.grab-downloads/
+docs/dist/

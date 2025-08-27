@@ -1,7 +1,7 @@
 function log(message = "", options = {}) {
   let {
     color = null,
-    style = "color: blue; font-size: 12pt;",
+    style = "color: blue; font-size: 11pt;",
     hideInProduction = void 0,
     startSpinner = false,
     stopSpinner = false
@@ -9,49 +9,72 @@ function log(message = "", options = {}) {
   if (typeof hideInProduction === "undefined")
     hideInProduction = typeof window !== "undefined" && (window == null ? void 0 : window.location.hostname.includes("localhost"));
   if (typeof message === "object")
-    message = printStructureJSON(message) + "\n\n" + JSON.stringify(message, null, 2);
-  if (style.split(" ").length == 1 || color) {
-    style = `color: ${style || color}; font-size: 12pt;`;
-  } else {
-    if (style.match(/^#[0-9a-fA-F]{6}$/)) {
-      style = `color: ${style}; font-size: 12pt;`;
-    }
-  }
+    message = printJSONStructure(message) + "\n\n" + JSON.stringify(message, null, 2);
+  if (color && typeof process !== void 0)
+    message = (colors[color] || "") + message + colors.reset;
   var i = 0;
   if (startSpinner)
     (global || globalThis).interval = setInterval(() => {
       process.stdout.write(
-        "\r" + "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏".split("")[i = ++i % 10] + " " + message
+        (colors[color] || "") + "\r" + "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏".split("")[i = ++i % 10] + " " + message + colors.reset
       );
     }, 50);
   else if (stopSpinner) {
     clearInterval((global || globalThis).interval);
-    process.stdout.write("\r" + message + " ".repeat(message.length) + "\n");
+    process.stdout.write(
+      "\r" + (message || "✔ Done") + " ".repeat(message.length + 20) + "\n"
+    );
   } else if (typeof style === "string") {
-    if (hideInProduction) console.debug((style ? "%c" : "") + message, style);
-    else console.log((style ? "%c" : "") + message, style);
+    if (style.split(" ").length == 1 || color) {
+      style = `color: ${color || style}; font-size: 11pt;`;
+    } else {
+      if (style.match(/^#[0-9a-fA-F]{6}$/)) {
+        style = `color: ${style}; font-size: 11pt;`;
+      }
+    }
+    if (hideInProduction)
+      console.debug((style ? "%c" : "") + (message || ""), style);
+    else console.log((style ? "%c" : "") + (message || ""), style);
   } else if (typeof style === "object") console.log(message, ...style);
   return true;
 }
 const colors = {
   reset: "\x1B[0m",
   // Reset to default color
-  yellow: "\x1B[33m",
-  // Used for strings
-  cyan: "\x1B[36m",
-  // Used for numbers
-  magenta: "\x1B[35m",
-  // Used for booleans
-  gray: "\x1B[90m",
-  // Used for null values
-  green: "\x1B[32m",
-  // Used for object braces
-  blue: "\x1B[34m",
-  // Used for array brackets
+  black: "\x1B[30m",
   red: "\x1B[31m",
-  // Used for functions
-  white: "\x1B[37m"
-  // Default color
+  // Functions, errors
+  green: "\x1B[32m",
+  // Object braces, success
+  yellow: "\x1B[33m",
+  // Strings, warnings
+  blue: "\x1B[34m",
+  // Array brackets, info
+  magenta: "\x1B[35m",
+  // Booleans
+  cyan: "\x1B[36m",
+  // Numbers
+  white: "\x1B[37m",
+  // Default color, plain text
+  gray: "\x1B[90m",
+  // Null, undefined, subtle
+  // Bright variants
+  brightRed: "\x1B[91m",
+  brightGreen: "\x1B[92m",
+  brightYellow: "\x1B[93m",
+  brightBlue: "\x1B[94m",
+  brightMagenta: "\x1B[95m",
+  brightCyan: "\x1B[96m",
+  brightWhite: "\x1B[97m",
+  // Background colors (optional)
+  bgRed: "\x1B[41m",
+  bgGreen: "\x1B[42m",
+  bgYellow: "\x1B[43m",
+  bgBlue: "\x1B[44m",
+  bgMagenta: "\x1B[45m",
+  bgCyan: "\x1B[46m",
+  bgWhite: "\x1B[47m",
+  bgGray: "\x1B[100m"
 };
 function getColorForType(value) {
   if (typeof value === "string") return colors.yellow;
@@ -76,7 +99,7 @@ function getTypeString(value) {
   if (typeof value === "object") return "{...}";
   return typeof value;
 }
-function printStructureJSON(obj, indent = 0) {
+function printJSONStructure(obj, indent = 0) {
   const pad = "  ".repeat(indent);
   if (typeof obj !== "object" || obj === null) {
     const color = getColorForType(obj);
@@ -86,7 +109,7 @@ function printStructureJSON(obj, indent = 0) {
     let result2 = colors.blue + "[" + colors.reset;
     if (obj.length) result2 += "\n";
     obj.forEach((item, idx) => {
-      result2 += pad + "  " + printStructureJSON(item, indent + 1);
+      result2 += pad + "  " + printJSONStructure(item, indent + 1);
       if (idx < obj.length - 1) result2 += ",";
       result2 += "\n";
     });
@@ -101,9 +124,9 @@ function printStructureJSON(obj, indent = 0) {
     const color = getColorForType(value);
     result += pad + "  ";
     if (typeof value === "object" && value !== null && !Array.isArray(value)) {
-      result += color + key + colors.reset + ": " + printStructureJSON(value, indent + 1);
+      result += color + key + colors.reset + ": " + printJSONStructure(value, indent + 1);
     } else if (Array.isArray(value)) {
-      result += color + key + colors.reset + ": " + printStructureJSON(value, indent + 1);
+      result += color + key + colors.reset + ": " + printJSONStructure(value, indent + 1);
     } else {
       result += color + key + ": " + getTypeString(value) + colors.reset;
     }
@@ -172,7 +195,7 @@ async function grab$1(path, options) {
     // Minimum seconds between requests
     debug = false,
     // Auto-enable debug on localhost
-    // typeof window !== "undefined" && window?.location?.hostname?.includes("localhost"), 
+    // typeof window !== "undefined" && window?.location?.hostname?.includes("localhost"),
     infiniteScroll = null,
     // page key, response field to concatenate, element with results
     setDefaults = false,
@@ -212,8 +235,10 @@ async function grab$1(path, options) {
     ...typeof window !== "undefined" ? (_a = window == null ? void 0 : window.grab) == null ? void 0 : _a.defaults : ((_c = (_b = global || globalThis) == null ? void 0 : _b.grab) == null ? void 0 : _c.defaults) || {},
     ...options
   };
-  if (path.startsWith("http:") || path.startsWith("https:")) baseURL = "";
-  else if (!path.startsWith("/") && !path.startsWith("http:") && !baseURL.endsWith("/")) path = "/" + path;
+  let s = (t) => path.startsWith(t);
+  if (s("http:") || s("https:")) baseURL = "";
+  else if (!s("/") && !baseURL.endsWith("/")) path = "/" + path;
+  else if (s("/") && baseURL.endsWith("/")) path = path.slice(1);
   try {
     if (debounce > 0)
       return await debouncer(async () => {
@@ -235,20 +260,20 @@ async function grab$1(path, options) {
       if (typeof window !== "undefined")
         window.grab.defaults = { ...options, setDefaults: void 0 };
       else if (typeof (global || globalThis).grab !== "undefined")
-        (global || globalThis).grab.defaults = { ...options, setDefaults: void 0 };
+        (global || globalThis).grab.defaults = {
+          ...options,
+          setDefaults: void 0
+        };
       return;
     }
     if (typeof window !== void 0) {
       const regrab = async () => await grab$1(path, { ...options, cache: false });
-      if (regrabOnStale && cache)
-        setTimeout(regrab, 1e3 * cacheForTime);
-      if (regrabOnNetwork)
-        window.addEventListener("online", regrab);
+      if (regrabOnStale && cache) setTimeout(regrab, 1e3 * cacheForTime);
+      if (regrabOnNetwork) window.addEventListener("online", regrab);
       if (regrabOnFocus) {
         window.addEventListener("focus", regrab);
         document.addEventListener("visibilitychange", async () => {
-          if (document.visibilityState === "visible")
-            await regrab();
+          if (document.visibilityState === "visible") await regrab();
         });
       }
     }
@@ -258,7 +283,10 @@ async function grab$1(path, options) {
     if ((infiniteScroll == null ? void 0 : infiniteScroll.length) && typeof window == "undefined") {
       let paginateDOM = typeof paginateElement === "string" ? document.querySelector(paginateElement) : paginateElement;
       if (paginateDOM)
-        paginateDOM.removeEventListener("scroll", (_d = window ?? globalThis) == null ? void 0 : _d.scrollListener);
+        paginateDOM.removeEventListener(
+          "scroll",
+          (_d = window ?? globalThis) == null ? void 0 : _d.scrollListener
+        );
       (window ?? globalThis).scrollListener = paginateDOM.addEventListener(
         "scroll",
         async ({ target }) => {
@@ -299,8 +327,7 @@ async function grab$1(path, options) {
       if (priorRequest) priorRequest.currentPage = pageNumber;
       params[paginateKey] = pageNumber;
     }
-    if (resFunction)
-      resFunction({ isLoading: true });
+    if (resFunction) resFunction({ isLoading: true });
     else if (typeof response === "object") response.isLoading = true;
     if (resFunction) response = resFunction(response);
     if (rateLimit > 0 && (priorRequest == null ? void 0 : priorRequest.lastFetchTime) && priorRequest.lastFetchTime > Date.now() - 1e3 * rateLimit)
@@ -332,7 +359,8 @@ async function grab$1(path, options) {
     let paramsGETRequest = "";
     if (["POST", "PUT", "PATCH"].includes(method))
       fetchParams.body = params.body || JSON.stringify(params);
-    else paramsGETRequest = (Object.keys(params).length ? "?" : "") + new URLSearchParams(params).toString();
+    else
+      paramsGETRequest = (Object.keys(params).length ? "?" : "") + new URLSearchParams(params).toString();
     if (typeof onRequest === "function")
       [path, response, params, fetchParams] = onRequest(
         path,
@@ -341,7 +369,7 @@ async function grab$1(path, options) {
         fetchParams
       );
     let res = null, startTime = /* @__PURE__ */ new Date(), mockHandler = (_i = grab$1.mock) == null ? void 0 : _i[path];
-    let wait = (s) => new Promise((res2) => setTimeout(res2, s * 1e3 || 0));
+    let wait = (s2) => new Promise((res2) => setTimeout(res2, s2 * 1e3 || 0));
     if (mockHandler && (!mockHandler.params || mockHandler.method == method) && (!mockHandler.params || paramsAsText == JSON.stringify(mockHandler.params))) {
       await wait(mockHandler.delay);
       res = typeof mockHandler.response === "function" ? mockHandler.response(params) : mockHandler.response;
@@ -354,11 +382,11 @@ async function grab$1(path, options) {
       if (!res.ok)
         throw new Error(`HTTP error: ${res.status} ${res.statusText}`);
       let type = res.headers.get("content-type");
-      if (onStream)
-        await onStream(res.body);
-      else res = await (type ? type.includes("application/json") ? res && res.json() : type.includes("application/pdf") || type.includes("application/octet-stream") ? res.blob() : res.text() : res.json()).catch((e) => {
-        throw new Error("Error parsing response: " + e);
-      });
+      if (onStream) await onStream(res.body);
+      else
+        res = await (type ? type.includes("application/json") ? res && res.json() : type.includes("application/pdf") || type.includes("application/octet-stream") ? res.blob() : res.text() : res.json()).catch((e) => {
+          throw new Error("Error parsing response: " + e);
+        });
     }
     if (typeof onResponse === "function")
       [path, response, params, fetchParams] = onResponse(
@@ -367,22 +395,19 @@ async function grab$1(path, options) {
         params,
         fetchParams
       );
-    if (resFunction)
-      resFunction({ isLoading: void 0 });
+    if (resFunction) resFunction({ isLoading: void 0 });
     else if (typeof response === "object") response == null ? true : delete response.isLoading;
     priorRequest == null ? true : delete priorRequest.controller;
     const elapsedTime = ((Number(/* @__PURE__ */ new Date()) - Number(startTime)) / 1e3).toFixed(1);
     if (debug) {
       logger(
-        "Path:" + baseURL + path + paramsGETRequest + "\n" + JSON.stringify(options, null, 2) + "\nTime: " + elapsedTime + "s\nResponse: " + printStructureJSON(res)
+        "Path:" + baseURL + path + paramsGETRequest + "\n" + JSON.stringify(options, null, 2) + "\nTime: " + elapsedTime + "s\nResponse: " + printJSONStructure(res)
       );
     }
-    if (typeof res === "undefined") return;
     if (typeof res === "object") {
       for (let key of Object.keys(res))
         response[key] = paginateResult == key && ((_j = response[key]) == null ? void 0 : _j.length) ? [...response[key], ...res[key]] : res[key];
-      if (typeof response !== "undefined")
-        response.data = res;
+      if (typeof response !== "undefined") response.data = res;
     } else if (resFunction) resFunction({ data: res, ...res });
     else if (typeof response === "object") response.data = res;
     if (typeof grab$1.log != "undefined")
@@ -398,18 +423,14 @@ async function grab$1(path, options) {
     let errorMessage = "Error: " + error.message + "\nPath:" + baseURL + path + "\n";
     JSON.stringify(params);
     if (typeof onError === "function")
-      onError(
-        error.message,
-        baseURL + path,
-        params
-      );
+      onError(error.message, baseURL + path, params);
     if (options.retryAttempts > 0)
       return await grab$1(path, {
         ...options,
         retryAttempts: --options.retryAttempts
       });
     if (!error.message.includes("signal") && options.debug) {
-      logger(errorMessage, "color: red;");
+      logger(errorMessage, { color: "red" });
       if (debug && typeof document !== void 0) showAlert(errorMessage);
     }
     response.error = error.message;
@@ -468,7 +489,7 @@ export {
   grab$1 as default,
   grab$1 as grab,
   log,
-  printStructureJSON,
+  printJSONStructure,
   showAlert
 };
 //# sourceMappingURL=grab-api.es.js.map
