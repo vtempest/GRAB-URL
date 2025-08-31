@@ -4,11 +4,11 @@
   "version": "1.1.0",
   "private": true,
   "scripts": {
-    "build": "next build --turbo; echo 'grab.js.org' > ./dist/CNAME;",
+    "build": " bun run build:compile && bun run start",
+    "build:compile": "next build --turbo; echo 'grab.js.org' > ./dist/CNAME;",
     "build:api": "node ./scripts/generate-api-docs.mjs",
     "dev": "next dev --turbo",
-    "start": "npx serve ./dist > /dev/null 2>&1 &",
-    "check": "fumadocs-mdx && tsc --noEmit"
+    "start": "bunx concurrently \"npx serve -l 3000 ./dist --single\" \"sleep 2 && bunx open-cli http://localhost:3000\"",    "check": "fumadocs-mdx && tsc --noEmit"
   },
   "dependencies": {
     "@fumadocs/mdx-remote": "^1.4.0",
