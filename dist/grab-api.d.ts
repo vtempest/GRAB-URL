@@ -39,7 +39,7 @@ declare const colors: {
  */
 /**
  * ### GRAB: Generate Request to API from Browser
- * ![GrabAPILogo](https://i.imgur.com/qrQWkeb.png)
+ * ![GrabAPILogo](https://i.imgur.com/xWD7gyV.png)
  *
  * 1. **GRAB is the FBEST Request Manager: Functionally Brilliant, Elegantly Simple Tool**: One Function, no dependencies,
  *    minimalist syntax, [more features than alternatives](https://grab.js.org/guide/Comparisons)
@@ -118,7 +118,7 @@ export { grab_2 as grab }
 export declare interface GrabFunction {
     /**
      * ### GRAB: Generate Request to API from Browser
-     * ![grabAPILogo](https://i.imgur.com/qrQWkeb.png)
+     * ![grabAPILogo](https://i.imgur.com/xWD7gyV.png)
      * Make API request with path
      * @returns {Promise<Object>} The response object with resulting data or .error if error.
      * @author [vtempest (2025)](https://github.com/vtempest/GRAB-URL)
@@ -127,7 +127,7 @@ export declare interface GrabFunction {
     <TResponse = any, TParams = Record<string, any>>(path: string): Promise<GrabResponse<TResponse>>;
     /**
      * ### GRAB: Generate Request to API from Browser
-     * ![grabAPILogo](https://i.imgur.com/qrQWkeb.png)
+     * ![grabAPILogo](https://i.imgur.com/xWD7gyV.png)
      * Make API request with path and options/parameters
      * @returns {Promise<Object>} The response object with resulting data or .error if error.
      * @author [vtempest (2025)](https://github.com/vtempest/GRAB-URL)
@@ -207,7 +207,7 @@ export declare type GrabOptions<TResponse = any, TParams = any> = TParams & {
     /** default=false Whether to log the request and response */
     debug?: boolean;
     /** default=null [page key, response field to concatenate, element with results] */
-    infiniteScroll?: [string, string, string];
+    infiniteScroll?: [string, string, string | HTMLElement];
     /** default=false Pass this with options to set those options as defaults for all requests */
     setDefaults?: boolean;
     /** default=0 Retry failed requests this many times */
@@ -270,7 +270,7 @@ export declare type GrabResponse<TResponse = any> = TResponse & {
  *  If true, uses `console.debug` (hidden in production). If false, uses `console.log`.
  *
  */
-declare function log_2(message?: string, options?: LogOptions): boolean;
+declare function log_2(message?: string | object, options?: LogOptions): boolean;
 export { log_2 as log }
 
 export declare interface LogFunction {

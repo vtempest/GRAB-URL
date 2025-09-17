@@ -19,7 +19,7 @@ export default defineConfig({
     lib: {
         entry: {
           'grab-api': resolve(__dirname, 'src/grab-api.ts'),
-          'icons': resolve(__dirname, 'src/icons/index.ts')
+          'icons': resolve(__dirname, 'src/icons/svg/index.ts')
         },
       formats: ['es', 'cjs'],
       fileName: (format, entryName) => `${entryName}.${format}.js`

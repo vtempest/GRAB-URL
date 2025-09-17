@@ -1,5 +1,5 @@
 ---
-title: Performance Best Practices
+title: ⚡️ Performance Best Practices
 ---
 
 ## Best Practices

@@ -13,7 +13,10 @@ export {
     loadingReloadArrow,
     loadingRing,
     loadingSpinner,
-} from '../src/icons';
+    loadingDoubleRing,
+    loadingGears,
+    loadingSpinner
+} from '../dist/icons';
 
 
 

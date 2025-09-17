@@ -1,7 +1,7 @@
 function log(message = "", options = {}) {
   let {
     color = null,
-    style = "color: blue; font-size: 11pt;",
+    style = "color: #66ccff; font-size: 10pt;",
     hideInProduction = void 0,
     startSpinner = false,
     stopSpinner = false
@@ -173,7 +173,7 @@ function setupDevTools() {
   });
 }
 async function grab$1(path, options) {
-  var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l;
+  var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j;
   let {
     headers,
     response = {},
@@ -239,213 +239,182 @@ async function grab$1(path, options) {
   if (s("http:") || s("https:")) baseURL = "";
   else if (!s("/") && !baseURL.endsWith("/")) path = "/" + path;
   else if (s("/") && baseURL.endsWith("/")) path = path.slice(1);
-  try {
-    if (debounce > 0)
-      return await debouncer(async () => {
-        await grab$1(path, { ...options, debounce: 0 });
-      }, debounce * 1e3);
-    if (repeat > 1) {
-      for (let i = 0; i < repeat; i++) {
-        await grab$1(path, { ...options, repeat: 0 });
-      }
-      return response;
+  if (debounce > 0)
+    return await debouncer(async () => {
+      await grab$1(path, { ...options, debounce: 0 });
+    }, debounce * 1e3);
+  if (repeat > 1) {
+    for (let i = 0; i < repeat; i++) {
+      await grab$1(path, { ...options, repeat: 0 });
     }
-    if (repeatEvery) {
-      setInterval(async () => {
-        await grab$1(path, { ...options, repeat: 0, repeatEvery: null });
-      }, repeatEvery * 1e3);
-      return response;
-    }
-    if (options == null ? void 0 : options.setDefaults) {
-      if (typeof window !== "undefined")
-        window.grab.defaults = { ...options, setDefaults: void 0 };
-      else if (typeof (global || globalThis).grab !== "undefined")
-        (global || globalThis).grab.defaults = {
-          ...options,
-          setDefaults: void 0
-        };
-      return;
-    }
-    if (typeof window !== void 0) {
-      const regrab = async () => await grab$1(path, { ...options, cache: false });
-      if (regrabOnStale && cache) setTimeout(regrab, 1e3 * cacheForTime);
-      if (regrabOnNetwork) window.addEventListener("online", regrab);
-      if (regrabOnFocus) {
-        window.addEventListener("focus", regrab);
-        document.addEventListener("visibilitychange", async () => {
-          if (document.visibilityState === "visible") await regrab();
-        });
-      }
-    }
-    let resFunction = typeof response === "function" ? response : null;
-    if (!response || resFunction) response = {};
-    var [paginateKey, paginateResult, paginateElement] = infiniteScroll || [];
-    if ((infiniteScroll == null ? void 0 : infiniteScroll.length) && typeof window == "undefined") {
-      let paginateDOM = typeof paginateElement === "string" ? document.querySelector(paginateElement) : paginateElement;
-      if (paginateDOM)
-        paginateDOM.removeEventListener(
-          "scroll",
-          (_d = window ?? globalThis) == null ? void 0 : _d.scrollListener
-        );
-      (window ?? globalThis).scrollListener = paginateDOM.addEventListener(
-        "scroll",
-        async ({ target }) => {
-          const t = target;
-          localStorage.setItem(
-            "scroll",
-            JSON.stringify([t.scrollTop, t.scrollLeft, paginateElement])
-          );
-          if (t.scrollHeight - t.scrollTop <= t.clientHeight + 200) {
-            await grab$1(path, {
-              ...options,
-              cache: false,
-              [paginateKey]: (priorRequest == null ? void 0 : priorRequest.currentPage) + 1
-            });
-          }
-        }
-      );
-    }
-    let paramsAsText = JSON.stringify(
-      paginateKey ? { ...params, [paginateKey]: void 0 } : params
-    );
-    let priorRequest = (_e = grab$1 == null ? void 0 : grab$1.log) == null ? void 0 : _e.find(
-      (e) => e.request == paramsAsText && e.path == path
-    );
-    if (!paginateKey) {
-      for (let key of Object.keys(response)) response[key] = void 0;
-      if (cache && (!cacheForTime || (priorRequest == null ? void 0 : priorRequest.lastFetchTime) > Date.now() - 1e3 * cacheForTime)) {
-        for (let key of Object.keys(priorRequest.res))
-          response[key] = priorRequest.res[key];
-        if (resFunction) response = resFunction(response);
-      }
-    } else {
-      let pageNumber = (priorRequest == null ? void 0 : priorRequest.currentPage) + 1 || (params == null ? void 0 : params[paginateKey]) || 1;
-      if (!priorRequest) {
-        response[paginateResult] = [];
-        pageNumber = 1;
-      }
-      if (priorRequest) priorRequest.currentPage = pageNumber;
-      params[paginateKey] = pageNumber;
-    }
-    if (resFunction) resFunction({ isLoading: true });
-    else if (typeof response === "object") response.isLoading = true;
-    if (resFunction) response = resFunction(response);
-    if (rateLimit > 0 && (priorRequest == null ? void 0 : priorRequest.lastFetchTime) && priorRequest.lastFetchTime > Date.now() - 1e3 * rateLimit)
-      throw new Error(`Fetch rate limit exceeded for ${path}. 
-        Wait ${rateLimit}s between requests.`);
-    if (priorRequest == null ? void 0 : priorRequest.controller) {
-      if (cancelOngoingIfNew) priorRequest.controller.abort();
-      else if (cancelNewIfOngoing) return { isLoading: true };
-    }
-    if (typeof grab$1.log != "undefined")
-      (_f = grab$1.log) == null ? void 0 : _f.unshift({
-        path,
-        request: paramsAsText,
-        lastFetchTime: Date.now(),
-        controller: new AbortController()
-      });
-    let fetchParams = {
-      method,
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        ...headers
-      },
-      body: params.body,
-      redirect: "follow",
-      cache: cache ? "force-cache" : "no-store",
-      signal: cancelOngoingIfNew ? (_h = (_g = grab$1.log[0]) == null ? void 0 : _g.controller) == null ? void 0 : _h.signal : AbortSignal.timeout(timeout * 1e3)
-    };
-    let paramsGETRequest = "";
-    if (["POST", "PUT", "PATCH"].includes(method))
-      fetchParams.body = params.body || JSON.stringify(params);
-    else
-      paramsGETRequest = (Object.keys(params).length ? "?" : "") + new URLSearchParams(params).toString();
-    if (typeof onRequest === "function")
-      [path, response, params, fetchParams] = onRequest(
-        path,
-        response,
-        params,
-        fetchParams
-      );
-    let res = null, startTime = /* @__PURE__ */ new Date(), mockHandler = (_i = grab$1.mock) == null ? void 0 : _i[path];
-    let wait = (s2) => new Promise((res2) => setTimeout(res2, s2 * 1e3 || 0));
-    if (mockHandler && (!mockHandler.params || mockHandler.method == method) && (!mockHandler.params || paramsAsText == JSON.stringify(mockHandler.params))) {
-      await wait(mockHandler.delay);
-      res = typeof mockHandler.response === "function" ? mockHandler.response(params) : mockHandler.response;
-    } else {
-      res = await fetch(baseURL + path + paramsGETRequest, fetchParams).catch(
-        (e) => {
-          throw new Error(e);
-        }
-      );
-      if (!res.ok)
-        throw new Error(`HTTP error: ${res.status} ${res.statusText}`);
-      let type = res.headers.get("content-type");
-      if (onStream) await onStream(res.body);
-      else
-        res = await (type ? type.includes("application/json") ? res && res.json() : type.includes("application/pdf") || type.includes("application/octet-stream") ? res.blob() : res.text() : res.json()).catch((e) => {
-          throw new Error("Error parsing response: " + e);
-        });
-    }
-    if (typeof onResponse === "function")
-      [path, response, params, fetchParams] = onResponse(
-        path,
-        response,
-        params,
-        fetchParams
-      );
-    if (resFunction) resFunction({ isLoading: void 0 });
-    else if (typeof response === "object") response == null ? true : delete response.isLoading;
-    priorRequest == null ? true : delete priorRequest.controller;
-    const elapsedTime = ((Number(/* @__PURE__ */ new Date()) - Number(startTime)) / 1e3).toFixed(1);
-    if (debug) {
-      logger(
-        "Path:" + baseURL + path + paramsGETRequest + "\n" + JSON.stringify(options, null, 2) + "\nTime: " + elapsedTime + "s\nResponse: " + printJSONStructure(res)
-      );
-    }
-    if (typeof res === "object") {
-      for (let key of Object.keys(res))
-        response[key] = paginateResult == key && ((_j = response[key]) == null ? void 0 : _j.length) ? [...response[key], ...res[key]] : res[key];
-      if (typeof response !== "undefined") response.data = res;
-    } else if (resFunction) resFunction({ data: res, ...res });
-    else if (typeof response === "object") response.data = res;
-    if (typeof grab$1.log != "undefined")
-      (_k = grab$1.log) == null ? void 0 : _k.unshift({
-        path,
-        request: JSON.stringify({ ...params, paginateKey: void 0 }),
-        response,
-        lastFetchTime: Date.now()
-      });
-    if (resFunction) response = resFunction(response);
-    return response;
-  } catch (error) {
-    let errorMessage = "Error: " + error.message + "\nPath:" + baseURL + path + "\n";
-    JSON.stringify(params);
-    if (typeof onError === "function")
-      onError(error.message, baseURL + path, params);
-    if (options.retryAttempts > 0)
-      return await grab$1(path, {
-        ...options,
-        retryAttempts: --options.retryAttempts
-      });
-    if (!error.message.includes("signal") && options.debug) {
-      logger(errorMessage, { color: "red" });
-      if (debug && typeof document !== void 0) showAlert(errorMessage);
-    }
-    response.error = error.message;
-    if (typeof response === "function") {
-      response.data = response({ isLoading: void 0, error: error.message });
-      response = response.data;
-    } else response == null ? true : delete response.isLoading;
-    if (typeof grab$1.log != "undefined")
-      (_l = grab$1.log) == null ? void 0 : _l.unshift({
-        path,
-        request: JSON.stringify(params),
-        error: error.message
-      });
     return response;
   }
+  if (repeatEvery) {
+    setInterval(async () => {
+      await grab$1(path, { ...options, repeat: 0, repeatEvery: null });
+    }, repeatEvery * 1e3);
+    return response;
+  }
+  if (options == null ? void 0 : options.setDefaults) {
+    if (typeof window !== "undefined")
+      window.grab.defaults = { ...options, setDefaults: void 0 };
+    else if (typeof (global || globalThis).grab !== "undefined")
+      (global || globalThis).grab.defaults = {
+        ...options,
+        setDefaults: void 0
+      };
+    return;
+  }
+  if (typeof window !== void 0) {
+    const regrab = async () => await grab$1(path, { ...options, cache: false });
+    if (regrabOnStale && cache) setTimeout(regrab, 1e3 * cacheForTime);
+    if (regrabOnNetwork) window.addEventListener("online", regrab);
+    if (regrabOnFocus) {
+      window.addEventListener("focus", regrab);
+      document.addEventListener("visibilitychange", async () => {
+        if (document.visibilityState === "visible") await regrab();
+      });
+    }
+  }
+  let resFunction = typeof response === "function" ? response : null;
+  if (!response || resFunction) response = {};
+  var [paginateKey, paginateResult, paginateElement] = infiniteScroll || [];
+  if ((infiniteScroll == null ? void 0 : infiniteScroll.length) && typeof paginateElement !== "undefined" && typeof window !== "undefined") {
+    let paginateDOM = typeof paginateElement === "string" ? document.querySelector(paginateElement) : paginateElement;
+    if (!paginateDOM) log("paginateDOM not found", { color: "red" });
+    if (window.scrollListener)
+      paginateDOM.removeEventListener("scroll", window.scrollListener);
+    window.scrollListener = async (event) => {
+      const t = event.target;
+      localStorage.setItem(
+        "scroll",
+        JSON.stringify([t.scrollTop, t.scrollLeft, paginateElement])
+      );
+      if (t.scrollHeight - t.scrollTop <= t.clientHeight + 200) {
+        await grab$1(path, {
+          ...options,
+          cache: false,
+          [paginateKey]: (priorRequest == null ? void 0 : priorRequest.currentPage) + 1
+        });
+      }
+    };
+    if (paginateDOM)
+      paginateDOM.addEventListener("scroll", window.scrollListener);
+  }
+  let paramsAsText = JSON.stringify(
+    paginateKey ? { ...params, [paginateKey]: void 0 } : params
+  );
+  let priorRequest = (_d = grab$1 == null ? void 0 : grab$1.log) == null ? void 0 : _d.find(
+    (e) => e.request == paramsAsText && e.path == path
+  );
+  if (!paginateKey) {
+    for (let key of Object.keys(response)) response[key] = void 0;
+    if (cache && (!cacheForTime || (priorRequest == null ? void 0 : priorRequest.lastFetchTime) > Date.now() - 1e3 * cacheForTime)) {
+      for (let key of Object.keys(priorRequest.res))
+        response[key] = priorRequest.res[key];
+      if (resFunction) response = resFunction(response);
+    }
+  } else {
+    let pageNumber = (priorRequest == null ? void 0 : priorRequest.currentPage) + 1 || (params == null ? void 0 : params[paginateKey]) || 1;
+    if (!priorRequest) {
+      response[paginateResult] = [];
+      pageNumber = 1;
+    }
+    if (priorRequest) priorRequest.currentPage = pageNumber;
+    params[paginateKey] = pageNumber;
+  }
+  if (resFunction) resFunction({ isLoading: true });
+  else if (typeof response === "object") response.isLoading = true;
+  if (resFunction) response = resFunction(response);
+  if (rateLimit > 0 && (priorRequest == null ? void 0 : priorRequest.lastFetchTime) && priorRequest.lastFetchTime > Date.now() - 1e3 * rateLimit)
+    throw new Error(`Fetch rate limit exceeded for ${path}. 
+        Wait ${rateLimit}s between requests.`);
+  if (priorRequest == null ? void 0 : priorRequest.controller) {
+    if (cancelOngoingIfNew) priorRequest.controller.abort();
+    else if (cancelNewIfOngoing) return { isLoading: true };
+  }
+  if (typeof grab$1.log != "undefined")
+    (_e = grab$1.log) == null ? void 0 : _e.unshift({
+      path,
+      request: paramsAsText,
+      lastFetchTime: Date.now(),
+      controller: new AbortController()
+    });
+  let fetchParams = {
+    method,
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      ...headers
+    },
+    body: params.body,
+    redirect: "follow",
+    cache: cache ? "force-cache" : "no-store",
+    signal: cancelOngoingIfNew ? (_g = (_f = grab$1.log[0]) == null ? void 0 : _f.controller) == null ? void 0 : _g.signal : AbortSignal.timeout(timeout * 1e3)
+  };
+  let paramsGETRequest = "";
+  if (["POST", "PUT", "PATCH"].includes(method))
+    fetchParams.body = params.body || JSON.stringify(params);
+  else
+    paramsGETRequest = (Object.keys(params).length ? "?" : "") + new URLSearchParams(params).toString();
+  if (typeof onRequest === "function")
+    [path, response, params, fetchParams] = onRequest(
+      path,
+      response,
+      params,
+      fetchParams
+    );
+  let res = null, startTime = /* @__PURE__ */ new Date(), mockHandler = (_h = grab$1.mock) == null ? void 0 : _h[path];
+  let wait = (s2) => new Promise((res2) => setTimeout(res2, s2 * 1e3 || 0));
+  if (mockHandler && (!mockHandler.params || mockHandler.method == method) && (!mockHandler.params || paramsAsText == JSON.stringify(mockHandler.params))) {
+    await wait(mockHandler.delay);
+    res = typeof mockHandler.response === "function" ? mockHandler.response(params) : mockHandler.response;
+  } else {
+    res = await fetch(baseURL + path + paramsGETRequest, fetchParams).catch(
+      (e) => {
+        throw new Error(e);
+      }
+    );
+    if (!res.ok)
+      throw new Error(`HTTP error: ${res.status} ${res.statusText}`);
+    let type = res.headers.get("content-type");
+    if (onStream) await onStream(res.body);
+    else
+      res = await (type ? type.includes("application/json") ? res && res.json() : type.includes("application/pdf") || type.includes("application/octet-stream") ? res.blob() : res.text() : res.json()).catch((e) => {
+        throw new Error("Error parsing response: " + e);
+      });
+  }
+  if (typeof onResponse === "function")
+    [path, response, params, fetchParams] = onResponse(
+      path,
+      response,
+      params,
+      fetchParams
+    );
+  if (resFunction) resFunction({ isLoading: void 0 });
+  else if (typeof response === "object") response == null ? true : delete response.isLoading;
+  priorRequest == null ? true : delete priorRequest.controller;
+  const elapsedTime = ((Number(/* @__PURE__ */ new Date()) - Number(startTime)) / 1e3).toFixed(1);
+  if (debug) {
+    logger(
+      "Path:" + baseURL + path + paramsGETRequest + "\n" + JSON.stringify(options, null, 2) + "\nTime: " + elapsedTime + "s\nResponse: " + printJSONStructure(res)
+    );
+  }
+  if (typeof res === "object") {
+    for (let key of Object.keys(res))
+      response[key] = paginateResult == key && ((_i = response[key]) == null ? void 0 : _i.length) ? [...response[key], ...res[key]] : res[key];
+    if (typeof response !== "undefined") response.data = res;
+  } else if (resFunction) resFunction({ data: res, ...res });
+  else if (typeof response === "object") response.data = res;
+  if (typeof grab$1.log != "undefined")
+    (_j = grab$1.log) == null ? void 0 : _j.unshift({
+      path,
+      request: JSON.stringify({ ...params, paginateKey: void 0 }),
+      response,
+      lastFetchTime: Date.now()
+    });
+  if (resFunction) response = resFunction(response);
+  return response;
 }
 grab$1.instance = (defaults = {}) => (path, options = {}) => grab$1(path, { ...defaults, ...options });
 const debouncer = async (func, wait) => {

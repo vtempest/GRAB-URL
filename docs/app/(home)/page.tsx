@@ -11,7 +11,7 @@ export default function HomePage() {
           <div className="mb-4">
             <img 
               width="300" 
-              src="https://i.imgur.com/qrQWkeb.png" 
+              src="https://i.imgur.com/xWD7gyV.png" 
               alt="Grab API Logo"
               className="mx-auto rounded-lg shadow-xl"
             />
@@ -67,7 +67,7 @@ export default function HomePage() {
             </Link>
             
             <a 
-              href="https://grab.js.org/docs/guide/Examples" 
+              href="/docs/Examples" 
               className="group bg-gradient-to-r from-green-500 to-emerald-600 text-white p-4 rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
             >
               <div className="text-center">

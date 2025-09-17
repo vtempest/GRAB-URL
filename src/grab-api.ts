@@ -20,9 +20,9 @@ import {
 
 /**
  * ### GRAB: Generate Request to API from Browser
- * ![GrabAPILogo](https://i.imgur.com/qrQWkeb.png)
- * 
- * 1. **GRAB is the FBEST Request Manager: Functionally Brilliant, Elegantly Simple Tool**: One Function, no dependencies, 
+ * ![GrabAPILogo](https://i.imgur.com/xWD7gyV.png)
+ *
+ * 1. **GRAB is the FBEST Request Manager: Functionally Brilliant, Elegantly Simple Tool**: One Function, no dependencies,
  *    minimalist syntax, [more features than alternatives](https://grab.js.org/guide/Comparisons)
  * 2. **Auto-JSON Convert**: Pass parameters and get response or error in JSON, handling other data types as is.
  * 3. **isLoading Status**: Sets `.isLoading=true` on the pre-initialized response object so you can show a "Loading..." in any framework
@@ -141,10 +141,9 @@ export default async function grab<TResponse = any, TParams = any>(
   let s = (t) => path.startsWith(t);
   if (s("http:") || s("https:")) baseURL = "";
   else if (!s("/") && !baseURL.endsWith("/")) path = "/" + path;
-  else if (s("/") && baseURL.endsWith("/")) path = path.slice(1)
+  else if (s("/") && baseURL.endsWith("/")) path = path.slice(1);
 
-
-  try {
+  // try {
     //handle debounce
     if (debounce > 0)
       return (await debouncer(async () => {
@@ -203,39 +202,39 @@ export default async function grab<TResponse = any, TParams = any>(
 
     // Configure infinite scroll behavior if enabled
     // Attaches scroll listener to specified element that triggers next page load
-    if (infiniteScroll?.length && typeof window == "undefined") {
+    if (infiniteScroll?.length && typeof paginateElement !== "undefined"
+         && typeof window !== "undefined") {
       let paginateDOM =
         typeof paginateElement === "string"
           ? document.querySelector(paginateElement)
           : paginateElement;
 
-      if (paginateDOM)
-        paginateDOM.removeEventListener(
-          "scroll",
-          (window ?? globalThis)?.scrollListener
-        );
+      if (!paginateDOM) log("paginateDOM not found", { color: "red" });
+
+      if (window.scrollListener) 
+        paginateDOM.removeEventListener("scroll", window.scrollListener);
 
       // Your modified scroll listener with position saving
-      (window ?? globalThis).scrollListener = paginateDOM.addEventListener(
-        "scroll",
-        async ({ target }: { target: EventTarget }) => {
-          // Save scroll position whenever user scrolls
-          const t = target as HTMLElement;
+      window.scrollListener = async (event) => {
+        const t = event.target as HTMLElement;
+        
+        // Save scroll position whenever user scrolls
+        localStorage.setItem(
+          "scroll",
+          JSON.stringify([t.scrollTop, t.scrollLeft, paginateElement])
+        );
 
-          localStorage.setItem(
-            "scroll",
-            JSON.stringify([t.scrollTop, t.scrollLeft, paginateElement])
-          );
-
-          if (t.scrollHeight - t.scrollTop <= t.clientHeight + 200) {
-            await grab(path, {
-              ...options,
-              cache: false,
-              [paginateKey]: priorRequest?.currentPage + 1,
-            });
-          }
+        if (t.scrollHeight - t.scrollTop <= t.clientHeight + 200) {
+          await grab(path, {
+            ...options,
+            cache: false,
+            [paginateKey]: priorRequest?.currentPage + 1,
+          });
         }
-      );
+      };
+
+      if (paginateDOM) 
+          paginateDOM.addEventListener("scroll", window.scrollListener);
     }
 
     // Check request history for a previous request with same path/params
@@ -452,64 +451,62 @@ export default async function grab<TResponse = any, TParams = any>(
             ? [...response[key], ...res[key]]
             : res[key];
 
-    if (typeof response !== "undefined") response.data = res; // for axios compat
+      if (typeof response !== "undefined") response.data = res; // for axios compat
     } else if (resFunction) resFunction({ data: res, ...res });
     else if (typeof response === "object") response.data = res;
-          
 
-    
     // Store request/response in history log
-    if (typeof grab.log != "undefined")
-        grab.log?.unshift({
-      path,
-      request: JSON.stringify({ ...params, paginateKey: undefined }),
-      response,
-      lastFetchTime: Date.now(),
-    });
-    
-    if (resFunction) response = resFunction(response);
-  
-    return response;
-  } catch (error) {
-    // Handle any errors that occurred during request processing
-    let errorMessage =
-      "Error: " + error.message + "\nPath:" + baseURL + path + "\n";
-    JSON.stringify(params);
-
-    if (typeof onError === "function")
-      onError(error.message, baseURL + path, params);
-
-    // Retry request if retries are configured and attempts remain
-    if (options.retryAttempts > 0)
-      return await grab(path, {
-        ...options,
-        retryAttempts: --options.retryAttempts,
-      });
-
-    // Update error state in response object
-    // Do not show errors for duplicate aborted requests
-    if (!error.message.includes("signal") && options.debug) {
-      logger(errorMessage, { color: "red" });
-      if (debug && typeof document !== undefined) showAlert(errorMessage);
-    }
-    response.error = error.message;
-    if (typeof response === "function") {
-      response.data = response({ isLoading: undefined, error: error.message });
-      response = response.data;
-    } else delete response?.isLoading;
-
-    // Log error in request history
     if (typeof grab.log != "undefined")
       grab.log?.unshift({
         path,
-        request: JSON.stringify(params),
-        error: error.message,
+        request: JSON.stringify({ ...params, paginateKey: undefined }),
+        response,
+        lastFetchTime: Date.now(),
       });
 
-    // if (typeof options.response === "function")
-    //   response = options.response(response);
+    if (resFunction) response = resFunction(response);
+
     return response;
-  }
+  // } catch (error) {
+  //   // Handle any errors that occurred during request processing
+  //   let errorMessage =
+  //     "Error: " + error.message + "\nPath:" + baseURL + path + "\n";
+  //   JSON.stringify(params);
+
+  //   if (typeof onError === "function")
+  //     onError(error.message, baseURL + path, params);
+
+  //   // Retry request if retries are configured and attempts remain
+  //   if (options.retryAttempts > 0)
+  //     return await grab(path, {
+  //       ...options,
+  //       retryAttempts: --options.retryAttempts,
+  //     });
+
+  //   // Update error state in response object
+  //   // Do not show errors for duplicate aborted requests
+  //   if (!error.message.includes("signal") && options.debug) {
+  //     logger(errorMessage, { color: "red" });
+  //     if (debug && typeof document !== undefined) showAlert(errorMessage);
+  //   }
+  //   response.error = error.message;
+  //   if (typeof response === "function") {
+  //     response.data = response({ isLoading: undefined, error: error.message });
+  //     response = response.data;
+  //   } else delete response?.isLoading;
+
+  //   // Log error in request history
+  //   if (typeof grab.log != "undefined")
+  //     grab.log?.unshift({
+  //       path,
+  //       request: JSON.stringify(params),
+  //       error: error.message,
+  //     });
+
+  //   // if (typeof options.response === "function")
+  //   //   response = options.response(response);
+  //   return response;
+  // }
 }
 
 /**
@@ -609,7 +606,7 @@ export type GrabOptions<TResponse = any, TParams = any> = TParams & {
   /** default=false Whether to log the request and response */
   debug?: boolean;
   /** default=null [page key, response field to concatenate, element with results] */
-  infiniteScroll?: [string, string, string];
+  infiniteScroll?: [string, string, string | HTMLElement];
   /** default=false Pass this with options to set those options as defaults for all requests */
   setDefaults?: boolean;
   /** default=0 Retry failed requests this many times */
@@ -696,7 +693,7 @@ export interface GrabGlobal {
 export interface GrabFunction {
   /**
    * ### GRAB: Generate Request to API from Browser
-   * ![grabAPILogo](https://i.imgur.com/qrQWkeb.png)
+   * ![grabAPILogo](https://i.imgur.com/xWD7gyV.png)
    * Make API request with path
    * @returns {Promise<Object>} The response object with resulting data or .error if error.
    * @author [vtempest (2025)](https://github.com/vtempest/GRAB-URL)
@@ -708,7 +705,7 @@ export interface GrabFunction {
 
   /**
    * ### GRAB: Generate Request to API from Browser
-   * ![grabAPILogo](https://i.imgur.com/qrQWkeb.png)
+   * ![grabAPILogo](https://i.imgur.com/xWD7gyV.png)
    * Make API request with path and options/parameters
    * @returns {Promise<Object>} The response object with resulting data or .error if error.
    * @author [vtempest (2025)](https://github.com/vtempest/GRAB-URL)
@@ -765,6 +762,7 @@ declare global {
   interface Window {
     grab: GrabFunction;
     log: LogFunction;
+    scrollListener: (event: Event) => void; // replace 'any' with the actual type if you know it (e.g., a function type)
   }
 
   // Node.js globals

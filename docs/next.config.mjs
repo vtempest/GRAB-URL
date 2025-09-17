@@ -14,6 +14,7 @@ const withMDX = createMDX({
 export const config = {
   output: 'export',
   distDir: './dist',
+  
 
   reactStrictMode: false,
   images: {

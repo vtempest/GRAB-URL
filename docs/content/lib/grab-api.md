@@ -1684,7 +1684,7 @@ function grab<TResponse, TParams>(path: string, options?: GrabOptions<TResponse,
 Defined in: [GRAB-URL.ts:88](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L88)
 
 ### GRAB: Generate Request to API from Browser
-![GrabAPILogo](https://i.imgur.com/qrQWkeb.png)
+![GrabAPILogo](https://i.imgur.com/xWD7gyV.png)
 
 1. **GRAB is the FBEST Request Manager: Functionally Brilliant, Elegantly Simple Tool**: One Function, no dependencies, 
    minimalist syntax, [more features than alternatives](https://grab.js.org/guide/Comparisons)

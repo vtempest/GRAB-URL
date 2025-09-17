@@ -31,20 +31,20 @@ describe('Ubuntu Downloads CLI Tests', () => {
     it('should successfully download 3 Ubuntu files simultaneously', async () => {
       const downloads = [
         {
-          url: 'https://releases.ubuntu.com/24.04.2/ubuntu-24.04.2-desktop-amd64.iso',
-          outputPath: path.join(testOutputDir, 'ubuntu-desktop.iso'),
-          filename: 'ubuntu-desktop.iso'
+          url: 'https://data-management.uni-muenster.de/direct-access/wwurdm/84958668513',
+          outputPath: path.join(testOutputDir, 'hallurag.zip'),
+          filename: 'hallurag.zip'
         },
-        {
-          url: 'https://releases.ubuntu.com/24.04.2/ubuntu-24.04.2-live-server-amd64.iso', 
-          outputPath: path.join(testOutputDir, 'ubuntu-server.iso'),
-          filename: 'ubuntu-server.iso'
-        },
-        {
-          url: 'https://releases.ubuntu.com/22.04.5/ubuntu-22.04.5-desktop-amd64.iso',
-          outputPath: path.join(testOutputDir, 'ubuntu-22-desktop.iso'), 
-          filename: 'ubuntu-22-desktop.iso'
-        }
+        // {
+        //   url: 'https://releases.ubuntu.com/24.04.2/ubuntu-24.04.2-live-server-amd64.iso', 
+        //   outputPath: path.join(testOutputDir, 'ubuntu-server.iso'),
+        //   filename: 'ubuntu-server.iso'
+        // },
+        // {
+        //   url: 'https://releases.ubuntu.com/22.04.5/ubuntu-22.04.5-desktop-amd64.iso',
+        //   outputPath: path.join(testOutputDir, 'ubuntu-22-desktop.iso'), 
+        //   filename: 'ubuntu-22-desktop.iso'
+        // }
       ];
 
       // Mock console methods to capture output

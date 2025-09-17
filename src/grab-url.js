@@ -8,11 +8,10 @@ import cliProgress from 'cli-progress';
 import chalk from 'chalk';
 import ora from 'ora';
 import Table from 'cli-table3';
-import grab, { log } from './grab-api.ts';
+import grab, { log } from '../dist/grab-api.es.js';
 import readline from 'readline';
-import { GlobalKeyboardListener } from 'node-global-key-listener';
 import { readFileSync } from 'fs';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 import { dirname, join } from 'path';
 
 // Try multiple possible paths for spinners.json
@@ -742,16 +741,14 @@ formatTotalSpeed(bytesPerSecond) {
  */
 async downloadMultipleFiles(downloads) {
   try {
-    console.log(this.colors.primary(`🚀 Starting download of ${downloads.length} files...\n`));
-
     // Set up global keyboard listener for pause/resume and add URL BEFORE starting downloads
     this.setupGlobalKeyboardListener();
     
     // Print header row with emojis
-    this.printHeaderRow();
+    // this.printHeaderRow();
 
     // Show keyboard shortcut info for pause/resume in multibar view
-    console.log(this.colors.info('💡 Press p to pause/resume downloads, a to add URL.'));
+    // console.log(this.colors.info('💡 [p] pause/resume downloads, [a] add URL.'));
 
     // Get random colors for the multibar
     const masterBarColor = this.getRandomBarColor();
@@ -974,7 +971,6 @@ async downloadMultipleFiles(downloads) {
     const successful = results.filter(r => r.status === 'fulfilled' && r.value.success).length;
     const failed = results.length - successful;
 
-    console.log(this.colors.green(`✅ Successful: ${successful}/${downloads.length}`));
     if (failed > 0) {
       console.log(this.colors.error(`❌ Failed: ${failed}/${downloads.length}`));
       
@@ -986,11 +982,11 @@ async downloadMultipleFiles(downloads) {
         }
       });
     }
-
+    
     // Random celebration emoji
     const celebrationEmojis = ['🥳', '🎊', '🎈', '🌟', '💯', '🚀', '✨', '🔥'];
     const randomEmoji = celebrationEmojis[Math.floor(Math.random() * celebrationEmojis.length)];
-    console.log(this.colors.success(`${randomEmoji} Batch download completed! ${randomEmoji}`));
+    console.log(this.colors.green(`${randomEmoji} Success: ${successful}/${downloads.length}`));
 
     this.clearAbortControllers();
     
@@ -1820,7 +1816,7 @@ setupFallbackKeyboardListener() {
     };
     
     process.stdin.on('data', handleKeypress);
-    console.log(this.colors.info('💡 Keyboard listener active: Press p to pause/resume, a to add URL'));
+    // console.log(this.colors.info('💡 Keyboard listener active: [p] pause/resume, [a] add URL'));
   }
 }
 
@@ -1909,10 +1905,21 @@ resumeAll() {
 
 // --- Main CLI logic ---
 // Only run CLI when this file is executed directly, not when imported
-if (import.meta.url === `file://${process.argv[1]}`) {
+const __isMain = (typeof import.meta.main === 'boolean' && import.meta.main) || (() => {
+  try {
+    const scriptArg = process.argv[1] ? path.resolve(process.argv[1]) : '';
+    if (!scriptArg) return false;
+    const href = pathToFileURL(scriptArg).href;
+    return import.meta.url === href;
+  } catch {
+    return false;
+  }
+})();
+
+if (__isMain) {
   const argv = new ArgParser()
-    .usage('Usage: grab <url> [options]')
-    .command('$0 <url>', 'Fetch data from API endpoint or download files')
+    .usage('Usage: grab-url <url...> [options]')
+    .command('$0 <url>', 'Fetch data or download files; pass one or more URLs')
     .option('no-save', {
       type: 'boolean',
       default: false,
@@ -1935,6 +1942,9 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     })
     .help()
     .alias('h', 'help')
+    .example('grab-url https://api.example.com/data', 'Fetch JSON/text from an API and save to output.json')
+    .example('grab-url https://example.com/file1.zip https://example.com/file2.zip', 'Download multiple files concurrently')
+    .example('grab-url https://example.com/file.iso -o ubuntu.iso', 'Save the first URL to a custom filename')
     .version('1.0.0')
     .strict()
     .parseSync();
@@ -1959,22 +1969,6 @@ if (import.meta.url === `file://${process.argv[1]}`) {
       if (i === 0 && outputFile) filename = outputFile;
       return { url, outputPath: filename };
     });
-    // Show detected downloads in a table
-    const detectedTable = new Table({
-      head: ['#', 'URL'],
-      colWidths: [4, 80],
-      colAligns: ['right', 'left'],
-      style: { 'padding-left': 1, 'padding-right': 1, head: [], border: [] }
-    });
-    downloads.forEach((download, index) => {
-      detectedTable.push([
-        (index + 1).toString(),
-        download.url
-      ]);
-    });
-    console.log(chalk.cyan.bold(`Detected ${downloads.length} download(s):`));
-    console.log(detectedTable.toString());
-    console.log('');
     // Prepare download objects with filenames
     const downloadObjects = downloads.map((download, index) => {
       let actualUrl = download.url;
@@ -1992,23 +1986,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
         filename: path.basename(filename)
       };
     });
-    // Show download queue in a table
-    const queueTable = new Table({
-      head: ['#', 'Filename', 'Output Path'],
-      colWidths: [4, 32, 54],
-      colAligns: ['right', 'left', 'left'],
-      style: { 'padding-left': 1, 'padding-right': 1, head: [], border: [] }
-    });
-    downloadObjects.forEach((downloadObj, index) => {
-      queueTable.push([
-        (index + 1).toString(),
-        downloadObj.filename,
-        downloadObj.outputPath
-      ]);
-    });
-    console.log(chalk.cyan.bold('\nDownload Queue:'));
-    console.log(queueTable.toString());
-    console.log('');
+    
     try {
       await downloader.downloadMultipleFiles(downloadObjects);
       // Display individual file stats in a table

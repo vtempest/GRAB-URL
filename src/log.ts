@@ -10,10 +10,10 @@
  *  If true, uses `console.debug` (hidden in production). If false, uses `console.log`.
  *
  */
-export function log(message = "", options: LogOptions = {}) {
+export function log(message: string|object  = "", options: LogOptions = {}) {
   let {
     color = null,
-    style = "color: blue; font-size: 11pt;",
+    style = "color: #66ccff; font-size: 10pt;",
     hideInProduction = undefined,
     startSpinner = false,
     stopSpinner = false,
