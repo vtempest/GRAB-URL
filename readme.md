@@ -119,11 +119,11 @@ grab('user').then(log)
 ![Info Tooltip](https://i.imgur.com/vV5jbZo.png)
 
 
-### Comparison of HTTP Request Libraries
+##  Comparison of HTTP Request Libraries
 
 | Feature | [GRAB](https://github.com/vtempest/GRAB-URL) | [Axios](https://github.com/axios/axios) | [TanStack Query](https://github.com/TanStack/query) | [SWR](https://github.com/vercel/swr) | [Alova](https://github.com/alovajs/alova) | [SuperAgent](https://github.com/ladjs/superagent) | [Apisauce](https://github.com/infinitered/apisauce) | [Ky](https://github.com/sindresorhus/ky) |
 | :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- | 
-| Size | ✅ 3KB | ❌ 13KB | ❌ 39KB | ❌ 4.2KB | ⚠️ 4KB | ❌ 19KB | ❌ 15KB (with axios) | ⚠️ 4KB |
+| Size | ✅ 4KB | ❌ 13KB | ❌ 39KB | ✅ 4.2KB | ✅ 4KB | ❌ 19KB | ❌ 15KB (with axios) | ✅ 4KB |
 | Zero Dependencies | ✅ Yes | ❌ No | ❌ No | ❌ No | ✅ Yes | ❌ No | ❌ Needs Axios | ✅ Yes |
 | isLoading State Handling | ✅ Auto-managed | ❌ Manual | ✅ Yes | ✅ Yes | ✅ Yes | ❌ Manual | ❌ Manual | ❌ Manual |
 | Auto JSON Handling | ✅ Automatic | ✅ Configurable | ❌ Manual | ❌ Manual | ✅ Automatic | ✅ Automatic | ✅ Automatic | ✅ Automatic |

@@ -1,5 +1,6 @@
 import { createMDX } from 'fumadocs-mdx/next';
 
+import type { NextConfig } from 'next';
 
 const withMDX = createMDX({
   mdxOptions: {
@@ -8,10 +9,16 @@ const withMDX = createMDX({
     },
   },
 });
-
-
-
-export const config = {
+export const config: NextConfig = {
+ 
+  async rewrites() {
+    return [
+      {
+        source: '/docs/:path*.mdx',
+        destination: '/llms.mdx/:path*',
+      },
+    ];
+  },
   output: 'export',
   distDir: './dist',
   

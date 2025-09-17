@@ -8,11 +8,13 @@
     "build": "next build --turbo; echo 'grab.js.org' > ./dist/CNAME;",
     "build:api": "node ./scripts/generate-api-docs.mjs",
     "dev": "next dev --turbo",
-    "start": "bunx concurrently \"npx serve -l 3000 ./dist --single\" \"sleep 2 && bunx open-cli http://localhost:3000\"",    "check": "fumadocs-mdx && tsc --noEmit"
+    "start": "bunx concurrently \"npx serve -l 3000 ./dist --single\" \"sleep 2 && bunx open-cli http://localhost:3000\"",
+    "check": "fumadocs-mdx && tsc --noEmit"
   },
   "dependencies": {
     "@fumadocs/mdx-remote": "^1.4.0",
     "@orama/orama": "^3.1.11",
+    "class-variance-authority": "^0.7.1",
     "fumadocs-core": "^15.7.2",
     "fumadocs-mdx": "^11.8.0",
     "fumadocs-openapi": "^9.2.3",
@@ -22,7 +24,8 @@
     "next": "^15.5.2",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
-    "shiki": "^3.12.0"
+    "shiki": "^3.12.0",
+    "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.12",
