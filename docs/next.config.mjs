@@ -1,15 +1,11 @@
 import { createMDX } from 'fumadocs-mdx/next';
 
-import type { NextConfig } from 'next';
-
 const withMDX = createMDX({
-  mdxOptions: {
-    remarkImageOptions: {
-      onError: "ignore", // or "hide"
-    },
-  },
+ 
 });
-export const config: NextConfig = {
+
+/** @type {import('next').NextConfig} */
+export const config = {
  
   async rewrites() {
     return [
