@@ -16,7 +16,7 @@
 </p>
 <h3 align="center">
   <a href="https://grab.js.org"> 📑 Docs (grab.js.org)</a>
-  <a href="https://grab.js.org/guide/Examples"> 🎯 Example Strategies </a>
+  <a href="https://grab.js.org/docs/Examples"> 🎯 Example Strategies </a>
 </h3>
 
 ```
@@ -25,7 +25,7 @@ npm i grab-url
 
 ### GRAB: Generate Request to API from Browser
 
-1.  **GRAB is the FBEST Request Manager: Functionally Brilliant, Elegantly Simple Tool**: One Function, no dependencies,   minimalist syntax, [more features than alternatives](https://grab.js.org/guide/Comparisons)
+1.  **GRAB is the FBEST Request Manager: Functionally Brilliant, Elegantly Simple Tool**: One Function, no dependencies,   minimalist syntax, [more features than alternatives](https://grab.js.org/docs/Comparisons)
 2. **Auto-JSON Convert**: Pass parameters and get response or error in JSON, handling other data types as is.
 3. **isLoading Status**: Sets `.isLoading=true` on the pre-initialized response object so you can show a "Loading..." in any framework
 4. **Debug Logging**: Adds global `log()` and prints colored JSON structure, response, timing for requests in test.
@@ -41,7 +41,7 @@ npm i grab-url
 14. **Framework Agnostic**: Alternatives like TanStack work only in component initialization and depend on React & others.
 15. **Globals**: Adds to window in browser or global in Node.js so you only import once: `grab()`, `log()`, `grab.log`, `grab.mock`, `grab.defaults`
 16. **TypeScript Tooltips**: Developers can hover over option names and autocomplete TypeScript.
-17. **Request Stategies**: [🎯 Examples](https://grab.js.org/guide/Examples) show common stategies like debounce, repeat, proxy, unit tests, interceptors, file upload, etc
+17. **Request Stategies**: [🎯 Examples](https://grab.js.org/docs/Examples) show common stategies like debounce, repeat, proxy, unit tests, interceptors, file upload, etc
 18. **Rate Limiting**: Built-in rate limiting to prevent multi-click cascading responses, require to wait seconds between requests.
 19. **Repeat**: Repeat request this many times, or repeat every X seconds to poll for updates.
 20. **Loading Icons**: Import from `grab-url/icons` to get enhanced animated loading icons.
@@ -144,7 +144,7 @@ grab('user').then(log)
 
 **Why fetch things when you can just GRAB?**
 
-**Debugging requests is a bitch. [Make the switch!](https://grab.js.org/guide/Comparisons)**
+**Debugging requests is a bitch. [Make the switch!](https://grab.js.org/docs/Comparisons)**
 
 
 🌟 Star this repo so it will grow and get updates! 

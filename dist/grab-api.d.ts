@@ -42,7 +42,7 @@ declare const colors: {
  * ![GrabAPILogo](https://i.imgur.com/xWD7gyV.png)
  *
  * 1. **GRAB is the FBEST Request Manager: Functionally Brilliant, Elegantly Simple Tool**: One Function, no dependencies,
- *    minimalist syntax, [more features than alternatives](https://grab.js.org/guide/Comparisons)
+ *    minimalist syntax, [more features than alternatives](https://grab.js.org/docs/Comparisons)
  * 2. **Auto-JSON Convert**: Pass parameters and get response or error in JSON, handling other data types as is.
  * 3. **isLoading Status**: Sets `.isLoading=true` on the pre-initialized response object so you can show a "Loading..." in any framework
  * 4. **Debug Logging**: Adds global `log()` and prints colored JSON structure, response, timing for requests in test.
@@ -58,7 +58,7 @@ declare const colors: {
  * 14. **Framework Agnostic**: Alternatives like TanStack work only in component initialization and depend on React & others.
  * 15. **Globals**: Adds to window in browser or global in Node.js so you only import once: `grab()`, `log()`, `grab.log`, `grab.mock`, `grab.defaults`
  * 16. **TypeScript Tooltips**: Developers can hover over option names and autocomplete TypeScript.
- * 17. **Request Stategies**: [🎯 Examples](https://grab.js.org/guide/Examples) show common stategies like debounce, repeat, proxy, unit tests, interceptors, file upload, etc
+ * 17. **Request Stategies**: [🎯 Examples](https://grab.js.org/docs/Examples) show common stategies like debounce, repeat, proxy, unit tests, interceptors, file upload, etc
  * 18. **Rate Limiting**: Built-in rate limiting to prevent multi-click cascading responses, require to wait seconds between requests.
  * 19. **Repeat**: Repeat request this many times, or repeat every X seconds to poll for updates.
  * 20. **Loading Icons**: Import from `grab-url/icons` to get enhanced animated loading icons.
@@ -96,7 +96,7 @@ declare const colors: {
  * @param {any} [...params] All other params become GET params, POST body, and other methods.
  * @returns {Promise<Object>} The response object with resulting data or .error if error.
  * @author [vtempest (2025)](https://github.com/vtempest/GRAB-URL)
- * @see  [🎯 Examples](https://grab.js.org/guide/Examples) [📑 Docs](https://grab.js.org)
+ * @see  [🎯 Examples](https://grab.js.org/docs/Examples) [📑 Docs](https://grab.js.org)
  * @example import grab from 'grab-url';
  * let res = {};
  * await grab('search', {
@@ -122,7 +122,7 @@ export declare interface GrabFunction {
      * Make API request with path
      * @returns {Promise<Object>} The response object with resulting data or .error if error.
      * @author [vtempest (2025)](https://github.com/vtempest/GRAB-URL)
-     * @see  [🎯 Examples](https://grab.js.org/guide/Examples) [📑 Docs](https://grab.js.org/lib)
+     * @see  [🎯 Examples](https://grab.js.org/docs/Examples) [📑 Docs](https://grab.js.org/lib)
      */
     <TResponse = any, TParams = Record<string, any>>(path: string): Promise<GrabResponse<TResponse>>;
     /**
@@ -131,7 +131,7 @@ export declare interface GrabFunction {
      * Make API request with path and options/parameters
      * @returns {Promise<Object>} The response object with resulting data or .error if error.
      * @author [vtempest (2025)](https://github.com/vtempest/GRAB-URL)
-     * @see  [🎯 Examples](https://grab.js.org/guide/Examples) [📑 Docs](https://grab.js.org/lib)
+     * @see  [🎯 Examples](https://grab.js.org/docs/Examples) [📑 Docs](https://grab.js.org/lib)
      */
     <TResponse = any, TParams = Record<string, any>>(path: string, config: GrabOptions<TResponse, TParams>): Promise<GrabResponse<TResponse>>;
     /** Default options applied to all requests */

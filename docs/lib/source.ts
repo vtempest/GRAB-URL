@@ -4,7 +4,7 @@ import { attachFile, createOpenAPI } from 'fumadocs-openapi/server';
 import { docs, meta } from '@/.source';
 
 export const source = loader({
-  baseUrl: '/docs',
+  baseUrl: '/',
   source: createMDXSource(docs, meta),
   pageTree: {
     attachFile,
