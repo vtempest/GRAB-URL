@@ -2,7 +2,7 @@
   "name": "grab-url",
   "description": "📥 Generate Request to API from Browser",
   "type": "module",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "author": "vtempest",
   "license": "rights.institute/prosper",
   "repository": {
@@ -30,6 +30,11 @@
       "types": "./dist/*.d.ts",
       "import": "./dist/*.js",
       "require": "./dist/*.js"
+    },
+    "./log": {
+      "types": "./dist/log.d.ts",
+      "import": "./dist/log.es.js",
+      "require": "./dist/log.cjs.js"
     }
   },
   "files": [
@@ -40,23 +45,23 @@
     "src/icons/cli/spinners.json"
   ],
   "scripts": {
-    "down": "bun test command.test.js",
+    "down": "bun src/grab-url.js https://releases.ubuntu.com/24.04.2/ubuntu-24.04.2-live-server-amd64.iso",
     "make": "npm run make:icons; npm run make:docs; npm run make:main",
     "make:docs": "cd docs && npm run build",
     "make:icons": "npx export-svg-typescript@latest -i ./src/icons/svg -o ./src/icons/svg/index.ts",
     "make:main": "vite build",
-    "ship": "npx standard-version --release-as patch; npm publish",
+    "ship": "bun x standard-version --release-as patch; npm publish",
     "check": "vitest --ui",
     "docs": "cd docs && npm run start"
   },
   "devDependencies": {
-    "@vitest/ui": "^3.1.4",
-    "export-svg-typescript": "^0.1.6",
-    "terser": "^5.40.0",
-    "typescript": "^5.8.3",
-    "vite": "^6.3.5",
+    "@vitest/ui": "^3.2.4",
+    "export-svg-typescript": "^0.1.15",
+    "terser": "^5.44.0",
+    "typescript": "^5.9.2",
+    "vite": "^7.1.6",
     "vite-plugin-dts": "^4.5.4",
-    "vitest": "^3.1.4"
+    "vitest": "^3.2.4"
   },
   "keywords": [
     "api",
@@ -71,11 +76,10 @@
     "http"
   ],
   "dependencies": {
-    "@types/node": "^24.2.1",
-    "chalk": "^5.4.1",
+    "chalk": "^5.6.2",
     "cli-progress": "^3.12.0",
-    "cli-spinners": "^3.2.0",
+    "cli-spinners": "^3.2.1",
     "cli-table3": "^0.6.5",
-    "ora": "^8.2.0"
+    "ora": "^9.0.0"
   }
 }
