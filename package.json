@@ -2,7 +2,7 @@
   "name": "grab-url",
   "description": "📥 Generate Request to API from Browser",
   "type": "module",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "author": "vtempest",
   "license": "rights.institute/prosper",
   "repository": {
@@ -41,7 +41,7 @@
     "dist",
     "src",
     "src/grab-api.ts",
-    "src/grab-url.ts",
+    "src/grab-url.js",
     "src/icons/cli/spinners.json"
   ],
   "scripts": {
