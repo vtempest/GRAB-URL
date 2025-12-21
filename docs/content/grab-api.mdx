@@ -2,11 +2,16 @@
 title: GRAB API Reference
 ---
 
+
+import { InlineTOC } from 'fumadocs-ui/components/inline-toc';
+
+<InlineTOC items={toc} defaultOpen="true" />
+
 [Documentation](modules.md) / GRAB-URL
 
 ## GrabMockHandler&lt;TParams, TResponse&gt;
 
-Defined in: [GRAB-URL.ts:654](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L654)
+Defined in: [grab-api.ts:654](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L654)
 
 Combined options and parameters interface
 Mock server configuration for testing
@@ -78,7 +83,7 @@ Mock response data or function that returns response
 </td>
 <td>
 
-[GRAB-URL.ts:656](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L656)
+[grab-api.ts:656](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L656)
 
 </td>
 </tr>
@@ -100,7 +105,7 @@ HTTP method this mock should respond to
 </td>
 <td>
 
-[GRAB-URL.ts:658](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L658)
+[grab-api.ts:658](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L658)
 
 </td>
 </tr>
@@ -122,7 +127,7 @@ Request parameters this mock should match
 </td>
 <td>
 
-[GRAB-URL.ts:660](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L660)
+[grab-api.ts:660](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L660)
 
 </td>
 </tr>
@@ -144,7 +149,7 @@ Delay in seconds before returning mock response
 </td>
 <td>
 
-[GRAB-URL.ts:662](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L662)
+[grab-api.ts:662](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L662)
 
 </td>
 </tr>
@@ -155,7 +160,7 @@ Delay in seconds before returning mock response
 
 ## GrabLogEntry
 
-Defined in: [GRAB-URL.ts:666](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L666)
+Defined in: [grab-api.ts:666](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L666)
 
 Request log entry for debugging and history
 
@@ -189,7 +194,7 @@ API path that was requested
 </td>
 <td>
 
-[GRAB-URL.ts:668](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L668)
+[grab-api.ts:668](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L668)
 
 </td>
 </tr>
@@ -211,7 +216,7 @@ Stringified request parameters
 </td>
 <td>
 
-[GRAB-URL.ts:670](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L670)
+[grab-api.ts:670](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L670)
 
 </td>
 </tr>
@@ -233,7 +238,7 @@ Response data (only present for successful requests)
 </td>
 <td>
 
-[GRAB-URL.ts:672](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L672)
+[grab-api.ts:672](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L672)
 
 </td>
 </tr>
@@ -255,7 +260,7 @@ Error message (only present for failed requests)
 </td>
 <td>
 
-[GRAB-URL.ts:674](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L674)
+[grab-api.ts:674](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L674)
 
 </td>
 </tr>
@@ -277,7 +282,7 @@ Timestamp when request was made
 </td>
 <td>
 
-[GRAB-URL.ts:676](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L676)
+[grab-api.ts:676](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L676)
 
 </td>
 </tr>
@@ -299,7 +304,7 @@ Abort controller for request cancellation
 </td>
 <td>
 
-[GRAB-URL.ts:678](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L678)
+[grab-api.ts:678](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L678)
 
 </td>
 </tr>
@@ -321,7 +326,7 @@ Current page number for paginated requests
 </td>
 <td>
 
-[GRAB-URL.ts:680](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L680)
+[grab-api.ts:680](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L680)
 
 </td>
 </tr>
@@ -332,7 +337,7 @@ Current page number for paginated requests
 
 ## GrabGlobal
 
-Defined in: [GRAB-URL.ts:684](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L684)
+Defined in: [grab-api.ts:684](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L684)
 
 Global grab configuration and state
 
@@ -366,7 +371,7 @@ Default options applied to all requests
 </td>
 <td>
 
-[GRAB-URL.ts:686](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L686)
+[grab-api.ts:686](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L686)
 
 </td>
 </tr>
@@ -388,7 +393,7 @@ Request history and debugging info
 </td>
 <td>
 
-[GRAB-URL.ts:688](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L688)
+[grab-api.ts:688](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L688)
 
 </td>
 </tr>
@@ -410,7 +415,7 @@ Mock server handlers for testing
 </td>
 <td>
 
-[GRAB-URL.ts:690](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L690)
+[grab-api.ts:690](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L690)
 
 </td>
 </tr>
@@ -432,7 +437,7 @@ Create a separate instance of grab with separate default options
 </td>
 <td>
 
-[GRAB-URL.ts:692](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L692)
+[grab-api.ts:692](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L692)
 
 </td>
 </tr>
@@ -443,7 +448,7 @@ Create a separate instance of grab with separate default options
 
 ## GrabFunction()
 
-Defined in: [GRAB-URL.ts:696](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L696)
+Defined in: [grab-api.ts:696](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L696)
 
 Main grab function signature with overloads for different use cases
 
@@ -453,7 +458,7 @@ Main grab function signature with overloads for different use cases
 GrabFunction<TResponse, TParams>(path: string): Promise<GrabResponse<TResponse>>;
 ```
 
-Defined in: [GRAB-URL.ts:705](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L705)
+Defined in: [grab-api.ts:705](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L705)
 
 Main grab function signature with overloads for different use cases
 
@@ -539,7 +544,7 @@ The response object with resulting data or .error if error.
 GrabFunction<TResponse, TParams>(path: string, config: GrabOptions<TResponse, TParams>): Promise<GrabResponse<TResponse>>;
 ```
 
-Defined in: [GRAB-URL.ts:717](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L717)
+Defined in: [grab-api.ts:717](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L717)
 
 Main grab function signature with overloads for different use cases
 
@@ -661,7 +666,7 @@ Default options applied to all requests
 </td>
 <td>
 
-[GRAB-URL.ts:723](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L723)
+[grab-api.ts:723](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L723)
 
 </td>
 </tr>
@@ -683,7 +688,7 @@ Request history and debugging info for all requests
 </td>
 <td>
 
-[GRAB-URL.ts:726](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L726)
+[grab-api.ts:726](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L726)
 
 </td>
 </tr>
@@ -705,7 +710,7 @@ Mock server handlers for testing
 </td>
 <td>
 
-[GRAB-URL.ts:729](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L729)
+[grab-api.ts:729](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L729)
 
 </td>
 </tr>
@@ -727,7 +732,7 @@ Create a separate instance of grab with separate default options
 </td>
 <td>
 
-[GRAB-URL.ts:732](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L732)
+[grab-api.ts:732](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L732)
 
 </td>
 </tr>
@@ -738,7 +743,7 @@ Create a separate instance of grab with separate default options
 
 ## LogFunction()
 
-Defined in: [GRAB-URL.ts:736](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L736)
+Defined in: [grab-api.ts:736](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L736)
 
 Log function for debugging
 
@@ -746,7 +751,7 @@ Log function for debugging
 LogFunction(message: string | object, options?: LogOptions): void;
 ```
 
-Defined in: [GRAB-URL.ts:741](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L741)
+Defined in: [grab-api.ts:741](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L741)
 
 Log function for debugging
 
@@ -806,7 +811,7 @@ Message to log (string or object)
 
 ## printJSONStructureFunction()
 
-Defined in: [GRAB-URL.ts:745](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L745)
+Defined in: [grab-api.ts:745](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L745)
 
 Utility function to describe JSON structure
 
@@ -814,7 +819,7 @@ Utility function to describe JSON structure
 printJSONStructureFunction(obj: any): string;
 ```
 
-Defined in: [GRAB-URL.ts:751](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L751)
+Defined in: [grab-api.ts:751](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L751)
 
 Utility function to describe JSON structure
 
@@ -863,7 +868,7 @@ String representation of object structure
 type GrabResponse<TResponse> = TResponse & object;
 ```
 
-Defined in: [GRAB-URL.ts:577](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L577)
+Defined in: [grab-api.ts:577](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L577)
 
 Core response object that gets populated with API response data
 
@@ -897,7 +902,7 @@ Indicates if request is currently in progress
 </td>
 <td>
 
-[GRAB-URL.ts:579](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L579)
+[grab-api.ts:579](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L579)
 
 </td>
 </tr>
@@ -919,7 +924,7 @@ Error message if request failed
 </td>
 <td>
 
-[GRAB-URL.ts:581](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L581)
+[grab-api.ts:581](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L581)
 
 </td>
 </tr>
@@ -941,7 +946,7 @@ Binary or text response data (JSON is set to the root)
 </td>
 <td>
 
-[GRAB-URL.ts:583](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L583)
+[grab-api.ts:583](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L583)
 
 </td>
 </tr>
@@ -981,7 +986,7 @@ Binary or text response data (JSON is set to the root)
 type GrabOptions<TResponse, TParams> = TParams & object;
 ```
 
-Defined in: [GRAB-URL.ts:588](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L588)
+Defined in: [grab-api.ts:588](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L588)
 
 ### Type declaration
 
@@ -1013,7 +1018,7 @@ include headers and authorization in the request
 </td>
 <td>
 
-[GRAB-URL.ts:590](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L590)
+[grab-api.ts:590](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L590)
 
 </td>
 </tr>
@@ -1035,7 +1040,7 @@ Pre-initialized object which becomes response JSON, no need for .data
 </td>
 <td>
 
-[GRAB-URL.ts:592](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L592)
+[grab-api.ts:592](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L592)
 
 </td>
 </tr>
@@ -1057,7 +1062,7 @@ default="GET" The HTTP method to use
 </td>
 <td>
 
-[GRAB-URL.ts:594](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L594)
+[grab-api.ts:594](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L594)
 
 </td>
 </tr>
@@ -1079,7 +1084,7 @@ default=false Whether to cache the request and from frontend cache
 </td>
 <td>
 
-[GRAB-URL.ts:596](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L596)
+[grab-api.ts:596](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L596)
 
 </td>
 </tr>
@@ -1101,7 +1106,7 @@ default=60 Seconds to consider data stale and invalidate cache
 </td>
 <td>
 
-[GRAB-URL.ts:598](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L598)
+[grab-api.ts:598](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L598)
 
 </td>
 </tr>
@@ -1123,7 +1128,7 @@ default=30 The timeout for the request in seconds
 </td>
 <td>
 
-[GRAB-URL.ts:600](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L600)
+[grab-api.ts:600](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L600)
 
 </td>
 </tr>
@@ -1145,7 +1150,7 @@ default='/api/' base url prefix, override with SERVER_API_URL env
 </td>
 <td>
 
-[GRAB-URL.ts:602](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L602)
+[grab-api.ts:602](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L602)
 
 </td>
 </tr>
@@ -1167,7 +1172,7 @@ default=true Cancel previous requests to same path
 </td>
 <td>
 
-[GRAB-URL.ts:604](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L604)
+[grab-api.ts:604](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L604)
 
 </td>
 </tr>
@@ -1189,7 +1194,7 @@ default=false Cancel if a request to path is in progress
 </td>
 <td>
 
-[GRAB-URL.ts:606](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L606)
+[grab-api.ts:606](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L606)
 
 </td>
 </tr>
@@ -1211,7 +1216,7 @@ default=false If set, how many seconds to wait between requests
 </td>
 <td>
 
-[GRAB-URL.ts:608](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L608)
+[grab-api.ts:608](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L608)
 
 </td>
 </tr>
@@ -1233,7 +1238,7 @@ default=false Whether to log the request and response
 </td>
 <td>
 
-[GRAB-URL.ts:610](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L610)
+[grab-api.ts:610](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L610)
 
 </td>
 </tr>
@@ -1255,7 +1260,7 @@ default=null [page key, response field to concatenate, element with results]
 </td>
 <td>
 
-[GRAB-URL.ts:612](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L612)
+[grab-api.ts:612](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L612)
 
 </td>
 </tr>
@@ -1277,7 +1282,7 @@ default=false Pass this with options to set those options as defaults for all re
 </td>
 <td>
 
-[GRAB-URL.ts:614](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L614)
+[grab-api.ts:614](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L614)
 
 </td>
 </tr>
@@ -1299,7 +1304,7 @@ default=0 Retry failed requests this many times
 </td>
 <td>
 
-[GRAB-URL.ts:616](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L616)
+[grab-api.ts:616](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L616)
 
 </td>
 </tr>
@@ -1321,7 +1326,7 @@ default=log Custom logger to override the built-in color JSON log()
 </td>
 <td>
 
-[GRAB-URL.ts:618](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L618)
+[grab-api.ts:618](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L618)
 
 </td>
 </tr>
@@ -1343,7 +1348,7 @@ Set with defaults to modify each request data. Takes and returns in order: path,
 </td>
 <td>
 
-[GRAB-URL.ts:620](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L620)
+[grab-api.ts:620](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L620)
 
 </td>
 </tr>
@@ -1365,7 +1370,7 @@ Set with defaults to modify each request data. Takes and returns in order: path,
 </td>
 <td>
 
-[GRAB-URL.ts:622](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L622)
+[grab-api.ts:622](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L622)
 
 </td>
 </tr>
@@ -1387,7 +1392,7 @@ Set with defaults to modify each request data. Takes and returns in order: error
 </td>
 <td>
 
-[GRAB-URL.ts:624](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L624)
+[grab-api.ts:624](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L624)
 
 </td>
 </tr>
@@ -1409,7 +1414,7 @@ Set with defaults to process the response as a stream (i.e., for instant unzip)
 </td>
 <td>
 
-[GRAB-URL.ts:626](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L626)
+[grab-api.ts:626](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L626)
 
 </td>
 </tr>
@@ -1431,7 +1436,7 @@ default=0 Repeat request this many times
 </td>
 <td>
 
-[GRAB-URL.ts:628](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L628)
+[grab-api.ts:628](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L628)
 
 </td>
 </tr>
@@ -1453,7 +1458,7 @@ default=null Repeat request every seconds
 </td>
 <td>
 
-[GRAB-URL.ts:630](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L630)
+[grab-api.ts:630](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L630)
 
 </td>
 </tr>
@@ -1475,7 +1480,7 @@ default=0 Seconds to debounce request, wait to execute so that other requests ma
 </td>
 <td>
 
-[GRAB-URL.ts:632](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L632)
+[grab-api.ts:632](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L632)
 
 </td>
 </tr>
@@ -1497,7 +1502,7 @@ default=false Refetch when cache is past cacheForTime
 </td>
 <td>
 
-[GRAB-URL.ts:634](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L634)
+[grab-api.ts:634](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L634)
 
 </td>
 </tr>
@@ -1519,7 +1524,7 @@ default=false Refetch on window refocus
 </td>
 <td>
 
-[GRAB-URL.ts:636](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L636)
+[grab-api.ts:636](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L636)
 
 </td>
 </tr>
@@ -1541,7 +1546,7 @@ default=false Refetch on network change
 </td>
 <td>
 
-[GRAB-URL.ts:638](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L638)
+[grab-api.ts:638](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L638)
 
 </td>
 </tr>
@@ -1563,7 +1568,7 @@ shortcut for method: "POST"
 </td>
 <td>
 
-[GRAB-URL.ts:640](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L640)
+[grab-api.ts:640](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L640)
 
 </td>
 </tr>
@@ -1585,7 +1590,7 @@ shortcut for method: "PUT"
 </td>
 <td>
 
-[GRAB-URL.ts:642](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L642)
+[grab-api.ts:642](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L642)
 
 </td>
 </tr>
@@ -1607,7 +1612,7 @@ shortcut for method: "PATCH"
 </td>
 <td>
 
-[GRAB-URL.ts:644](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L644)
+[grab-api.ts:644](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L644)
 
 </td>
 </tr>
@@ -1629,7 +1634,7 @@ default=null The body of the POST/PUT/PATCH request (can be passed into main)
 </td>
 <td>
 
-[GRAB-URL.ts:646](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L646)
+[grab-api.ts:646](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L646)
 
 </td>
 </tr>
@@ -1681,10 +1686,10 @@ default=null The body of the POST/PUT/PATCH request (can be passed into main)
 function grab<TResponse, TParams>(path: string, options?: GrabOptions<TResponse, TParams>): Promise<GrabResponse<TResponse>>;
 ```
 
-Defined in: [GRAB-URL.ts:88](https://github.com/vtempest/GRAB-URL/tree/master/src/GRAB-URL.ts#L88)
+Defined in: [grab-api.ts:88](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L88)
 
 ### GRAB: Generate Request to API from Browser
-![GrabAPILogo](https://i.imgur.com/xWD7gyV.png)
+![GrabAPILogo](https://i.imgur.com/Rwl5P3p.png)
 
 1. **GRAB is the FBEST Request Manager: Functionally Brilliant, Elegantly Simple Tool**: One Function, no dependencies, 
    minimalist syntax, [more features than alternatives](https://grab.js.org/docs/Comparisons)

@@ -12,12 +12,13 @@
  */
 export function log(message: string|object  = "", options: LogOptions = {}) {
   let {
-    color = null,
-    style = "color: #66ccff; font-size: 10pt;",
+    color,
+    style = "color:rgb(54, 165, 220); font-size: 10pt;",
     hideInProduction = undefined,
     startSpinner = false,
     stopSpinner = false,
   } = options;
+  const colors = getColors();
 
   // Auto-detect if we should hide logs in production based on hostname
   if (typeof hideInProduction === "undefined")
@@ -30,9 +31,17 @@ export function log(message: string|object  = "", options: LogOptions = {}) {
     message =
       printJSONStructure(message) + "\n\n" + JSON.stringify(message, null, 2);
 
-  //colorize in terminal (%c is only in browser)
+  // change color: [red] to color: red if only one
+  if (Array.isArray(color) && color.length == 1) color = color[0];
+
+  //colorize in terminal (%c is only in browser but we polyfill it)
   if (color && typeof process !== undefined)
-    message = (colors[color] || "") + message + colors.reset;
+    if (message.includes("%c") && Array.isArray(color)) // replace each c with color[i]
+      message = message.replace(/%c/g, (match, index) => colors[color[index]] || "");
+    else if (color && typeof color === "string")
+      message = (colors[color] || "") + message + colors.reset;
+
+
 
   //  Displays an animated spinner in the terminal with the provided text.
   var i = 0;
@@ -40,7 +49,7 @@ export function log(message: string|object  = "", options: LogOptions = {}) {
   if (startSpinner)
     (global || globalThis).interval = setInterval(() => {
       process.stdout.write(
-        (colors[color] || "") +
+        (Array.isArray(color) ? colors[color[0]] : colors[color] || "") +
           "\r" +
           "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏".split("")[(i = ++i % 10)] +
           " " +
@@ -51,7 +60,7 @@ export function log(message: string|object  = "", options: LogOptions = {}) {
   else if (stopSpinner) {
     clearInterval((global || globalThis).interval);
     process.stdout.write(
-      "\r" + (message || "✔ Done") + " ".repeat(message.length + 20) + "\n"
+      "\r" + (message || " ") + " ".repeat(message.length + 20) + "\n"
     );
   } else if (typeof style === "string") {
     // check if style is a one word color code or named color
@@ -76,7 +85,7 @@ export interface LogOptions {
   /** CSS style string or array of CSS strings for browser console styling */
   style?: string | string[];
   /** Optional color name or code for terminal environments */
-  color?: keyof typeof colors | null;
+  color?: ColorName | ColorName[] | string | string[] ;
   /** If true, hides log in production (auto-detects by hostname if undefined) */
   hideInProduction?: boolean;
   /** Start a spinner (for CLI tools, optional) */
@@ -85,42 +94,109 @@ export interface LogOptions {
   stopSpinner?: boolean;
 }
 
-// ANSI escape codes for terminal colors when running in Node.js
-export const colors = {
-  reset: "\x1b[0m", // Reset to default color
-  black: "\x1b[30m",
-  red: "\x1b[31m", // Functions, errors
-  green: "\x1b[32m", // Object braces, success
-  yellow: "\x1b[33m", // Strings, warnings
-  blue: "\x1b[34m", // Array brackets, info
-  magenta: "\x1b[35m", // Booleans
-  cyan: "\x1b[36m", // Numbers
-  white: "\x1b[37m", // Default color, plain text
-  gray: "\x1b[90m", // Null, undefined, subtle
-  // Bright variants
-  brightRed: "\x1b[91m",
-  brightGreen: "\x1b[92m",
-  brightYellow: "\x1b[93m",
-  brightBlue: "\x1b[94m",
-  brightMagenta: "\x1b[95m",
-  brightCyan: "\x1b[96m",
-  brightWhite: "\x1b[97m",
-  // Background colors (optional)
-  bgRed: "\x1b[41m",
-  bgGreen: "\x1b[42m",
-  bgYellow: "\x1b[43m",
-  bgBlue: "\x1b[44m",
-  bgMagenta: "\x1b[45m",
-  bgCyan: "\x1b[46m",
-  bgWhite: "\x1b[47m",
-  bgGray: "\x1b[100m",
+/**
+ * Available color names
+ */
+export enum ColorName {
+  RESET = 'reset',
+  BLACK = 'black',
+  RED = 'red',
+  GREEN = 'green',
+  YELLOW = 'yellow',
+  BLUE = 'blue',
+  MAGENTA = 'magenta',
+  CYAN = 'cyan',
+  WHITE = 'white',
+  GRAY = 'gray',
+  BRIGHT_RED = 'brightRed',
+  BRIGHT_GREEN = 'brightGreen',
+  BRIGHT_YELLOW = 'brightYellow',
+  BRIGHT_BLUE = 'brightBlue',
+  BRIGHT_MAGENTA = 'brightMagenta',
+  BRIGHT_CYAN = 'brightCyan',
+  BRIGHT_WHITE = 'brightWhite',
+  BG_RED = 'bgRed',
+  BG_GREEN = 'bgGreen',
+  BG_YELLOW = 'bgYellow',
+  BG_BLUE = 'bgBlue',
+  BG_MAGENTA = 'bgMagenta',
+  BG_CYAN = 'bgCyan',
+  BG_WHITE = 'bgWhite',
+  BG_GRAY = 'bgGray',
+  BG_BLACK = 'bgBlack',
+  BG_BRIGHT_RED = 'bgBrightRed',
+  BG_BRIGHT_GREEN = 'bgBrightGreen',
+  BG_BRIGHT_YELLOW = 'bgBrightYellow',
+  BG_BRIGHT_BLUE = 'bgBrightBlue',
+  BG_BRIGHT_MAGENTA = 'bgBrightMagenta',
+  BG_BRIGHT_CYAN = 'bgBrightCyan',
+  BG_BRIGHT_WHITE = 'bgBrightWhite',
+}
+
+/**
+ * Color mapping with ANSI codes and HTML hex values
+ * @type {Record<ColorName, [number, string]>}
+ * @description Maps color names to [ansiCode, hexValue] pairs
+ * - ansiCode: ANSI escape sequence number for terminal colors
+ * - hexValue: Hex color value (without #) for HTML/CSS
+ */
+const colorMap: Record<ColorName, [number, string]> = {
+  [ColorName.RESET]: [0, '000000'],
+  [ColorName.BLACK]: [30, '000000'],
+  [ColorName.RED]: [31, 'ff0000'],
+  [ColorName.GREEN]: [32, '00ff00'],
+  [ColorName.YELLOW]: [33, 'ffff00'],
+  [ColorName.BLUE]: [34, '0000ff'],
+  [ColorName.MAGENTA]: [35, 'ff00ff'],
+  [ColorName.CYAN]: [36, '00ffff'],
+  [ColorName.WHITE]: [37, 'ffffff'],
+  [ColorName.GRAY]: [90, '808080'],
+  [ColorName.BRIGHT_RED]: [91, 'ff5555'],
+  [ColorName.BRIGHT_GREEN]: [92, '55ff55'],
+  [ColorName.BRIGHT_YELLOW]: [93, 'ffff55'],
+  [ColorName.BRIGHT_BLUE]: [94, '5555ff'],
+  [ColorName.BRIGHT_MAGENTA]: [95, 'ff55ff'],
+  [ColorName.BRIGHT_CYAN]: [96, '55ffff'],
+  [ColorName.BRIGHT_WHITE]: [97, 'ffffff'],
+  [ColorName.BG_BLACK]: [40, '000000'],
+  [ColorName.BG_RED]: [41, 'ff0000'],
+  [ColorName.BG_GREEN]: [42, '00ff00'],
+  [ColorName.BG_YELLOW]: [43, 'ffff00'],
+  [ColorName.BG_BLUE]: [44, '0000ff'],
+  [ColorName.BG_MAGENTA]: [45, 'ff00ff'],
+  [ColorName.BG_CYAN]: [46, '00ffff'],
+  [ColorName.BG_WHITE]: [47, 'ffffff'],
+  [ColorName.BG_GRAY]: [100, '808080'],
+  [ColorName.BG_BRIGHT_RED]: [101, 'ff8888'],
+  [ColorName.BG_BRIGHT_GREEN]: [102, '88ff88'],
+  [ColorName.BG_BRIGHT_YELLOW]: [103, 'ffff88'],
+  [ColorName.BG_BRIGHT_BLUE]: [104, '8888ff'],
+  [ColorName.BG_BRIGHT_MAGENTA]: [105, 'ff88ff'],
+  [ColorName.BG_BRIGHT_CYAN]: [106, '88ffff'],
+  [ColorName.BG_BRIGHT_WHITE]: [107, 'ffffff'],
 };
+
+/**
+ * Returns color codes based on the specified format
+ * @param format - Output format for colors
+ *   - 'ansi': Returns ANSI escape codes (e.g., '\x1b[31m')
+ *   - 'html': Returns HTML hex colors (e.g., '#ff0000')
+ * @returns Object with color names as keys and color codes as values
+ */
+export function getColors(format: 'html' | 'ansi' = 'ansi'): Record<ColorName, string> {
+  const colors: Record<ColorName, string> = {} as Record<ColorName, string>;
+  for (const [name, [ansiCode, hexCode]] of Object.entries(colorMap)) {
+    colors[name] = format === 'html' ? '#' + hexCode : '\x1b[' + ansiCode + 'm';
+  }
+  return colors;
+}
 
 /**
  * Determines the appropriate color code for a given value type
  * Used for consistent color coding in the structure visualization
  */
 function getColorForType(value) {
+  const colors = getColors();
   if (typeof value === "string") return colors.yellow;
   if (typeof value === "number") return colors.cyan;
   if (typeof value === "boolean") return colors.magenta;
@@ -153,20 +229,30 @@ function getTypeString(value) {
  * Creates a colored visualization of a JSON object's structure
  * Shows the shape and types of the data rather than actual values
  * Recursively processes nested objects and arrays
+ * @param {object} obj - The JSON object to visualize
+ * @param {number} indent - The number of spaces to indent the object
+ * @param {ColorFormat} colorFormat - The color format to use
+ * @returns {string} The colored visualization of the JSON object
  */
-export function printJSONStructure(obj, indent = 0) {
+export function printJSONStructure(obj, indent = 0, colorFormat: 'html' | 'ansi' = 'ansi') {
+  const colors = getColors(colorFormat);
   const pad = "  ".repeat(indent);
-
+  var result = "";
   // Handle primitive values and null
   if (typeof obj !== "object" || obj === null) {
     const color = getColorForType(obj);
     return color + getTypeString(obj) + colors.reset;
   }
-
   // Handle arrays with special bracket formatting
   if (Array.isArray(obj)) {
-    let result = colors.blue + "[" + colors.reset;
+    result = colors.blue + "[" + colors.reset;
     if (obj.length) result += "\n";
+    // if array has items all of the same type or object types, print only once
+    if (obj.every((item) => typeof item === typeof obj[0])) {
+      result += pad + "  " + printJSONStructure(obj[0], indent + 1);
+      result += ",";
+      result += "\n";
+    } else {
     obj.forEach((item, idx) => {
       result += pad + "  " + printJSONStructure(item, indent + 1);
       if (idx < obj.length - 1) result += ",";
@@ -174,10 +260,11 @@ export function printJSONStructure(obj, indent = 0) {
     });
     result += pad + colors.blue + "]" + colors.reset;
     return result;
+    }
   }
 
   // Handle objects with special brace and property formatting
-  let result = colors.green + "{" + colors.reset;
+  result = colors.green + "{" + colors.reset;
   const keys = Object.keys(obj);
   if (keys.length) result += "\n";
   keys.forEach((key, index) => {
@@ -219,91 +306,3 @@ export function printJSONStructure(obj, indent = 0) {
   return result;
 }
 
-/**
- * Shows message in a modal overlay with scrollable message stack
- * and is easier to dismiss unlike alert() which blocks window.
- * Creates a semi-transparent overlay with a white box containing the message.
- * @param {string} msg - The message to display
- */
-export function showAlert(msg) {
-  if (typeof document === "undefined") return;
-  let o = document.getElementById("alert-overlay"),
-    list;
-
-  // Create overlay and alert box if they don't exist
-  if (!o) {
-    o = document.body.appendChild(document.createElement("div"));
-    o.id = "alert-overlay";
-    o.setAttribute(
-      "style",
-      "position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center"
-    );
-    o.innerHTML = `<div id="alert-box" style="background:#fff;padding:1.5em 2em;border-radius:8px;box-shadow:0 2px 16px #0003;min-width:220px;max-height:80vh;position:relative;display:flex;flex-direction:column;">
-      <button id="close-alert" style="position:absolute;top:12px;right:20px;font-size:1.5em;background:none;border:none;cursor:pointer;color:black;">&times;</button>
-      <div id="alert-list" style="overflow:auto;flex:1;"></div>
-    </div>`;
-
-    // Add click handlers to close overlay
-    o.addEventListener("click", (e) => e.target == o && o.remove());
-    document.getElementById("close-alert").onclick = () => o.remove();
-  }
-
-  list = o.querySelector("#alert-list");
-
-  // Add new message to list
-  list.innerHTML += `<div style="border-bottom:1px solid #333; font-size:1.2em;margin:0.5em 0;">${msg}</div>`;
-}
-
-/**
- * Sets up development tools for debugging API requests
- * Adds a keyboard shortcut (Ctrl+I) that shows a modal with request history
- * Each request entry shows:
- * - Request path
- * - Request details
- * - Response data
- * - Timestamp
- */
-export function setupDevTools() {
-  // Keyboard shortcut (Ctrl+I) to toggle debug view
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "i" && e.ctrlKey) {
-      // Create HTML of the grab.log requests
-      let html = " ";
-      for (let request of grab.log) {
-        html += `<div style="margin-bottom:1em; border-bottom:1px solid #ccc; padding-bottom:1em;">
-          <b>Path:</b> ${request.path}<br>
-          <b>Request:</b> ${request.request}<br>
-          <b>Response:</b> ${JSON.stringify(request.response, null, 2)}<br>
-          <b>Time:</b> ${new Date(request.lastFetchTime).toLocaleString()}
-        </div>`;
-      }
-      showAlert(html);
-    }
-  });
-}
-
-/**
- * Displays an animated spinner in the terminal with the provided text.
- * The spinner animates in-place until the returned function is called,
- * which stops the spinner and prints a success message.
- * @param {string} text - The text to display next to the spinner animation.
- * @returns {(success?: string) => void} Stop function with optional message.
- * @example
- * const stopSpinner = showSpinnerInTerminal('Downloading...');
- * setTimeout(() => {
- *    stopSpinner('Success!');
- * }, 2000);
- */
-export function showSpinnerInTerminal(text) {
-  let i = 0,
-    interval = setInterval(() => {
-      process.stdout.write(
-        "\r" + "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏".split("")[(i = ++i % 10)] + " " + text
-      );
-    }, 50);
-
-  return function (success = "✔ Done!") {
-    clearInterval(interval);
-    process.stdout.write("\r" + success + " ".repeat(text.length) + "\n");
-  };
-}

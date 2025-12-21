@@ -1,4 +1,4 @@
-import {log} from "../src/log"
+import {log} from "../src/log-json"
 
 log("Downloading...", {
     startSpinner: true,

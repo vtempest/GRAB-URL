@@ -70,8 +70,8 @@ function customSVG(options, svgString) {
   const { colors = [], width, height, size, raw = false } = options;
   const widthMatch = svgString.match(/width="[^"]*"/);
   const heightMatch = svgString.match(/height="[^"]*"/);
-  const finalWidth = size || width || (widthMatch == null ? void 0 : widthMatch[1]) || "100";
-  const finalHeight = size || height || (heightMatch == null ? void 0 : heightMatch[1]) || "100";
+  const finalWidth = size || width || widthMatch?.[1] || "100";
+  const finalHeight = size || height || heightMatch?.[1] || "100";
   if (width || height || size) {
     svgString = svgString.replace(/width="[^"]*"/, `width="${finalWidth}px"`);
     svgString = svgString.replace(/height="[^"]*"/, `height="${finalHeight}px"`);
@@ -83,7 +83,7 @@ function customSVG(options, svgString) {
       if (colorIndex < colors.length) {
         const replacement = colors[colorIndex];
         colorIndex++;
-        return (replacement == null ? void 0 : replacement.startsWith("#")) ? replacement : `#${replacement}`;
+        return replacement?.startsWith("#") ? replacement : `#${replacement}`;
       }
       return match;
     });

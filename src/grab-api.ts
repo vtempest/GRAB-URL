@@ -1,26 +1,12 @@
 import {
   printJSONStructure,
   log,
-  showAlert,
-  setupDevTools,
   type LogOptions,
-} from "./log";
-
-/**
- * TODO
- *  - react tests
- *  - grab error popup and dev tool
- *  - show net log in alert
- *  - progress
- *  - pagination working
- *  - tests in stackblitz
- *  - loading icons
- *  - cache revalidation
- */
+} from "./log-json";
 
 /**
  * ### GRAB: Generate Request to API from Browser
- * ![GrabAPILogo](https://i.imgur.com/xWD7gyV.png)
+ * ![GrabAPILogo](https://i.imgur.com/Rwl5P3p.png)
  *
  * 1. **GRAB is the FBEST Request Manager: Functionally Brilliant, Elegantly Simple Tool**: One Function, no dependencies,
  *    minimalist syntax, [more features than alternatives](https://grab.js.org/docs/Comparisons)
@@ -77,33 +63,27 @@ import {
  * @param {any} [...params] All other params become GET params, POST body, and other methods.
  * @returns {Promise<Object>} The response object with resulting data or .error if error.
  * @author [vtempest (2025)](https://github.com/vtempest/GRAB-URL)
- * @see  [🎯 Examples](https://grab.js.org/docs/Examples) [📑 Docs](https://grab.js.org)
- * @example import grab from 'grab-url';
- * let res = {};
- * await grab('search', {
- *   response: res,
- *   query: "search words"
- * })
+ * @see [🎯 Examples](https://grab.js.org/docs/Examples) [📑 Docs](https://grab.js.org)
  */
 export default async function grab<TResponse = any, TParams = any>(
   path: string,
   options: GrabOptions<TResponse, TParams>
 ): Promise<GrabResponse<TResponse>> {
-  let {
+  var {
     headers,
     response = {} as any, // Pre-initialized object to set the response in. isLoading and error are also set on this object.
     method = options.post // set post: true for POST, omit for GET
       ? "POST"
       : options.put
-      ? "PUT"
-      : options.patch
-      ? "PATCH"
-      : "GET",
+        ? "PUT"
+        : options.patch
+          ? "PATCH"
+          : "GET",
     cache = false, // Enable/disable frontend caching
     cacheForTime = 60, // Seconds to consider data stale and invalidate cache
     timeout = 30, // Request timeout in seconds
     baseURL = (typeof process !== "undefined" && process.env.SERVER_API_URL) ||
-      "/api/", // Use env var or default to /api/
+    "/api/", // Use env var or default to /api/
     cancelOngoingIfNew = false, // Cancel previous request for same path
     cancelNewIfOngoing = false, // Don't make new request if one is ongoing
     rateLimit = 0, // Minimum seconds between requests
@@ -127,7 +107,7 @@ export default async function grab<TResponse = any, TParams = any>(
     put = false,
     patch = false,
     body = null,
-    ...params // All other params become request params/query
+    ...params  // All other params become request params/query
   } = {
     // Destructure options with defaults, merging with any globally set defaults
     ...(typeof window !== "undefined"
@@ -143,7 +123,7 @@ export default async function grab<TResponse = any, TParams = any>(
   else if (!s("/") && !baseURL.endsWith("/")) path = "/" + path;
   else if (s("/") && baseURL.endsWith("/")) path = path.slice(1);
 
-  // try {
+  try {
     //handle debounce
     if (debounce > 0)
       return (await debouncer(async () => {
@@ -181,7 +161,7 @@ export default async function grab<TResponse = any, TParams = any>(
     }
 
     // regrab on stale, on window refocus, on network
-    if (typeof window !== undefined) {
+    if (typeof window !== "undefined") {
       const regrab = async () => await grab(path, { ...options, cache: false });
       if (regrabOnStale && cache) setTimeout(regrab, 1000 * cacheForTime);
       if (regrabOnNetwork) window.addEventListener("online", regrab);
@@ -203,21 +183,22 @@ export default async function grab<TResponse = any, TParams = any>(
     // Configure infinite scroll behavior if enabled
     // Attaches scroll listener to specified element that triggers next page load
     if (infiniteScroll?.length && typeof paginateElement !== "undefined"
-         && typeof window !== "undefined") {
+      && typeof window !== "undefined") {
       let paginateDOM =
         typeof paginateElement === "string"
           ? document.querySelector(paginateElement)
           : paginateElement;
 
       if (!paginateDOM) log("paginateDOM not found", { color: "red" });
-
-      if (window.scrollListener) 
+      else if (window.scrollListener
+        && typeof paginateDOM !== "undefined"
+        && typeof paginateDOM.removeEventListener === "function")
         paginateDOM.removeEventListener("scroll", window.scrollListener);
 
       // Your modified scroll listener with position saving
       window.scrollListener = async (event) => {
         const t = event.target as HTMLElement;
-        
+
         // Save scroll position whenever user scrolls
         localStorage.setItem(
           "scroll",
@@ -233,8 +214,8 @@ export default async function grab<TResponse = any, TParams = any>(
         }
       };
 
-      if (paginateDOM) 
-          paginateDOM.addEventListener("scroll", window.scrollListener);
+      if (paginateDOM)
+        paginateDOM.addEventListener("scroll", window.scrollListener);
     }
 
     // Check request history for a previous request with same path/params
@@ -280,8 +261,7 @@ export default async function grab<TResponse = any, TParams = any>(
 
       // Update page tracking
       if (priorRequest) priorRequest.currentPage = pageNumber;
-      // @ts-ignore
-      params[paginateKey] = pageNumber;
+      params = { ...params, [paginateKey]: pageNumber };
     }
 
     // Set loading state on response object
@@ -377,7 +357,7 @@ export default async function grab<TResponse = any, TParams = any>(
       // Make actual API request and handle response based on content type
       res = await fetch(baseURL + path + paramsGETRequest, fetchParams).catch(
         (e) => {
-          throw new Error(e);
+          throw new Error(e.message);
         }
       );
 
@@ -394,8 +374,8 @@ export default async function grab<TResponse = any, TParams = any>(
             ? res && res.json()
             : type.includes("application/pdf") ||
               type.includes("application/octet-stream")
-            ? res.blob()
-            : res.text()
+              ? res.blob()
+              : res.text()
           : res.json()
         ).catch((e) => {
           throw new Error("Error parsing response: " + e);
@@ -427,15 +407,15 @@ export default async function grab<TResponse = any, TParams = any>(
     if (debug) {
       logger(
         "Path:" +
-          baseURL +
-          path +
-          paramsGETRequest +
-          "\n" +
-          JSON.stringify(options, null, 2) +
-          "\nTime: " +
-          elapsedTime +
-          "s\nResponse: " +
-          printJSONStructure(res)
+        baseURL +
+        path +
+        paramsGETRequest +
+        "\n" +
+        JSON.stringify(options, null, 2) +
+        "\nTime: " +
+        elapsedTime +
+        "s\nResponse: " +
+        printJSONStructure(res)
       );
       // console.log(res);
     }
@@ -467,46 +447,47 @@ export default async function grab<TResponse = any, TParams = any>(
     if (resFunction) response = resFunction(response);
 
     return response;
-  // } catch (error) {
-  //   // Handle any errors that occurred during request processing
-  //   let errorMessage =
-  //     "Error: " + error.message + "\nPath:" + baseURL + path + "\n";
-  //   JSON.stringify(params);
+  } catch (error) {
+    // Handle any errors that occurred during request processing
+    let errorMessage =
+      "Error: " + error.message + "\nPath:" + baseURL + path + "\n";
+    // JSON.stringify(params);
 
-  //   if (typeof onError === "function")
-  //     onError(error.message, baseURL + path, params);
+    // if onError hook is passed
+    if (typeof onError === "function")
+      onError(error.message, baseURL + path, params);
 
-  //   // Retry request if retries are configured and attempts remain
-  //   if (options.retryAttempts > 0)
-  //     return await grab(path, {
-  //       ...options,
-  //       retryAttempts: --options.retryAttempts,
-  //     });
+    // Retry request if retries are configured and attempts remain
+    if (options.retryAttempts > 0)
+      return await grab(path, {
+        ...options,
+        retryAttempts: --options.retryAttempts,
+      });
 
-  //   // Update error state in response object
-  //   // Do not show errors for duplicate aborted requests
-  //   if (!error.message.includes("signal") && options.debug) {
-  //     logger(errorMessage, { color: "red" });
-  //     if (debug && typeof document !== undefined) showAlert(errorMessage);
-  //   }
-  //   response.error = error.message;
-  //   if (typeof response === "function") {
-  //     response.data = response({ isLoading: undefined, error: error.message });
-  //     response = response.data;
-  //   } else delete response?.isLoading;
+    // Update error state in response object
+    // Do not show errors for duplicate aborted requests
+    if (!error.message.includes("signal") && options.debug) {
+      logger(errorMessage, { color: "red" });
+      if (debug && typeof document !== "undefined") showAlert(errorMessage);
+    }
+    response.error = error.message;
+    if (typeof response === "function") {
+      response.data = response({ isLoading: undefined, error: error.message });
+      response = response.data;
+    } else delete response?.isLoading;
 
-  //   // Log error in request history
-  //   if (typeof grab.log != "undefined")
-  //     grab.log?.unshift({
-  //       path,
-  //       request: JSON.stringify(params),
-  //       error: error.message,
-  //     });
+    // Log error in request history
+    if (typeof grab.log != "undefined")
+      grab.log?.unshift({
+        path,
+        request: JSON.stringify(params),
+        error: error.message,
+      });
 
-  //   // if (typeof options.response === "function")
-  //   //   response = options.response(response);
-  //   return response;
-  // }
+    // if (typeof options.response === "function")
+    //   response = options.response(response);
+    return response;
+  }
 }
 
 /**
@@ -517,8 +498,8 @@ export default async function grab<TResponse = any, TParams = any>(
  */
 grab.instance =
   (defaults = {}) =>
-  (path, options = {}) =>
-    grab(path, { ...defaults, ...options });
+    (path, options = {}) =>
+      grab(path, { ...defaults, ...options });
 
 // delays execution so that future calls may override and only executes last one
 const debouncer = async (func, wait) => {
@@ -536,7 +517,6 @@ const debouncer = async (func, wait) => {
 // Add globals to window in browser, or global in Node.js
 if (typeof window !== "undefined") {
   window.log = log;
-  // @ts-ignore
   window.grab = grab;
 
   window.grab.log = [];
@@ -567,6 +547,73 @@ if (typeof window !== "undefined") {
   globalThis.log = log;
   globalThis.grab = grab.instance();
 }
+
+
+
+/**
+ * Shows message in a modal overlay with scrollable message stack
+ * and is easier to dismiss unlike alert() which blocks window.
+ * Creates a semi-transparent overlay with a white box containing the message.
+ * @param {string} msg - The message to display
+ */
+export function showAlert(msg) {
+  if (typeof document === "undefined") return;
+  let o = document.getElementById("alert-overlay"),
+    list;
+
+  // Create overlay and alert box if they don't exist
+  if (!o) {
+    o = document.body.appendChild(document.createElement("div"));
+    o.id = "alert-overlay";
+    o.setAttribute(
+      "style",
+      "position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center"
+    );
+    o.innerHTML = `<div id="alert-box" style="background:#fff;padding:1.5em 2em;border-radius:8px;box-shadow:0 2px 16px #0003;min-width:220px;max-height:80vh;position:relative;display:flex;flex-direction:column;">
+      <button id="close-alert" style="position:absolute;top:12px;right:20px;font-size:1.5em;background:none;border:none;cursor:pointer;color:black;">&times;</button>
+      <div id="alert-list" style="overflow:auto;flex:1;"></div>
+    </div>`;
+
+    // Add click handlers to close overlay
+    o.addEventListener("click", (e) => e.target == o && o.remove());
+    document.getElementById("close-alert").onclick = () => o.remove();
+  }
+
+  list = o.querySelector("#alert-list");
+
+  // Add new message to list
+  list.innerHTML += `<div style="border-bottom:1px solid #333; font-size:1.2em;margin:0.5em 0;">${msg}</div>`;
+}
+
+/**
+ * Sets up development tools for debugging API requests
+ * Adds a keyboard shortcut (Ctrl+Alt+I) that shows a modal with request history
+ * Each request entry shows:
+ * - Request path
+ * - Request details
+ * - Response data
+ * - Timestamp
+ */
+export function setupDevTools() {
+  // Keyboard shortcut (Ctrl+Alt+I) to toggle debug view
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "i" && e.ctrlKey && e.altKey) {
+      // Create HTML of the grab.log requests
+      let html = " ";
+      for (let request of grab.log) {
+        html += `<div style="margin-bottom:1em; border-bottom:1px solid #ccc; padding-bottom:1em;">
+          <b>Path:</b> ${request.path}<br>
+          <b>Request:</b> ${printJSONStructure(request.request, 0, 'html')}<br>
+          <b>Response:</b> ${printJSONStructure(request.response, 0, 'html')}<br> 
+          <b>Time:</b> ${new Date(request.lastFetchTime).toLocaleString()}
+        </div>`;
+      }
+      showAlert(html);
+    }
+  });
+}
+
+
 
 /***************** TYPESCRIPT INTERFACES *****************/
 
@@ -693,19 +740,19 @@ export interface GrabGlobal {
 export interface GrabFunction {
   /**
    * ### GRAB: Generate Request to API from Browser
-   * ![grabAPILogo](https://i.imgur.com/xWD7gyV.png)
+   * ![grabAPILogo](https://i.imgur.com/Rwl5P3p.png)
    * Make API request with path
    * @returns {Promise<Object>} The response object with resulting data or .error if error.
    * @author [vtempest (2025)](https://github.com/vtempest/GRAB-URL)
    * @see  [🎯 Examples](https://grab.js.org/docs/Examples) [📑 Docs](https://grab.js.org/lib)
    */
-  <TResponse = any, TParams = Record<string, any>>(path: string): Promise<
+  <TResponse = any, TParams = Record<string, any>>(path: string, options?: GrabOptions<TResponse, TParams>): Promise<
     GrabResponse<TResponse>
   >;
 
   /**
    * ### GRAB: Generate Request to API from Browser
-   * ![grabAPILogo](https://i.imgur.com/xWD7gyV.png)
+   * ![grabAPILogo](https://i.imgur.com/Rwl5P3p.png)
    * Make API request with path and options/parameters
    * @returns {Promise<Object>} The response object with resulting data or .error if error.
    * @author [vtempest (2025)](https://github.com/vtempest/GRAB-URL)
@@ -748,15 +795,6 @@ export interface printJSONStructureFunction {
   (obj: any): string;
 }
 
-// Helper type for creating typed API clients
-// export type TypedGrabFunction = <
-//   TResponse = any,
-//   TParams = Record<string, any>
-// >(
-//   path: string,
-//   config?: GrabOptions<TResponse, TParams>
-// ) => Promise<GrabResponse<TResponse>>;
-
 declare global {
   // Browser globals
   interface Window {
@@ -778,4 +816,4 @@ declare global {
   var grab: GrabFunction;
 }
 
-export { grab, log, showAlert, printJSONStructure };
+export { grab, log, printJSONStructure };

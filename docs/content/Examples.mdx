@@ -5,7 +5,7 @@ sidebar_position: 1
 
 import { InlineTOC } from 'fumadocs-ui/components/inline-toc';
 
-<InlineTOC items={toc} />
+<InlineTOC items={toc} defaultOpen="true" />
 
 ### Install & Import 
 
@@ -274,34 +274,14 @@ await grab("products", {
 ### Debounced Search
 
 ```javascript
-// Utility function for debouncing
-function debounce(func, wait) {
-  let timeout;
-  return function executedFunction(...args) {
-    const later = () => {
-      clearTimeout(timeout);
-      func(...args);
-    };
-    clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
-  };
-}
+// Seconds to debounce request, wait to execute so that other requests may override
 
-// Debounced search implementation
-const debouncedSearch = debounce(async (query) => {
-  if (query.length < 2) return;
-
-  await grab("search", {
-    response: searchResults,
-    query: query,
-    cancelOngoingIfNew: true, // Cancel previous searches
-  });
-}, 300); // Wait 300ms after user stops typing
-
-// Usage in input handler
-function handleSearchInput(event) {
-  debouncedSearch(event.target.value);
-}
+await grab("search", {
+  response: searchResults,
+  debounce: 2,
+  query: query,
+  cancelOngoingIfNew: true, // Cancel previous searches
+});
 ```
 
 ### Client Cache in User Memory

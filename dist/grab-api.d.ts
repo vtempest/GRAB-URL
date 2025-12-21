@@ -1,45 +1,45 @@
-declare const colors: {
-    reset: string;
-    black: string;
-    red: string;
-    green: string;
-    yellow: string;
-    blue: string;
-    magenta: string;
-    cyan: string;
-    white: string;
-    gray: string;
-    brightRed: string;
-    brightGreen: string;
-    brightYellow: string;
-    brightBlue: string;
-    brightMagenta: string;
-    brightCyan: string;
-    brightWhite: string;
-    bgRed: string;
-    bgGreen: string;
-    bgYellow: string;
-    bgBlue: string;
-    bgMagenta: string;
-    bgCyan: string;
-    bgWhite: string;
-    bgGray: string;
-};
+/**
+ * Available color names
+ */
+declare enum ColorName {
+    RESET = "reset",
+    BLACK = "black",
+    RED = "red",
+    GREEN = "green",
+    YELLOW = "yellow",
+    BLUE = "blue",
+    MAGENTA = "magenta",
+    CYAN = "cyan",
+    WHITE = "white",
+    GRAY = "gray",
+    BRIGHT_RED = "brightRed",
+    BRIGHT_GREEN = "brightGreen",
+    BRIGHT_YELLOW = "brightYellow",
+    BRIGHT_BLUE = "brightBlue",
+    BRIGHT_MAGENTA = "brightMagenta",
+    BRIGHT_CYAN = "brightCyan",
+    BRIGHT_WHITE = "brightWhite",
+    BG_RED = "bgRed",
+    BG_GREEN = "bgGreen",
+    BG_YELLOW = "bgYellow",
+    BG_BLUE = "bgBlue",
+    BG_MAGENTA = "bgMagenta",
+    BG_CYAN = "bgCyan",
+    BG_WHITE = "bgWhite",
+    BG_GRAY = "bgGray",
+    BG_BLACK = "bgBlack",
+    BG_BRIGHT_RED = "bgBrightRed",
+    BG_BRIGHT_GREEN = "bgBrightGreen",
+    BG_BRIGHT_YELLOW = "bgBrightYellow",
+    BG_BRIGHT_BLUE = "bgBrightBlue",
+    BG_BRIGHT_MAGENTA = "bgBrightMagenta",
+    BG_BRIGHT_CYAN = "bgBrightCyan",
+    BG_BRIGHT_WHITE = "bgBrightWhite"
+}
 
 /**
- * TODO
- *  - react tests
- *  - grab error popup and dev tool
- *  - show net log in alert
- *  - progress
- *  - pagination working
- *  - tests in stackblitz
- *  - loading icons
- *  - cache revalidation
- */
-/**
  * ### GRAB: Generate Request to API from Browser
- * ![GrabAPILogo](https://i.imgur.com/xWD7gyV.png)
+ * ![GrabAPILogo](https://i.imgur.com/Rwl5P3p.png)
  *
  * 1. **GRAB is the FBEST Request Manager: Functionally Brilliant, Elegantly Simple Tool**: One Function, no dependencies,
  *    minimalist syntax, [more features than alternatives](https://grab.js.org/docs/Comparisons)
@@ -96,13 +96,7 @@ declare const colors: {
  * @param {any} [...params] All other params become GET params, POST body, and other methods.
  * @returns {Promise<Object>} The response object with resulting data or .error if error.
  * @author [vtempest (2025)](https://github.com/vtempest/GRAB-URL)
- * @see  [🎯 Examples](https://grab.js.org/docs/Examples) [📑 Docs](https://grab.js.org)
- * @example import grab from 'grab-url';
- * let res = {};
- * await grab('search', {
- *   response: res,
- *   query: "search words"
- * })
+ * @see [🎯 Examples](https://grab.js.org/docs/Examples) [📑 Docs](https://grab.js.org)
  */
 declare function grab_2<TResponse = any, TParams = any>(path: string, options: GrabOptions<TResponse, TParams>): Promise<GrabResponse<TResponse>>;
 
@@ -118,16 +112,16 @@ export { grab_2 as grab }
 export declare interface GrabFunction {
     /**
      * ### GRAB: Generate Request to API from Browser
-     * ![grabAPILogo](https://i.imgur.com/xWD7gyV.png)
+     * ![grabAPILogo](https://i.imgur.com/Rwl5P3p.png)
      * Make API request with path
      * @returns {Promise<Object>} The response object with resulting data or .error if error.
      * @author [vtempest (2025)](https://github.com/vtempest/GRAB-URL)
      * @see  [🎯 Examples](https://grab.js.org/docs/Examples) [📑 Docs](https://grab.js.org/lib)
      */
-    <TResponse = any, TParams = Record<string, any>>(path: string): Promise<GrabResponse<TResponse>>;
+    <TResponse = any, TParams = Record<string, any>>(path: string, options?: GrabOptions<TResponse, TParams>): Promise<GrabResponse<TResponse>>;
     /**
      * ### GRAB: Generate Request to API from Browser
-     * ![grabAPILogo](https://i.imgur.com/xWD7gyV.png)
+     * ![grabAPILogo](https://i.imgur.com/Rwl5P3p.png)
      * Make API request with path and options/parameters
      * @returns {Promise<Object>} The response object with resulting data or .error if error.
      * @author [vtempest (2025)](https://github.com/vtempest/GRAB-URL)
@@ -285,7 +279,7 @@ declare interface LogOptions {
     /** CSS style string or array of CSS strings for browser console styling */
     style?: string | string[];
     /** Optional color name or code for terminal environments */
-    color?: keyof typeof colors | null;
+    color?: ColorName | ColorName[] | string | string[];
     /** If true, hides log in production (auto-detects by hostname if undefined) */
     hideInProduction?: boolean;
     /** Start a spinner (for CLI tools, optional) */
@@ -298,8 +292,12 @@ declare interface LogOptions {
  * Creates a colored visualization of a JSON object's structure
  * Shows the shape and types of the data rather than actual values
  * Recursively processes nested objects and arrays
+ * @param {object} obj - The JSON object to visualize
+ * @param {number} indent - The number of spaces to indent the object
+ * @param {ColorFormat} colorFormat - The color format to use
+ * @returns {string} The colored visualization of the JSON object
  */
-export declare function printJSONStructure(obj: any, indent?: number): string;
+export declare function printJSONStructure(obj: any, indent?: number, colorFormat?: 'html' | 'ansi'): string;
 
 export declare interface printJSONStructureFunction {
     /**
@@ -309,6 +307,17 @@ export declare interface printJSONStructureFunction {
      */
     (obj: any): string;
 }
+
+/**
+ * Sets up development tools for debugging API requests
+ * Adds a keyboard shortcut (Ctrl+Alt+I) that shows a modal with request history
+ * Each request entry shows:
+ * - Request path
+ * - Request details
+ * - Response data
+ * - Timestamp
+ */
+export declare function setupDevTools(): void;
 
 /**
  * Shows message in a modal overlay with scrollable message stack

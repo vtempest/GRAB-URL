@@ -2,7 +2,11 @@
 title: Log Module Reference
 ---
 
-[Documentation](modules.md) / log
+
+import { InlineTOC } from 'fumadocs-ui/components/inline-toc';
+
+<InlineTOC items={toc} defaultOpen="true" />
+
 
 ## LogOptions
 
@@ -1041,7 +1045,7 @@ function setupDevTools(): void;
 Defined in: [log.ts:266](https://github.com/vtempest/GRAB-URL/tree/master/src/log.ts#L266)
 
 Sets up development tools for debugging API requests
-Adds a keyboard shortcut (Ctrl+I) that shows a modal with request history
+Adds a keyboard shortcut (Ctrl+Alt+I) that shows a modal with request history
 Each request entry shows:
 - Request path
 - Request details

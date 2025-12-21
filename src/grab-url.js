@@ -4,48 +4,17 @@ import fs from 'fs';
 import path from 'path';
 import { pipeline } from 'stream/promises';
 import { Readable } from 'stream';
-import cliProgress from 'cli-progress';
-import chalk from 'chalk';
-import ora from 'ora';
-import Table from 'cli-table3';
-import grab, { log } from '../dist/grab-api.es.js';
 import readline from 'readline';
 import { readFileSync } from 'fs';
-import { fileURLToPath, pathToFileURL } from 'url';
-import { dirname, join } from 'path';
+import { join } from 'path';
+import spinners from './icons/cli/spinners.js';
+import grab, { log } from '../dist/grab-api.es.js';
+import { pathToFileURL, fileURLToPath } from 'url';
 
-// Try multiple possible paths for spinners.json
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-let spinners;
-try {
-  // Try the icons/cli path first (where it actually exists)
-  spinners = JSON.parse(readFileSync(join(__dirname, 'icons', 'cli', 'spinners.json'), 'utf8'));
-} catch (error) {
-  try {
-    // Try the local path
-    spinners = JSON.parse(readFileSync(join(__dirname, 'spinners.json'), 'utf8'));
-  } catch (error2) {
-    try {
-      // Try the parent directory (src)
-      spinners = JSON.parse(readFileSync(join(__dirname, '..', 'spinners.json'), 'utf8'));
-    } catch (error3) {
-      try {
-        // Try the current working directory
-        spinners = JSON.parse(readFileSync(join(process.cwd(), 'src', 'spinners.json'), 'utf8'));
-      } catch (error4) {
-        // Fallback to default spinners if file not found
-        console.warn('Could not load spinners.json, using defaults');
-        spinners = {
-          dots: { frames: ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'] },
-          line: { frames: ['-', '\\', '|', '/'] },
-          arrow: { frames: ['←', '↖', '↑', '↗', '→', '↘', '↓', '↙'] }
-        };
-      }
-    }
-  }
-}
+import cliProgress from 'cli-progress';
+import chalk from 'chalk';
+// Use cli-spinners for spinner animations
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // --- ArgParser from grab-cli.js ---
 class ArgParser {
