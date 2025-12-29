@@ -25,7 +25,7 @@ export function HeroSection() {
         <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
           <div className="mb-8 relative" style={{ animation: "float 6s ease-in-out infinite" }}>
             <Image
-              src="/images/17642410019312965377779191791883.png"
+              src="https://i.imgur.com/Rwl5P3p.png"
               alt="GRAB - Generate Request to API from Browser"
               width={200}
               height={200}
@@ -57,9 +57,9 @@ export function HeroSection() {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center gap-4 mb-12">
-            <Button size="lg" className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90">
+            <Button onClick={() => window.location.href = "/docs"} size="lg" className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90">
               <BookOpen className="h-4 w-4" />
-              Get Started
+              Documentation
             </Button>
 
             <div

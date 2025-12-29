@@ -98,7 +98,7 @@ declare enum ColorName {
  * @author [vtempest (2025)](https://github.com/vtempest/GRAB-URL)
  * @see [🎯 Examples](https://grab.js.org/docs/Examples) [📑 Docs](https://grab.js.org)
  */
-declare function grab_2<TResponse = any, TParams = any>(path: string, options: GrabOptions<TResponse, TParams>): Promise<GrabResponse<TResponse>>;
+declare function grab_2<TResponse = any, TParams = any>(path: string, options?: GrabOptions<TResponse, TParams>): Promise<GrabResponse<TResponse>>;
 
 declare namespace grab_2 {
     var instance: (defaults?: {}) => (path: any, options?: {}) => Promise<any>;

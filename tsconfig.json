@@ -2,29 +2,31 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
-    "moduleResolution": "bundler",  // Recommended for Vite/ESM
+    "moduleResolution": "bundler", // Recommended for Vite/ESM
     "resolveJsonModule": true,
     "allowJs": true,
     "declaration": true,
     "emitDeclarationOnly": true,
-    "checkJs": false,               // Disable JS type checking
+    "checkJs": false, // Disable JS type checking
     "noImplicitAny": false,
-    "declarationDir": "./dist",     // Output dir for .d.ts files
-    "outDir": "./dist",             // Output directory
+    "declarationDir": "./dist", // Output dir for .d.ts files
+    "outDir": "./dist", // Output directory
     "strict": false,
     "skipLibCheck": true,
     "allowImportingTsExtensions": true,
     "noEmit": true,
     "allowSyntheticDefaultImports": true,
-    "isolatedModules": true         // Required for Vite
+    "isolatedModules": true // Required for Vite
   },
   "include": [
-    "./src/**/*.ts",                // Include all TS files
-    "./src/**/*.js"                 // Include JS files if needed
-, "src/grab-url.ts"  ],
+    "./src/**/*.ts", // Include all TS files
+    "./src/**/*.js" // Include JS files if needed
+    ,
+    "src/grab-url.ts"
+  ],
   "exclude": [
     "node_modules",
     "dist",
-    "docs"
+    "docs222"
   ]
 }

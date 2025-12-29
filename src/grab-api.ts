@@ -67,16 +67,16 @@ import {
  */
 export default async function grab<TResponse = any, TParams = any>(
   path: string,
-  options: GrabOptions<TResponse, TParams>
+  options?: GrabOptions<TResponse, TParams>
 ): Promise<GrabResponse<TResponse>> {
   var {
     headers,
     response = {} as any, // Pre-initialized object to set the response in. isLoading and error are also set on this object.
-    method = options.post // set post: true for POST, omit for GET
+    method = options?.post // set post: true for POST, omit for GET
       ? "POST"
-      : options.put
+      : options?.put
         ? "PUT"
-        : options.patch
+        : options?.patch
           ? "PATCH"
           : "GET",
     cache = false, // Enable/disable frontend caching
@@ -112,7 +112,7 @@ export default async function grab<TResponse = any, TParams = any>(
     // Destructure options with defaults, merging with any globally set defaults
     ...(typeof window !== "undefined"
       ? window?.grab?.defaults
-      : (global || globalThis)?.grab?.defaults || {}),
+      : (globalThis)?.grab?.defaults || {}),
     ...options,
   };
 
@@ -151,8 +151,8 @@ export default async function grab<TResponse = any, TParams = any>(
     if (options?.setDefaults) {
       if (typeof window !== "undefined")
         window.grab.defaults = { ...options, setDefaults: undefined };
-      else if (typeof (global || globalThis).grab !== "undefined")
-        (global || globalThis).grab.defaults = {
+      else if (typeof globalThis.grab !== "undefined")
+        globalThis.grab.defaults = {
           ...options,
           setDefaults: undefined,
         };
@@ -534,12 +534,6 @@ if (typeof window !== "undefined") {
     document.querySelector(paginateElement).scrollTop = scrollTop;
     document.querySelector(paginateElement).scrollLeft = scrollLeft;
   });
-} else if (typeof global !== "undefined") {
-  grab.log = [];
-  grab.mock = {};
-  grab.defaults = {};
-  global.log = log;
-  global.grab = grab.instance();
 } else if (typeof globalThis !== "undefined") {
   grab.log = [];
   grab.mock = {};
