@@ -1,15 +1,6 @@
-export const title = "GRAB URL Lib",
+export const title = "GRAB URL Docs",
   description = "GRAB URL Lib",
-  logo = "./logo.png",
+  logo = "./apple-touch-icon.png",
+  github = "https://github.com/vtempest/grab-url",
   favicon = "./favicon.ico";
 
-export const nav = [
-  {
-    label: "Docs",
-    href: "/docs",
-  },
-  {
-    label: "API",
-    href: "/api",
-  },
-];

@@ -51,10 +51,24 @@ export function HeroSection() {
             {"}"}
           </p>
 
-          <p className="text-base md:text-lg text-muted-foreground max-w-2xl mb-8 text-pretty">
+
+          <p className="text-base md:text-lg text-muted-foreground max-w-2xl mb-6 text-pretty">
             Functionally Brilliant, Elegantly Simple. One function, no dependencies, minimalist syntax with more
             features than alternatives.
           </p>
+
+          <div className="flex flex-wrap justify-center gap-2 mb-8">
+            <a href="https://npmjs.org/package/grab-url" target="_blank" rel="noreferrer">
+              <img alt="NPM Version" src="https://img.shields.io/npm/v/grab-url" />
+            </a>
+            <a href="https://github.com/vtempest/GRAB-URL/discussions" target="_blank" rel="noreferrer">
+              <img alt="GitHub Discussions" src="https://img.shields.io/github/discussions/vtempest/GRAB-URL" />
+            </a>
+            <a href="https://github.blog/developer-skills/github/beginners-guide-to-github-creating-a-pull-request/" target="_blank" rel="noreferrer">
+              <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome" />
+            </a>
+          </div>
+
 
           <div className="flex flex-col sm:flex-row items-center gap-4 mb-12">
             <Button onClick={() => window.location.href = "/docs"} size="lg" className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90">

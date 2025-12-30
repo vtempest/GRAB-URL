@@ -1,12 +1,12 @@
 import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
-import { Link2 }   from 'lucide-react';
-import { title } from './customize-docs';
+import { title, logo, github } from './customize-docs';
+import Image from 'next/image';
 
 export const baseOptions: BaseLayoutProps = {
   nav: {
     title: (
       <span className="inline-flex items-center gap-2">
-        <Link2 />
+        <Image src={logo} alt="Logo" width={32} height={32} />
         {title}
       </span>
     ),
@@ -18,7 +18,7 @@ export const baseOptions: BaseLayoutProps = {
     },
     {
       text: 'GitHub',
-      url: 'https://github.com/vtempest/grab-url',
+      url: github,
       external: true,
     },
   ],
