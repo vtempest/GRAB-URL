@@ -20,6 +20,7 @@
     "fumadocs-openapi": "^10.0.11",
     "fumadocs-typescript": "^4.0.13",
     "fumadocs-ui": "^16.1.0",
+    "highlight.js": "^11.11.1",
     "lucide-react": "^0.555.0",
     "next": "^16.0.5",
     "react": "^19.2.0",

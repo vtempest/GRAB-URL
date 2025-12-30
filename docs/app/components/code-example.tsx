@@ -1,8 +1,18 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Button } from "@/app/components/ui/button"
 import { Copy, Check } from "lucide-react"
+import hljs from 'highlight.js/lib/core'
+import javascript from 'highlight.js/lib/languages/javascript'
+import typescript from 'highlight.js/lib/languages/typescript'
+import bash from 'highlight.js/lib/languages/bash'
+import 'highlight.js/styles/github-dark.css'
+
+// Register languages
+hljs.registerLanguage('javascript', javascript)
+hljs.registerLanguage('typescript', typescript)
+hljs.registerLanguage('bash', bash)
 
 const codeExamples = {
   basic: `import grab from 'grab-url';
@@ -151,12 +161,19 @@ const tabLabels: Record<TabKey, string> = {
 export function CodeExample() {
   const [activeTab, setActiveTab] = useState<TabKey>("basic")
   const [copied, setCopied] = useState(false)
+  const codeRef = useRef<HTMLElement>(null)
 
   const copyCode = () => {
     navigator.clipboard.writeText(codeExamples[activeTab])
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
+
+  useEffect(() => {
+    if (codeRef.current) {
+      hljs.highlightElement(codeRef.current)
+    }
+  }, [activeTab])
 
   return (
     <section className="py-20 md:py-32 border-b border-border">
@@ -194,7 +211,7 @@ export function CodeExample() {
               </Button>
             </div>
             <pre className="p-6 overflow-x-auto text-sm max-h-[400px] overflow-y-auto">
-              <code className="font-mono text-foreground">{codeExamples[activeTab]}</code>
+              <code ref={codeRef} className={`font-mono language-${activeTab === 'cli' ? 'bash' : 'javascript'}`}>{codeExamples[activeTab]}</code>
             </pre>
           </div>
         </div>

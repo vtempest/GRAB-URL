@@ -74,7 +74,7 @@ export function HeroSection() {
               )}
             </div>
 
-            <Button variant="outline" size="lg" className="gap-2 bg-transparent">
+            <Button onClick={() => window.location.href = "https://github.com/vtempest/grab-url"} variant="outline" size="lg" className="gap-2 bg-transparent">
               <Github className="h-4 w-4" />
               GitHub
             </Button>
