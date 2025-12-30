@@ -209,8 +209,8 @@ export function CodeExample() {
                     key={tab}
                     onClick={() => setActiveTab(tab)}
                     className={`px-3 py-1.5 text-sm rounded-md transition-colors whitespace-nowrap ${activeTab === tab
-                        ? "bg-primary text-primary-foreground"
-                        : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:text-foreground hover:bg-secondary"
                       }`}
                   >
                     {tabLabels[tab]}
@@ -223,7 +223,7 @@ export function CodeExample() {
               </Button>
             </div>
             <pre className="p-6 overflow-x-auto text-sm max-h-[400px] overflow-y-auto">
-              <code ref={codeRef} className={`font-mono language-${tabLanguages[activeTab]}`}>{codeExamples[activeTab]}</code>
+              <code ref={codeRef} className={`font-mono language-${tabLanguages[activeTab]}`} style={{ fontFamily: 'var(--font-mono)' }}>{codeExamples[activeTab]}</code>
             </pre>
           </div>
         </div>
