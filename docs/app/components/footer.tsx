@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { Button } from "@/app/components/ui/button"
 import { Github, BookOpen, MessageCircle } from "lucide-react"
 
@@ -14,18 +15,24 @@ export function Footer() {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-            <Button size="lg" className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90">
-              <BookOpen className="h-4 w-4" />
-              Read the Docs
-            </Button>
-            <Button variant="outline" size="lg" className="gap-2 bg-transparent">
-              <Github className="h-4 w-4" />
-              Star on GitHub
-            </Button>
-            <Button variant="outline" size="lg" className="gap-2 bg-transparent">
-              <MessageCircle className="h-4 w-4" />
-              Join Discord
-            </Button>
+            <Link href="/docs">
+              <Button size="lg" className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90">
+                <BookOpen className="h-4 w-4" />
+                Read the Docs
+              </Button>
+            </Link>
+            <Link href="https://github.com/vtempest/grab-url" target="_blank" rel="noopener noreferrer">
+              <Button variant="outline" size="lg" className="gap-2 bg-transparent">
+                <Github className="h-4 w-4" />
+                Star on GitHub
+              </Button>
+            </Link>
+            <Link href="https://discord.gg/SJdBqBz3tV" target="_blank" rel="noopener noreferrer">
+              <Button variant="outline" size="lg" className="gap-2 bg-transparent">
+                <MessageCircle className="h-4 w-4" />
+                Join Discord
+              </Button>
+            </Link>
           </div>
 
           <div className="border-t border-border pt-8">

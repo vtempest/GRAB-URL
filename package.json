@@ -45,14 +45,14 @@
     "src/icons/cli/spinners.json"
   ],
   "scripts": {
-    "down": "bun src/grab-url.js https://releases.ubuntu.com/24.04.2/ubuntu-24.04.2-live-server-amd64.iso",
     "make": "npm run make:icons; npm run make:docs; npm run make:main",
     "make:docs": "cd docs && npm run build",
     "make:icons": "npx export-svg-typescript@latest -i ./src/icons/svg -o ./src/icons/svg/index.ts",
     "make:main": "vite build",
-    "ship": "bun x standard-version --release-as patch; npm publish",
+    "ship": "bun x standard-version --release-as patch;rm CHANGELOG.md; npm publish",
     "check": "vitest --ui",
-    "docs": "cd docs && npm run start"
+    "test": "vitest",
+    "test:cli": "bun src/grab-url.js https://releases.ubuntu.com/24.04.2/ubuntu-24.04.2-live-server-amd64.iso"
   },
   "devDependencies": {
     "@vitest/ui": "^3.2.4",
