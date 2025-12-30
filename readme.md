@@ -32,7 +32,7 @@ npm i grab-url
 5. **Mock Server Support**: Configure `window.grab.mock` for development and testing environments
 6. **Cancel Duplicates**: Prevent this request if one is ongoing to same path & params, or cancel the ongoing request.
 7. **Timeout & Retry**: Customizable request timeout, default 30s, and auto-retry on error
-8. **DevTools**: `Ctrl+I` overlays webpage with devtools showing all requests and responses, timing, and JSON structure.
+8. **DevTools**: `Ctrl+Alt+I` overlays webpage with devtools showing all requests and responses, timing, and JSON structure.
 9. **Request History**: Stores all request and response data in global `grab.log` object
 10. **Pagination Infinite Scroll**: Built-in pagination for infinite scroll to auto-load and merge next result page, with scroll position recovery.
 11. **Base URL Based on Environment**: Configure `grab.defaults.baseURL` once at the top, overide with `SERVER_API_URL` in `.env`.
