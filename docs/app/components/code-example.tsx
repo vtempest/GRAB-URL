@@ -181,6 +181,8 @@ export function CodeExample() {
 
   useEffect(() => {
     if (codeRef.current) {
+      // Remove previous highlighting before applying new highlighting
+      delete codeRef.current.dataset.highlighted
       hljs.highlightElement(codeRef.current)
     }
   }, [activeTab])
