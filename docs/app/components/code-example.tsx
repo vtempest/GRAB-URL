@@ -158,6 +158,16 @@ const tabLabels: Record<TabKey, string> = {
   cli: "CLI",
 }
 
+const tabLanguages: Record<TabKey, string> = {
+  basic: "javascript",
+  reactive: "javascript",
+  typescript: "typescript",
+  config: "javascript",
+  mock: "javascript",
+  features: "javascript",
+  cli: "bash",
+}
+
 export function CodeExample() {
   const [activeTab, setActiveTab] = useState<TabKey>("basic")
   const [copied, setCopied] = useState(false)
@@ -211,7 +221,7 @@ export function CodeExample() {
               </Button>
             </div>
             <pre className="p-6 overflow-x-auto text-sm max-h-[400px] overflow-y-auto">
-              <code ref={codeRef} className={`font-mono language-${activeTab === 'cli' ? 'bash' : 'javascript'}`}>{codeExamples[activeTab]}</code>
+              <code ref={codeRef} className={`font-mono language-${tabLanguages[activeTab]}`}>{codeExamples[activeTab]}</code>
             </pre>
           </div>
         </div>
