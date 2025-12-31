@@ -1,3 +1,4 @@
+import Image from "next/image"
 import {
   Zap,
   Database,
@@ -130,13 +131,24 @@ export function FeaturesGrid() {
       <div className="absolute inset-0 animated-grid-bg opacity-30" />
 
       <div className="container mx-auto px-4 relative">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Everything You Need, <span className="text-primary">Nothing You Don't</span>
-          </h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            20+ features packed into 4KB. No bloat, no dependencies, just pure functionality.
-          </p>
+        <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12 mb-16">
+          <div className="relative" style={{ animation: "float 6s ease-in-out infinite" }}>
+            <Image
+              src="https://i.imgur.com/Rwl5P3p.png"
+              alt="GRAB - Generate Request to API from Browser"
+              width={200}
+              height={200}
+              className="drop-shadow-2xl"
+            />
+          </div>
+          <div className="text-center md:text-left max-w-2xl">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              GRAB is the FBEST Request Manager: Functionally Brilliant, Elegantly Simple Tool
+            </h2>
+            <p className="text-muted-foreground text-lg">
+              20+ features packed into 4KB. No bloat, no dependencies, just pure functionality.
+            </p>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">

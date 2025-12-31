@@ -21,7 +21,7 @@ export function HeroSection() {
       <div className="absolute inset-0 grid-glow" />
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/50 to-background" />
 
-      <div className="container mx-auto px-4 py-20 md:py-32 relative">
+      <div className="container mx-auto px-4  relative">
         <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
           <div className="mb-8 relative" style={{ animation: "float 6s ease-in-out infinite" }}>
             <Image
@@ -93,7 +93,7 @@ export function HeroSection() {
               GitHub
             </Button>
           </div>
-
+          {/* 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 pt-8 border-t border-border w-full max-w-2xl">
             <div className="text-center">
               <p className="text-2xl md:text-3xl font-bold text-primary">4KB</p>
@@ -111,7 +111,7 @@ export function HeroSection() {
               <p className="text-2xl md:text-3xl font-bold text-foreground">100%</p>
               <p className="text-sm text-muted-foreground">TypeScript</p>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </section>

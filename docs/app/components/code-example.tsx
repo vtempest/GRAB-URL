@@ -34,17 +34,35 @@ const searchResults = await grab('search', {
   limit: 10
 });`,
   reactive: `// Reactive loading state in React
-const [userState, setUserState] = useState({});
 
-await grab('user', {
-  response: setUserState
-});
+  import React, { useState } from "react";
+import grab from "grab-url";
 
-// In your component:
-{userState.isLoading && <div>Loading...</div>}
-{userState.error && <div>Error: {userState.error}</div>}
-{userState.name && <h2>{userState.name}</h2>}
+function UserProfile() {
+  const [userState, setUserState] = useState<Partial<{ 
+    name: string; 
+    email: string;
+    isLoading: boolean;
+    error: string; 
+  }>>({})
 
+  await grab('user', {
+    response: setUserState
+  });
+
+  return (
+    <div>
+      {userState.isLoading && <div>Loading...</div>}
+      {userState.error && <div>Error: {userState.error}</div>}
+      {userState && (
+        <div>
+          <h2>{userState.name}</h2>
+          <p>{userState.email}</p>
+        </div>
+      )}
+    </div>
+  );
+}
 // Works with Vue, Svelte, and any framework!`,
   typescript: `// Full TypeScript support with tooltips
 type User = {

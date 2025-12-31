@@ -1,0 +1,31 @@
+{
+  "name": "api2ai",
+  "version": "1.0.1",
+  "description": "Generate MCP servers from OpenAPI specs using the mcp-use framework",
+  "type": "module",
+  "main": "generate-mcp-use-server.js",
+  "bin": {
+    "api2ai": "./generate-mcp-use-server.js"
+  },
+  "scripts": {
+    "ship": "bun x standard-version --release-as patch;rm CHANGELOG.md; npm publish",
+    "generate": "node generate-mcp-use-server.js",
+    "example:petstore": "node generate-mcp-use-server.js https://petstore3.swagger.io/api/v3/openapi.json ./example-petstore --name petstore-api --port 3000"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "js-yaml": "^4.1.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "mcp",
+    "openapi",
+    "model-context-protocol",
+    "mcp-use",
+    "ai",
+    "llm",
+    "tools"
+  ]
+}
