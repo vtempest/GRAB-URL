@@ -1,6 +1,6 @@
 {
   "name": "api2ai",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Generate MCP servers from OpenAPI specs using the mcp-use framework",
   "type": "module",
   "main": "generate-mcp-use-server.js",
