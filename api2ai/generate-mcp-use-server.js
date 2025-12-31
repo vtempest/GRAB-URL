@@ -246,7 +246,7 @@ function generatePackageJson(serverName, tools, port) {
       dev: 'node --watch src/index.js',
     },
     dependencies: {
-      'mcp-use': '^0.2.0',
+      'mcp-use': '^1.11.2',
       'zod': '^3.23.0',
       'dotenv': '^16.4.0',
     },
@@ -775,7 +775,7 @@ Then open http://localhost:${port}/inspector to test your tools!
 export { generateMcpServer, extractTools, loadOpenApiSpec };
 
 // CLI entry point
-const isMainModule = process.argv[1]?.includes('generate-mcp-use-server');
+const isMainModule = process.argv[1]?.includes('api2ai');
 
 if (isMainModule) {
   const args = process.argv.slice(2);
@@ -785,7 +785,7 @@ if (isMainModule) {
 OpenAPI to MCP Server Generator (mcp-use framework)
 
 Usage:
-  node generate-mcp-use-server.js <openapi-spec> [output-folder] [options]
+  npx api2ai <openapi-spec> [output-folder] [options]
 
 Arguments:
   openapi-spec    Path to local file or URL to remote OpenAPI spec
@@ -798,8 +798,8 @@ Options:
   --help, -h      Show this help message
 
 Examples:
-  node generate-mcp-use-server.js ./petstore.json ./my-server
-  node generate-mcp-use-server.js https://petstore3.swagger.io/api/v3/openapi.json ./petstore-mcp \\
+  npx api2ai ./petstore.json ./my-server
+  npx api2ai https://petstore3.swagger.io/api/v3/openapi.json ./petstore-mcp \\
     --name petstore-api --port 8080
 `);
     process.exit(0);
