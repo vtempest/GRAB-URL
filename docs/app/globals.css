@@ -625,6 +625,33 @@ div[class*="sidebar"],
   transform: translateY(-4px);
 }
 
+/* Video Modal Animations */
+@keyframes modal-fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes modal-fade-out {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.animate-modal-fade-in {
+  animation: modal-fade-in 500ms ease-out;
+}
+
+.animate-modal-fade-out {
+  animation: modal-fade-out 500ms ease-in;
+}
+
 /* Enhanced typography for MDX content */
 .prose {
   color: var(--color-fd-text);

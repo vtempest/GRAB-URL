@@ -14,11 +14,24 @@ import {
   Bot,
   Github,
   FileJson,
+  PlayCircle,
 } from "lucide-react";
 
 import hljs from 'highlight.js/lib/core';
 import bash from 'highlight.js/lib/languages/bash';
 import 'highlight.js/styles/github-dark.css';
+
+import {
+  VideoModal,
+  VideoModalContent,
+  VideoModalDescription,
+  VideoModalTitle,
+  VideoModalTrigger,
+  VideoModalVideo,
+  VideoPlayButton,
+  VideoPlayer,
+  VideoPreview,
+} from "@/app/components/ui/video-modal";
 
 hljs.registerLanguage('bash', bash);
 
@@ -75,7 +88,7 @@ function CodeBlock({ code }: { code: string }) {
 
 export default function API2AICompact() {
   return (
-    <section className="py-16 px-6">
+    <section className="py-16 px-6" id="api2ai">
       <div className="max-w-6xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left Content */}
@@ -134,13 +147,56 @@ export default function API2AICompact() {
             </div>
           </div>
 
-          {/* Right Image */}
+          {/* Right Image - Video Modal */}
           <div className="flex justify-center lg:justify-end">
-            <img
-              src="https://i.imgur.com/TTJBLxo.png"
-              alt="API2AI Preview"
-              className="max-w-full h-auto rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700"
-            />
+            <VideoModal>
+              <VideoModalTrigger asChild>
+                <div className="relative cursor-pointer group">
+                  <h1 className="text-3xl md:text-4xl text-center font-bold mb-4 bg-gradient-to-r from-violet-600 via-purple-600 to-cyan-500 bg-clip-text text-transparent animate-gradient">
+                    Play Video Intro
+                  </h1>
+                  <img
+                    src="https://i.imgur.com/TTJBLxo.png"
+                    alt="API2AI Preview"
+                    className="max-w-full h-auto rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 transition-all group-hover:shadow-3xl group-hover:scale-[1.02]"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm">
+                      <PlayCircle className="w-6 h-6 text-violet-500" />
+                      <span className="text-sm font-medium">Watch Demo</span>
+                    </div>
+                  </div>
+                </div>
+              </VideoModalTrigger>
+              <VideoModalContent>
+                <VideoModalDescription>
+                  See how to generate a production-ready MCP server from any OpenAPI spec
+                </VideoModalDescription>
+                <VideoModalVideo>
+                  <VideoPlayer>
+                    <VideoPreview>
+                      <img
+                        src="https://i.imgur.com/TTJBLxo.png"
+                        alt="Video preview"
+                        className="w-full h-full object-cover"
+                      />
+                    </VideoPreview>
+                    <VideoPlayButton>
+                      <button className="absolute inset-0 m-auto flex size-32 items-center justify-center rounded-full border border-white border-white/10 bg-white/50 transition duration-300 hover:bg-white/75">
+                        <PlayCircle className="size-20 stroke-1 text-white" />
+                      </button>
+                    </VideoPlayButton>
+                    <video
+                      className="size-full"
+                      src="https://i.imgur.com/5wsY7Wm.mp4"
+                      controls
+                      autoPlay
+                      loop
+                    />
+                  </VideoPlayer>
+                </VideoModalVideo>
+              </VideoModalContent>
+            </VideoModal>
           </div>
         </div>
       </div>

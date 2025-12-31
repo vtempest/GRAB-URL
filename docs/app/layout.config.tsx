@@ -17,6 +17,10 @@ export const baseOptions: BaseLayoutProps = {
       url: '/docs',
     },
     {
+      text: 'API2AI',
+      url: '/docs/api2ai-mcp-server',
+    },
+    {
       text: 'GitHub',
       url: github,
       external: true,
