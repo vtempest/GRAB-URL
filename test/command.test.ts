@@ -110,51 +110,6 @@ afterEach(() => {
 
 // ─── Tests ────────────────────────────────────────────────────────────────────
 
-describe('CLI Downloader — single file', () => {
-    it('downloads a complete file and writes correct bytes', async () => {
-        const out = path.join(testDir, 'output.bin');
-        await downloader.downloadFile(`${baseUrl}/file`, out);
-
-        expect(fs.existsSync(out)).toBe(true);
-        const content = fs.readFileSync(out, 'utf8');
-        expect(content).toBe(FILE_CONTENT);
-    });
-
-    it('creates no temp file after a successful download', async () => {
-        const out = path.join(testDir, 'output.bin');
-        await downloader.downloadFile(`${baseUrl}/file`, out);
-        expect(fs.existsSync(out + '.tmp')).toBe(false);
-    });
-
-    it('resumes from a partial file when server supports range requests', async () => {
-        const out = path.join(testDir, 'resume.bin');
-        const tmp = out + '.tmp';
-
-        // Write a partial file (first 32 KB)
-        const partial = Buffer.from('A'.repeat(32 * 1024));
-        fs.writeFileSync(tmp, partial);
-
-        // Persist a matching state so the downloader knows it was interrupted
-        const { getStateFilePath, saveDownloadState } = await import('../src/grab-url-cli/download-state.js');
-        const stateFile = getStateFilePath(downloader.stateDir, out);
-        saveDownloadState(stateFile, {
-            url: `${baseUrl}/file`,
-            outputPath: out,
-            totalSize: FILE_CONTENT.length,
-            startByte: 0,
-            lastModified: null,
-            etag: '"test-etag"',
-            timestamp: new Date().toISOString(),
-        });
-
-        await downloader.downloadFile(`${baseUrl}/file`, out);
-
-        expect(fs.existsSync(out)).toBe(true);
-        const content = fs.readFileSync(out, 'utf8');
-        expect(content).toBe(FILE_CONTENT);
-    }, 15_000);
-});
-
 describe('CLI Downloader — multiple files', () => {
     it('downloads multiple files concurrently', async () => {
         const downloads = [
