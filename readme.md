@@ -14,8 +14,8 @@
     <a href="https://codespaces.new/vtempest/GRAB-URL"><img src="https://github.com/codespaces/badge.svg" width="150" height="20"/></a>
 </p>
 <h3 align="center">
-  <a href="https://grab.js.org"> 📑 Docs (grab.js.org)</a>
-  <a href="https://grab.js.org/docs/Examples"> 🎯 Example Strategies </a>
+  <a href="https://grab-url.vercel.app"> 📑 Docs </a>
+  <a href="https://grab-url.vercel.app/docs/Examples/basic"> 🎯 Example Strategies </a>
 </h3>
 
 ```bash
