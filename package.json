@@ -2,7 +2,7 @@
   "name": "grab-url",
   "description": "📥 Generate Request to API from Browser",
   "type": "module",
-  "version": "1.5.2",
+  "version": "1.5.3",
   "author": "vtempest",
   "license": "rights.institute/prosper",
   "repository": {
