@@ -36,17 +36,22 @@ export async function grab<TResponse = any, TParams = any>(
         headers, response: responseOption, method = merged.post ? "POST" : merged.put ? "PUT" : merged.patch ? "PATCH" : "GET",
         cache, timeout = 30, baseURL = (typeof process !== "undefined" && process.env.SERVER_API_URL) || "/api/",
         cancelOngoingIfNew, cancelNewIfOngoing, rateLimit, debug, infiniteScroll, logger = log,
-        onRequest, onResponse, onError, onStream, body, ...params
+        onRequest, onResponse, onError, onStream, body, post, put, patch, ...params
     } = merged;
 
     const urlConfig = buildUrl(baseURL, path);
     baseURL = urlConfig.baseURL;
     path = urlConfig.path;
 
-    let response: any = {};
-    let resFunction: ((data: any) => any) | null = null;
+    const initialized = initializeResponse(responseOption);
+    let response: any = initialized.response;
+    let resFunction = initialized.resFunction;
     const target = (typeof window !== "undefined" ? window.grab : (globalThis as any).grab) as GrabFunction;
     const grabLog = target?.log || [];
+
+    // Set loading state synchronously before any await
+    if (resFunction) response = resFunction({ ...response, isLoading: true });
+    else if (typeof response === "object") response.isLoading = true;
 
     try {
         const flowResult = await handleFlowControl(path, options || {}, merged, grab);
@@ -54,17 +59,11 @@ export async function grab<TResponse = any, TParams = any>(
 
         handleRegrabEvents(path, options || {}, merged, grab);
 
-        ({ response, resFunction } = initializeResponse(responseOption));
-
         let { params: updatedParams, priorRequest, response: updatedResponse, paramsAsText } = manageCacheAndPagination(path, params, merged, response, resFunction, grabLog);
         params = updatedParams;
         response = updatedResponse;
 
         setupInfiniteScroll(path, options, infiniteScroll, priorRequest, grab);
-
-        // Set loading state
-        if (resFunction) response = resFunction({ ...response, isLoading: true });
-        else if (typeof response === "object") response.isLoading = true;
 
         if (rateLimit > 0 && priorRequest?.lastFetchTime > Date.now() - 1000 * rateLimit) {
             throw new Error(`Fetch rate limit exceeded for ${path}. Wait ${rateLimit}s between requests.`);
