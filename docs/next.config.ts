@@ -25,7 +25,12 @@ export const config: NextConfig = {
   },
   reactStrictMode: false,
   images: {
-    domains: ['i.imgur.com'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'i.imgur.com',
+      },
+    ],
     unoptimized: true,
   },
 };
