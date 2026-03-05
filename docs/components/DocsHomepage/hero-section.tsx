@@ -29,7 +29,7 @@ export function HeroSection() {
         <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
           {/* <div className="mb-8 relative" style={{ animation: "float 6s ease-in-out infinite" }}>
             <Image
-              src="https://i.imgur.com/Rwl5P3p.png"
+              src="https://i.imgur.com/RH80JGZ.png"
               alt="GRAB - Generate Request to API from Browser"
               width={200}
               height={200}

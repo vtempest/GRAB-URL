@@ -69,7 +69,7 @@ export { grab_2 as grab }
 export declare interface GrabFunction {
     /**
      * ### GRAB: Generate Request to API from Browser
-     * ![grabAPILogo](https://i.imgur.com/Rwl5P3p.png)
+     * ![grabAPILogo](https://i.imgur.com/RH80JGZ.png)
      * Make API request with path
      * @template TResponse The expected shape of the response data.
      * @template TParams The shape of the request parameters.
@@ -82,7 +82,7 @@ export declare interface GrabFunction {
     <TResponse = any, TParams = Record<string, any>>(path: string, options?: GrabOptions<TResponse, TParams>): Promise<GrabResponse<TResponse>>;
     /**
      * ### GRAB: Generate Request to API from Browser
-     * ![grabAPILogo](https://i.imgur.com/Rwl5P3p.png)
+     * ![grabAPILogo](https://i.imgur.com/RH80JGZ.png)
      * Make API request with path and options/parameters
      * @template TResponse The expected shape of the response data.
      * @template TParams The shape of the request parameters.

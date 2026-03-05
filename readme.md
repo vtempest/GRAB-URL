@@ -1,5 +1,5 @@
 <p align="center">
-    <img width="400px" src="https://i.imgur.com/Rwl5P3p.png" />
+    <img width="400px" src="https://i.imgur.com/RH80JGZ.png" />
 </p>
 
 <p align="center">
@@ -11,11 +11,11 @@
 <a href="https://github.com/vtempest/GRAB-URL/discussions">
 <img alt="GitHub Stars" src="https://img.shields.io/github/stars/vtempest/GRAB-URL" /></a>
 <a href="https://npmjs.org/package/grab-url"><img alt="NPM Version" src="https://img.shields.io/npm/v/grab-url" /></a>
-<a href="https://bundlephobia.com/package/grab-url"><img src="https://img.shields.io/bundlephobia/minzip/grab-url" /></a>
 <a href="https://github.com/vtempest/GRAB-URL/discussions"><img alt="GitHub Discussions"
         src="https://img.shields.io/github/discussions/vtempest/GRAB-URL" /></a>
 <a href="https://github.blog/developer-skills/github/beginners-guide-to-github-creating-a-pull-request/"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome"/></a>
 <a href="https://codespaces.new/vtempest/GRAB-URL"><img src="https://github.com/codespaces/badge.svg" width="150" height="20"/></a>
+<a href="https://bundlephobia.com/package/grab-url"><img src="https://img.shields.io/bundlephobia/minzip/grab-url" /></a>
 
 </p>
 <h3 align="center">
