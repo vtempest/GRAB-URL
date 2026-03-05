@@ -1,3 +1,7 @@
+/**
+ * @file comparison-table.tsx
+ * @description Table component comparing GRAB with other popular request libraries.
+ */
 import { Check, X, AlertCircle } from "lucide-react"
 
 const libraries = ["GRAB", "Axios", "TanStack", "SWR", "Alova", "Ky"]

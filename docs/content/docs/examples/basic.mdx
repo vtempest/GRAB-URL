@@ -1,0 +1,176 @@
+---
+title: Basic Requests
+description: Basic usage of the grab library
+icon: Zap
+---
+
+### Install & Import 
+
+```bash npm2yarn
+npm install grab-url
+```
+
+```bash npm2yarn
+bun i grab-url
+```
+
+```javascript
+import grab from "grab-url";
+```
+
+
+### Basic Request
+
+```javascript
+// Basic GET request
+grab("user").then(log); // { id: 123, name: "John Doe", ... }
+
+// GET with query parameters
+const searchResults = await grab("search", {
+  query: "javascript",
+  page: 1,
+  limit: 10,
+});
+
+// POST with body
+await grab("users", {
+  post: true, //shorthand for method: "POST"
+  email: "jane@example.com",
+  age: 25,
+});
+```
+
+### Reactive Loading Status
+
+
+<Tabs  groupId="language"  items={['React', 'Vue', 'Svelte']}>
+<Tab value="React" >
+
+```jsx
+import React, { useState } from "react";
+import grab from "grab-url";
+
+function UserProfile() {
+  const [userState, setUserState] = useState<Partial<{ 
+    name: string; 
+    email: string;
+    isLoading: boolean;
+    error: string; 
+  }>>({})
+
+  await grab(`user`, {
+    response: setUserState
+  });
+
+  return (
+    <div>
+      {userState.isLoading && <div>Loading...</div>}
+      {userState.error && <div>Error: {userState.error}</div>}
+      {userState && (
+        <div>
+          <h2>{userState.name}</h2>
+          <p>{userState.email}</p>
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+</Tab>
+
+<Tab value="Svelte" >
+
+```javascript
+<script>
+  import grab from 'grab-url';
+
+
+  let searchResults = $state({
+    results: [],
+    isLoading: false,
+    error: null
+  });
+
+  async function searchProducts(query) {
+    await grab('products/search', {
+      response: searchResults,
+      post: true,
+      query: query,
+      category: 'electronics'
+    });
+  }
+</script>
+
+<input
+  type="text"
+  on:input={(e) => searchProducts(e.target.value)}
+  placeholder="Search products..."
+/>
+
+{#if searchResults.isLoading}
+  <div class="loading">Searching...</div>
+{:else if searchResults.error}
+  <div class="error">{searchResults.error}</div>
+{:else if searchResults.results}
+  <div class="results">
+    {#each searchResults.results as product}
+      <div class="product-card">
+        <h3>{product.name}</h3>
+        <p>${product.price}</p>
+      </div>
+    {/each}
+  </div>
+{/if}
+```
+
+</Tab>
+<Tab value="Vue" >
+```javascript
+<template>
+  <div>
+    <input 
+      v-model="searchTerm" 
+      @input="searchUsers"
+      placeholder="Search users..."
+    />
+    <div v-if="userResults.isLoading" class="loading">
+      Loading users...
+    </div>
+    <div v-else-if="userResults.error" class="error">
+      {{ userResults.error }}
+    </div>
+    <div v-else class="user-list">
+      <div 
+        v-for="user in userResults.users" 
+        :key="user.id"
+        class="user-card"
+      >
+        {{ user.name }} - {{ user.email }}
+      </div>
+    </div>
+  </div>
+</template>
+<script setup>
+import { ref, reactive } from 'vue';
+import grab from 'grab-url';
+const searchTerm = ref('');
+const userResults = reactive({
+  users: [],
+  isLoading: false,
+  error: null
+});
+const searchUsers = async () => {
+  if (searchTerm.value.length < 2) return;
+  
+  await grab('users/search', {
+    response: userResults,
+    query: searchTerm.value,
+    status: 'active'
+  });
+};
+</script>
+```
+
+</Tab>
+</Tabs>

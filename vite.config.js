@@ -21,7 +21,7 @@ export default defineConfig({
         'grab-api': resolve(__dirname, 'src/grab-api/index.ts'),
         'icons': resolve(__dirname, 'src/icons/svg/index.ts'),
         'log': resolve(__dirname, 'src/grab-api/logging/log-json.ts'),
-        'download': resolve(__dirname, 'src/grab-url-cli/grab-url.ts')
+        'grab-url-cli': resolve(__dirname, 'src/grab-url-cli/index.ts')
       },
 
       formats: ['es', 'cjs'],

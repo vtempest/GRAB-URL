@@ -26,10 +26,10 @@ describe('download-format — formatBytesCompact()', () => {
 });
 
 describe('download-format — formatBytesPlain()', () => {
-    it('labels bytes correctly', () => expect(formatBytesPlain(512)).toBe('512.0 B'));
-    it('labels KB correctly', () => expect(formatBytesPlain(2048)).toBe('2.0 KB'));
-    it('labels MB correctly', () => expect(formatBytesPlain(5 * 1024 * 1024)).toBe('5.0 MB'));
-    it('labels GB correctly', () => expect(formatBytesPlain(2 * 1024 ** 3)).toBe('2.0 GB'));
+    it('labels bytes correctly', () => expect(formatBytesPlain(512)).toBe('512 B'));
+    it('labels KB correctly', () => expect(formatBytesPlain(2048)).toBe('2 KB'));
+    it('labels MB correctly', () => expect(formatBytesPlain(5 * 1024 * 1024)).toBe('5 MB'));
+    it('labels GB correctly', () => expect(formatBytesPlain(2 * 1024 ** 3)).toBe('2 GB'));
 });
 
 describe('download-format — formatETA()', () => {
@@ -101,7 +101,7 @@ describe('download-state — directory helpers', () => {
     it('getStateFilePath() appends .download-state', () => {
         const p = getStateFilePath('/tmp/states', '/downloads/file.zip');
         expect(p).toContain('file.zip.download-state');
-        expect(p).toContain('/tmp/states');
+        expect(p).toContain(path.join('/tmp', 'states'));
     });
 });
 

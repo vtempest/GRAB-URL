@@ -1,7 +1,46 @@
-export const title = "GRAB URL Docs",
-  description = "GRAB URL",
-  logo = "/apple-touch-icon.png",
-  github = "https://github.com/vtempest/grab-url",
-  githubDocs = "https://github.com/vtempest/grab-url/blob/dev/docs",
-  favicon = "/favicon.ico";
+
+/**
+ * @file customize-docs.ts
+ * @description Documentation configuration object and types.
+ */
+export const docsConfig: DocsConfig = {
+  title: "GRAB-URL Docs",
+  description: "GRAB URL: 📥 Generate Request to API from Browser",
+  github: "https://github.com/vtempest/grab-url",
+  githubDocs: "https://github.com/vtempest/grab-url/blob/dev/docs",
+  favicon: "/favicon.ico",
+  topLinks: [
+    {
+      text: 'Docs',
+      url: '/docs',
+    },
+    {
+      text: 'GitHub',
+      url: 'https://github.com/vtempest/grab-url',
+      external: true,
+    },
+  ],
+};
+
+
+export interface DocsConfig {
+  /** The title of the documentation site */
+  title?: string;
+  /** A short description of the project */
+  description?: string;
+  /** URL to the GitHub repository */
+  github?: string;
+  /** Base URL for document editing on GitHub */
+  githubDocs?: string;
+  /** Path to the favicon */
+  favicon?: string;
+  /** Path to the OpenAPI specification file */
+  apiDocsPath?: string;
+  /** Links to be displayed in the navigation bar */
+  topLinks?: {
+    text: string;
+    url: string;
+    external?: boolean;
+  }[];
+}
 

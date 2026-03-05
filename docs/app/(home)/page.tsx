@@ -1,18 +1,27 @@
-import { HeroSection } from "@/components/homepage/hero-section"
-import { FeaturesGrid } from "@/components/homepage/features-grid"
-import { CodeExample } from "@/components/homepage/code-example"
-import { ComparisonTable } from "@/components/homepage/comparison-table"
-import { Footer } from "@/components/homepage/footer"
-import API2AILanding from "@/components/homepage/api2ai-section"
+/**
+ * @file page.tsx
+ * @description Home page component for the documentation site.
+ */
+import { HeroSection } from "@/components/DocsHomepage/hero-section"
+import { FeaturesGrid } from "@/components/DocsHomepage/features-grid"
+import { CodeExample } from "@/components/DocsHomepage/code-example"
+import { ComparisonTable } from "@/components/DocsHomepage/comparison-table"
+import { Footer } from "@/components/DocsHomepage/footer"
+import API2AILanding from "@/components/DocsHomepage/api2ai-section"
+import { Inter } from "next/font/google"
+
+const inter = Inter({
+  subsets: ['latin'],
+});
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-background">
+    <main className={`${inter.className} min-h-screen bg-background`}>
       <HeroSection />
-      <API2AILanding />
       <FeaturesGrid />
       <CodeExample />
       <ComparisonTable />
+      {/* <API2AILanding /> */}
       <Footer />
     </main>
   )

@@ -1,3 +1,7 @@
+/**
+ * @file get-llm-text.ts
+ * @description Utility to extract and format page content for LLM consumption.
+ */
 import { source } from './source';
 import type { InferPageType } from 'fumadocs-core/source';
 

@@ -1,5 +1,4 @@
 /**
- * @file download-keyboard.ts
  * @description Raw-mode keyboard listener and interactive URL-prompt for the CLI downloader.
  * Receives callbacks so it stays decoupled from ColorFileDownloader internals.
  */
@@ -7,7 +6,7 @@
 import fs from 'fs';
 import path from 'path';
 import readline from 'readline';
-import { colors } from './download-format.js';
+import { colors } from './download-format';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

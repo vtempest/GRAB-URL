@@ -1,3 +1,7 @@
+/**
+ * @file badge.tsx
+ * @description Badge component for displaying small amounts of information or status.
+ */
 import * as React from 'react'
 import { Slot } from '@radix-ui/react-slot'
 import { cva, type VariantProps } from 'class-variance-authority'

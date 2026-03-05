@@ -1,3 +1,7 @@
+/**
+ * @file api2ai-section.tsx
+ * @description Section component showcasing the API2AI MCP server generator.
+ */
 "use client";
 
 import React, { useState } from "react";

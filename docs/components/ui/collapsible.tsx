@@ -1,3 +1,7 @@
+/**
+ * @file collapsible.tsx
+ * @description Collapsible component for hiding/showing content, built with Radix UI.
+ */
 'use client';
 import * as CollapsiblePrimitive from '@radix-ui/react-collapsible';
 import { forwardRef, useEffect, useState } from 'react';

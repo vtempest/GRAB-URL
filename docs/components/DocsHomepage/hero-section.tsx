@@ -1,3 +1,7 @@
+/**
+ * @file hero-section.tsx
+ * @description Hero section component for the documentation landing page.
+ */
 "use client"
 
 import { Button } from "@/components/ui/button"

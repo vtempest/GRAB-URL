@@ -119,6 +119,7 @@ export async function downloadMultipleFiles(
         });
 
         const n = downloads.length;
+        const isSingle = n === 1;
         const indSpeeds = new Array(n).fill(0);
         const indSizes = new Array(n).fill(0);
         const indDl = new Array(n).fill(0);
@@ -127,20 +128,23 @@ export async function downloadMultipleFiles(
         let lastSpeedUpdate = Date.now();
         let totalSize = downloads.reduce((s, d) => s + (d.estimatedSize ?? 100 * 1024 * 1024), 0);
 
-        const masterSW = getSpinnerWidth('⬇️');
-        const masterBar = ctx.multiBar.create(totalSize, 0, {
-            filename: 'Total'.padEnd(COL_FILENAME - masterSW), spinner: '⬇️',
-            speed: '0B'.padEnd(COL_SPEED), progress: formatMasterProgress(0, totalSize),
-            downloadedDisplay: formatBytesCompact(0), totalDisplay: formatTotalDisplay(totalSize),
-            etaFormatted: formatETA(0), percentage: '  0'.padStart(COL_PERCENT - 1),
-        }, {
-            format: colors.success('{percentage}%') + ' ' + colors.yellow.bold('{filename}') + ' ' +
-                colors.success('{spinner}') + ' ' + '\u001b[92m{bar}\u001b[0m' + ' ' +
-                colors.info('{downloadedDisplay}') + ' ' + colors.info('{totalDisplay}') + ' ' +
-                colors.purple('{speed}') + ' ' + colors.pink('{etaFormatted}'),
-            barCompleteChar: '▶', barIncompleteChar: '▷',
-            barGlue: '\u001b[33m', barsize: calculateBarSize('⬇️', COL_BAR),
-        });
+        let masterBar: any = null;
+        if (!isSingle) {
+            const masterSW = getSpinnerWidth('⬇️');
+            masterBar = ctx.multiBar.create(totalSize, 0, {
+                filename: 'Total'.padEnd(COL_FILENAME - masterSW), spinner: '⬇️',
+                speed: '0B'.padEnd(COL_SPEED), progress: formatMasterProgress(0, totalSize),
+                downloadedDisplay: formatBytesCompact(0), totalDisplay: formatTotalDisplay(totalSize),
+                etaFormatted: formatETA(0), percentage: '  0'.padStart(COL_PERCENT - 1),
+            }, {
+                format: colors.success('{percentage}%') + ' ' + colors.yellow.bold('{filename}') + ' ' +
+                    colors.success('{spinner}') + ' ' + '\u001b[92m{bar}\u001b[0m' + ' ' +
+                    colors.info('{downloadedDisplay}') + ' ' + colors.info('{totalDisplay}') + ' ' +
+                    colors.purple('{speed}') + ' ' + colors.pink('{etaFormatted}'),
+                barCompleteChar: '▶', barIncompleteChar: '▷',
+                barGlue: '\u001b[33m', barsize: calculateBarSize('⬇️', COL_BAR),
+            });
+        }
 
         const fileBars = downloads.map((dl, idx) => {
             const frames = getSpinnerFrames(getRandomSpinner());
@@ -180,7 +184,7 @@ export async function downloadMultipleFiles(
             const discTot = indSizes.reduce((s, v) => s + v, 0);
             const dispTot = discTot > 0 ? discTot : totalSize;
 
-            masterBar.update(totDl, {
+            masterBar?.update(totDl, {
                 speed: formatTotalSpeed(totSpd),
                 progress: formatMasterProgress(totDl, dispTot),
                 downloadedDisplay: formatBytesCompact(totDl),

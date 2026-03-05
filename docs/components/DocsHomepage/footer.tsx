@@ -1,3 +1,7 @@
+/**
+ * @file footer.tsx
+ * @description Footer component for the documentation landing page.
+ */
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Github, BookOpen, MessageCircle } from "lucide-react"

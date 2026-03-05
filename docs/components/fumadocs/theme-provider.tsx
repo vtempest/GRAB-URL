@@ -1,3 +1,7 @@
+/**
+ * @file theme-provider.tsx
+ * @description Theme provider component for managing light and dark mode.
+ */
 'use client'
 
 import * as React from 'react'

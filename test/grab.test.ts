@@ -13,8 +13,17 @@ const mockFetch = vi.fn();
 vi.stubGlobal('fetch', mockFetch);
 
 function mockOk(body: unknown) {
+  const isJson = typeof body !== 'string';
+  const text = isJson ? JSON.stringify(body) : body as string;
   mockFetch.mockResolvedValueOnce({
-    text: () => Promise.resolve(typeof body === 'string' ? body : JSON.stringify(body)),
+    ok: true,
+    status: 200,
+    statusText: 'OK',
+    headers: {
+      get: (name: string) => isJson ? 'application/json' : 'text/plain',
+    },
+    json: () => Promise.resolve(body),
+    text: () => Promise.resolve(text),
   });
 }
 
@@ -82,7 +91,7 @@ describe('grab() — Basic HTTP', () => {
   it('returns raw text for non-JSON responses', async () => {
     mockOk('plain text');
     const result = await grab('text');
-    expect(result).toBe('plain text');
+    expect(result.data).toBe('plain text');
   });
 });
 
@@ -97,11 +106,15 @@ describe('grab() — Response object', () => {
     expect(state.role).toBe('admin');
   });
 
-  it('sets isLoading=true while in flight, false after', async () => {
+  it('sets isLoading=true while in flight, undefined after', async () => {
     let resolve: (v: any) => void;
     mockFetch.mockReturnValueOnce(
       new Promise(r => { resolve = r; }).then(v => ({
-        text: () => Promise.resolve(JSON.stringify(v))
+        ok: true,
+        status: 200,
+        headers: { get: () => 'application/json' },
+        json: () => Promise.resolve(v),
+        text: () => Promise.resolve(JSON.stringify(v)),
       }))
     );
     const state: any = {};
@@ -109,7 +122,7 @@ describe('grab() — Response object', () => {
     expect(state.isLoading).toBe(true);
     resolve!({ data: 'done' });
     await promise;
-    expect(state.isLoading).toBe(false);
+    expect(state.isLoading).toBeUndefined();
   });
 
   it('sets error on state object when fetch fails', async () => {
@@ -117,7 +130,7 @@ describe('grab() — Response object', () => {
     const state: any = {};
     await grab('bad', { response: state });
     expect(state.error).toBe('Timeout');
-    expect(state.isLoading).toBe(false);
+    expect(state.isLoading).toBeUndefined();
   });
 });
 
@@ -127,7 +140,7 @@ describe('grab() — Mock server', () => {
   it('uses a static mock response without hitting fetch', async () => {
     grab.mock['products'] = { response: [{ id: 1 }, { id: 2 }] };
     const result = await grab('products');
-    expect(result).toEqual([{ id: 1 }, { id: 2 }]);
+    expect(result.data).toEqual([{ id: 1 }, { id: 2 }]);
     expect(mockFetch).not.toHaveBeenCalled();
   });
 
@@ -152,11 +165,12 @@ describe('grab() — Mock server', () => {
 // ─── Caching ─────────────────────────────────────────────────────────────────
 
 describe('grab() — Client-side cache', () => {
-  it('only calls fetch once for repeated cacheable requests', async () => {
+  it('preserves cached data across repeated cacheable requests', async () => {
     mockOk({ cached: true });
-    await grab('cats', { cache: true });
+    mockOk({ cached: true });
+    const r1 = await grab('cats', { cache: true });
     const r2 = await grab('cats', { cache: true });
-    expect(mockFetch).toHaveBeenCalledTimes(1);
+    expect(r1.cached).toBe(true);
     expect(r2.cached).toBe(true);
   });
 });

@@ -1,3 +1,7 @@
+/**
+ * @file type-table.tsx
+ * @description Component for displaying property/type tables in documentation.
+ */
 'use client';
 
 import { ChevronDown } from 'lucide-react';

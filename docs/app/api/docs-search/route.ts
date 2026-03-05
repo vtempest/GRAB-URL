@@ -1,3 +1,7 @@
+/**
+ * @file route.ts
+ * @description API route for documentation search using Orama.
+ */
 import { source } from '@/lib/fumadocs/source';
 import { createFromSource } from 'fumadocs-core/search/server';
 

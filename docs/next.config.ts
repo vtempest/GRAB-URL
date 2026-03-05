@@ -13,13 +13,13 @@ const withMDX = createMDX({
 
 
 export const config: NextConfig = {
-  output: 'export',
-  distDir: './dist',
+  // output: 'export',
+  // distDir: './dist',
   async rewrites() {
     return [
       {
-        source: '/docs/:path*.mdx',
-        destination: '/llms.mdx/:path*',
+        source: '/docs/:path*.mdx',  
+        destination: '/llms.mdx/docs/:path*',
       },
     ];
   },

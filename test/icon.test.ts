@@ -37,19 +37,19 @@ describe('SVG Icons — output shape', () => {
 
     for (const [name, fn] of icons) {
         it(`${name}() returns a valid SVG string`, () => {
-            const svg = fn({ colors: DEFAULT_COLORS, size: 80 });
+            const svg = fn({ colors: DEFAULT_COLORS, size: 80, raw: true });
             expect(isSVG(svg)).toBe(true);
             expect(svg).toContain('</svg>');
         });
 
         it(`${name}() respects the size option`, () => {
-            const svg = fn({ colors: DEFAULT_COLORS, size: 120 });
+            const svg = fn({ colors: DEFAULT_COLORS, size: 120, raw: true });
             // SVG should embed the requested size in width/height attributes
             expect(svg).toMatch(/120/);
         });
 
         it(`${name}() accepts custom colors`, () => {
-            const svg = fn({ colors: ['#abcdef', '#123456'], size: 60 });
+            const svg = fn({ colors: ['#abcdef', '#123456'], size: 60, raw: true });
             expect(svg).toContain('#abcdef');
         });
     }
@@ -62,7 +62,7 @@ describe('SVG Icons — edge cases', () => {
     });
 
     it('loadingSpinner() works with a single color', () => {
-        const svg = loadingSpinner({ colors: ['#ffffff'], size: 50 });
+        const svg = loadingSpinner({ colors: ['#ffffff'], size: 50, raw: true });
         expect(isSVG(svg)).toBe(true);
     });
 });

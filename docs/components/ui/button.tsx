@@ -1,6 +1,6 @@
 /**
- * @fileoverview Versatile button component with multiple variants and sizes.
- * Built with class-variance-authority for flexible styling.
+ * @file button.tsx
+ * @description Versatile button component with multiple variants and sizes.
  */
 
 import * as React from 'react'

@@ -1,3 +1,7 @@
+/**
+ * @file code-example.tsx
+ * @description Interactive component displaying various code examples for using GRAB.
+ */
 "use client"
 
 import { useState, useEffect, useRef } from "react"

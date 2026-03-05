@@ -12,7 +12,7 @@ import cliProgress from 'cli-progress';
 import chalk from 'chalk';
 
 import {
-    COL_BAR, COL_PERCENT, COL_SPINNER, COL_DOWNLOADED, COL_TOTAL, COL_SPEED, COL_ETA,
+    COL_BAR,
     colors,
     formatBytes, formatBytesCompact, formatTotalDisplay,
     formatETA, formatProgress, formatSpeed, formatSpeedDisplay,
@@ -120,13 +120,6 @@ export async function downloadFile(
         let spinnerIdx = 0;
         let lastSpinnerSwap = Date.now();
         let lastFrameUpdate = Date.now();
-
-        console.log(
-            colors.success('📈 %'.padEnd(COL_PERCENT)) + colors.cyan('🔄'.padEnd(COL_SPINNER)) + ' ' +
-            colors.green('📊 Progress'.padEnd(COL_BAR + 1)) + colors.info('📥 Downloaded'.padEnd(COL_DOWNLOADED)) +
-            colors.info('📦 Total'.padEnd(COL_TOTAL)) + colors.purple('⚡ Speed'.padEnd(COL_SPEED)) +
-            colors.pink('⏱️ ETA'.padEnd(COL_ETA))
-        );
 
         ctx.setupKeyboard();
 

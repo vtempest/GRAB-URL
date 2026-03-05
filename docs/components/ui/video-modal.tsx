@@ -1,3 +1,7 @@
+/**
+ * @file video-modal.tsx
+ * @description Modal component specifically designed for playing video content.
+ */
 'use client'
 
 import * as React from 'react'

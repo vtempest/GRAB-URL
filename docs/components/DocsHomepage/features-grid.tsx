@@ -1,3 +1,7 @@
+/**
+ * @file features-grid.tsx
+ * @description Grid component displaying the key features and benefits of GRAB.
+ */
 import Image from "next/image"
 import {
   Zap,

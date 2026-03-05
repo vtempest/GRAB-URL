@@ -1,3 +1,7 @@
+/**
+ * @file theme-toggle.tsx
+ * @description Component for toggling between light and dark themes.
+ */
 "use client"
 
 import { useState, useEffect } from "react"

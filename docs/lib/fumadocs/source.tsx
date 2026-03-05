@@ -1,3 +1,7 @@
+/**
+ * @file source.tsx
+ * @description Fumadocs source loader configuration and page structure.
+ */
 import { docs } from 'fumadocs-mdx:collections/server'
 import {
   type InferMetaType,

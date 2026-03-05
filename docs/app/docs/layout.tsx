@@ -1,3 +1,7 @@
+/**
+ * @file layout.tsx
+ * @description Layout component for documentation pages.
+ */
 import { source } from '@/lib/fumadocs/source';
 import { DocsLayout } from 'fumadocs-ui/layouts/notebook';
 import type { ReactNode } from 'react';

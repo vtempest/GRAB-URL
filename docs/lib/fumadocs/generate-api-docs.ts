@@ -1,15 +1,20 @@
+/**
+ * @file generate-api-docs.ts
+ * @description Script to generate API documentation files from an OpenAPI specification.
+ */
 import { generateFiles } from 'fumadocs-openapi';
 import { createOpenAPI } from 'fumadocs-openapi/server';
 import { rimraf } from 'rimraf';
 import { existsSync } from 'fs';
+import { docsConfig } from './customize-docs'
 
 const out = 'content/docs/(api)';
 
 
-async function generate(openapiPath) {
+async function generate(openapiPath: string | undefined) {
   // Validate file exists
-  if (!existsSync(openapiPath)) {
-    console.error(`Error: OpenAPI file not found at "${openapiPath}"`);
+  if (!openapiPath || !existsSync(openapiPath)) {
+    console.error(`Error: OpenAPI file not found${openapiPath ? ` at "${openapiPath}"` : ''}`);
     process.exit(1);
   }
 
@@ -38,7 +43,6 @@ async function generate(openapiPath) {
     frontmatter: (title, description) => ({
       description: ''
     }),
-    index: false,
     // index: {
     //   // for generating `href`
     //   url: {
@@ -61,10 +65,9 @@ async function generate(openapiPath) {
 // Parse command line arguments
 const args = process.argv.slice(2);
 
-if (args.length === 0 || args.includes('-h') || args.includes('--help')) {
-  process.exit(0);
+const openapiPath = args[0] || docsConfig.apiDocsPath;
+if (!openapiPath) {
+    console.error('Error: OpenAPI file path not provided');
+    process.exit(1);
 }
-
-const openapiPath = args[0];
-
 void generate(openapiPath);

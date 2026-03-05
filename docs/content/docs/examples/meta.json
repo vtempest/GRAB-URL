@@ -1,0 +1,11 @@
+{
+  "title": "Strategy Examples",
+  "pages": [
+    "basic",
+    "configuration",
+    "advanced",
+    "testing",
+    "cli",
+    "options"
+  ]
+}

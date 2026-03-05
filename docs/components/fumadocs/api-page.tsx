@@ -1,3 +1,7 @@
+/**
+ * @file api-page.tsx
+ * @description API page component that generates dynamic documentation and code samples.
+ */
 import { openapi } from '@/lib/fumadocs/openapi';
 import { createAPIPage } from 'fumadocs-openapi/ui';
 
