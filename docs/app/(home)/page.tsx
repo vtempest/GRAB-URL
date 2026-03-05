@@ -1,10 +1,9 @@
-import { HeroSection } from "@/app/components/hero-section"
-import { FeaturesGrid } from "@/app/components/features-grid"
-import { CodeExample } from "@/app/components/code-example"
-import { ComparisonTable } from "@/app/components/comparison-table"
-import { Footer } from "@/app/components/footer"
-
-import API2AILanding from "@/app/components/api2ai-section"
+import { HeroSection } from "@/components/homepage/hero-section"
+import { FeaturesGrid } from "@/components/homepage/features-grid"
+import { CodeExample } from "@/components/homepage/code-example"
+import { ComparisonTable } from "@/components/homepage/comparison-table"
+import { Footer } from "@/components/homepage/footer"
+import API2AILanding from "@/components/homepage/api2ai-section"
 
 export default function Home() {
   return (

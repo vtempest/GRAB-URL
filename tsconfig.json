@@ -19,14 +19,11 @@
     "isolatedModules": true // Required for Vite
   },
   "include": [
-    "./src/**/*.ts", // Include all TS files
-    "./src/**/*.js" // Include JS files if needed
-    ,
-    "src/grab-url.ts"
+    "./src/**/*.ts",
+    "./src/**/*.js"
   ],
   "exclude": [
     "node_modules",
-    "dist",
-    "docs222"
+    "dist"
   ]
 }

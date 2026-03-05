@@ -1,5 +1,5 @@
-import { source } from '@/lib/source';
-import { getLLMText } from '@/lib/get-llm-text';
+import { source } from '@/lib/fumadocs/source';
+import { getLLMText } from '@/lib/fumadocs/get-llm-text';
 
 // cached forever
 export const revalidate = false;

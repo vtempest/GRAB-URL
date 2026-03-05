@@ -1,7 +1,6 @@
 'use client';
 import { RootProvider } from 'fumadocs-ui/provider/next';
-// your custom dialog
-import SearchDialog from './components/search';
+import SearchDialog from '@/components/fumadocs/search';
 import type { ReactNode } from 'react';
 
 export function Provider({ children }: { children: ReactNode }) {

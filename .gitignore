@@ -43,3 +43,4 @@ test/test-downloads
 .grab-downloads/
 docs/dist/
 devtools/
+.claude

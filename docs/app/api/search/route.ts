@@ -1,4 +1,4 @@
-import { source } from '@/lib/source';
+import { source } from '@/lib/fumadocs/source';
 import { createFromSource } from 'fumadocs-core/search/server';
 
 // it should be cached forever

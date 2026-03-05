@@ -2,7 +2,7 @@
   "name": "grab-url",
   "description": "📥 Generate Request to API from Browser",
   "type": "module",
-  "version": "1.0.20",
+  "version": "1.5.0",
   "author": "vtempest",
   "license": "rights.institute/prosper",
   "repository": {
@@ -13,7 +13,7 @@
   "types": "./dist/grab-api.d.ts",
   "module": "./dist/grab-api.es.js",
   "bin": {
-    "grab-url": "./src/grab-url.js"
+    "grab-url": "./src/grab-url-cli/grab-url.ts"
   },
   "exports": {
     ".": {
@@ -41,7 +41,7 @@
     "dist",
     "src",
     "src/grab-api.ts",
-    "src/grab-url.js",
+    "bin/grab-url.js",
     "src/icons/cli/spinners.json"
   ],
   "scripts": {
@@ -52,7 +52,7 @@
     "ship": "bun x standard-version --release-as patch;rm CHANGELOG.md; npm publish",
     "check": "vitest --ui",
     "test": "vitest",
-    "test:cli": "bun src/grab-url.js https://releases.ubuntu.com/24.04.2/ubuntu-24.04.2-live-server-amd64.iso"
+    "test:cli": "bun src/grab-url-cli/grab-url.ts https://releases.ubuntu.com/24.04.2/ubuntu-24.04.2-live-server-amd64.iso"
   },
   "devDependencies": {
     "@vitest/ui": "^3.2.4",

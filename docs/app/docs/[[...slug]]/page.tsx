@@ -1,4 +1,4 @@
-import { source } from '@/lib/source';
+import { source } from '@/lib/fumadocs/source';
 import {
   DocsBody,
   DocsDescription,
@@ -8,7 +8,8 @@ import {
 import { notFound } from 'next/navigation';
 import { getMDXComponents } from '@/mdx-components';
 import type { Metadata } from 'next';
-import { ViewOptions, LLMCopyButton } from '@/components/page-actions';
+import { ViewOptions, LLMCopyButton } from '@/components/fumadocs/page-actions';
+import { githubDocs } from '@/lib/fumadocs/customize-docs';
 
 export default async function Page(props: {
   params: Promise<{ slug?: string[] }>;
@@ -31,7 +32,7 @@ export default async function Page(props: {
           <LLMCopyButton markdownUrl={`${page.url}.mdx`} />
           <ViewOptions
             markdownUrl={`${page.url}.mdx`}
-            githubUrl={`https://github.com/vtempest/ai-research-agent/blob/dev/apps/docs/content/docs/${page.path}`}
+            githubUrl={`${githubDocs}/${page.path}`}
           />
         </div>
 

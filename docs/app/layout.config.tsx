@@ -1,29 +1,14 @@
 import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
-import { title, logo, github } from './customize-docs';
-import Image from 'next/image';
+import { Link2 } from 'lucide-react';
+import { title } from '@/lib/fumadocs/customize-docs';
 
 export const baseOptions: BaseLayoutProps = {
   nav: {
     title: (
       <span className="inline-flex items-center gap-2">
-        <Image src={logo} alt="Logo" width={32} height={32} />
+        <Link2 />
         {title}
       </span>
     ),
   },
-  links: [
-    {
-      text: 'Docs',
-      url: '/docs',
-    },
-    {
-      text: 'API2AI',
-      url: '/docs/api2ai-mcp-server',
-    },
-    {
-      text: 'GitHub',
-      url: github,
-      external: true,
-    },
-  ],
 };

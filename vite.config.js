@@ -17,12 +17,13 @@ export default defineConfig({
   ],
   build: {
     lib: {
-        entry: {
-          'grab-api': resolve(__dirname, 'src/grab-api.ts'),
-          'icons': resolve(__dirname, 'src/icons/svg/index.ts'),
-          'log': resolve(__dirname, 'src/log-json.ts'),
-          'download': resolve(__dirname, 'src/grab-url.js')
-        },
+      entry: {
+        'grab-api': resolve(__dirname, 'src/grab-api/index.ts'),
+        'icons': resolve(__dirname, 'src/icons/svg/index.ts'),
+        'log': resolve(__dirname, 'src/grab-api/logging/log-json.ts'),
+        'download': resolve(__dirname, 'src/grab-url-cli/grab-url.ts')
+      },
+
       formats: ['es', 'cjs'],
       name: 'grab-api',
       fileName: (format, entryName) => `${entryName}.${format}.js`
@@ -39,6 +40,8 @@ export default defineConfig({
           'child_process', 'events', 'buffer', 'process', 'assert', 'timers',
           'tty', 'zlib', 'http', 'https', 'net', 'dns', 'cluster', 'worker_threads'
         ];
+        // Also externalize already-built dist files referenced by bin scripts
+        if (id.includes('/dist/')) return true;
         return nodeModules.includes(id) || id.startsWith('node:');
       }
     },

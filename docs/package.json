@@ -1,21 +1,18 @@
 {
-  "name": "grab-url-docs",
-  "description": "Grab URL Documentation - Search, Docs Sidebar, API Docs",
+  "name": "research-agent-docs",
+  "description": "FumaDocs Starter - Search, Docs Sidebar, API Docs",
   "version": "1.1.0",
   "private": true,
   "scripts": {
-    "build": "next build --turbo",
+    "build": "next build --turbo; echo 'grab-url.js.org' > ./dist/CNAME;",
     "build:api": "node ./scripts/generate-api-docs.mjs ./qwksearch-openapi.yml",
-    "dev": "next dev --turbo",
-    "copy": "rm -rf ../web/static/docs; mkdir ../web/static/docs; cp -r ./dist/* ../web/static/docs/",
-    "start": "bunx concurrently \"npx serve -l 3000 ./dist --single\" \"sleep 2 && bunx open-cli http://localhost:3000\"",
-    "check": "fumadocs-mdx && tsc --noEmit"
+    "dev": "concurrently \"next dev  --turbo \" \"wait-on http://localhost:3000 && opener http://localhost:3000\"",
+   "check": "fumadocs-mdx && tsc --noEmit",
+    "favicon": "npm create favicon public/favicon-512.png public/ -- --overwrite"
   },
   "dependencies": {
     "@fumadocs/mdx-remote": "^1.4.3",
     "@orama/orama": "^3.1.16",
-    "@radix-ui/react-dialog": "^1.1.15",
-    "@radix-ui/react-slot": "^1.2.4",
     "class-variance-authority": "^0.7.1",
     "fumadocs-core": "^16.1.0",
     "fumadocs-mdx": "^14.0.3",

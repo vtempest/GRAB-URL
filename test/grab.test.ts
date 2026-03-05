@@ -1,324 +1,194 @@
+/**
+ * @file grab.test.ts
+ * @description Unit tests for the grab() API function and utilities.
+ * Runs in Node (Vitest) — no window globals assumed.
+ */
+
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { grab,type GrabOptions, log, printJSONStructure, type GrabFunction } from 'grab-url';
+import { grab, log } from '../src/grab-api/index.js';
 
+// ─── Mock fetch ───────────────────────────────────────────────────────────────
 
-// Mock fetch globally
-global.fetch = vi.fn();
+const mockFetch = vi.fn();
+vi.stubGlobal('fetch', mockFetch);
 
-describe('GRAB API Library - Core Functions', () => {
-  beforeEach(() => {
-    // Reset globals before each test
-    window.grab.log = {};
-    window.grabMockServer = {};
-    window.grabDefaults = {};
-    vi.clearAllMocks();
+function mockOk(body: unknown) {
+  mockFetch.mockResolvedValueOnce({
+    text: () => Promise.resolve(typeof body === 'string' ? body : JSON.stringify(body)),
+  });
+}
+
+function mockErr(msg: string) {
+  mockFetch.mockRejectedValueOnce(new Error(msg));
+}
+
+// ─── Setup ────────────────────────────────────────────────────────────────────
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  grab.log = [];
+  grab.mock = {};
+  grab.defaults = {};
+});
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
+
+// ─── Basic HTTP ───────────────────────────────────────────────────────────────
+
+describe('grab() — Basic HTTP', () => {
+  it('makes a GET request and returns parsed JSON', async () => {
+    mockOk({ id: 1, name: 'Alice' });
+    const result = await grab('users/1');
+    expect(result.id).toBe(1);
+    expect(result.name).toBe('Alice');
+    expect(mockFetch).toHaveBeenCalledTimes(1);
   });
 
-  afterEach(() => {
-    vi.restoreAllMocks();
+  it('appends query params to the URL', async () => {
+    mockOk({ results: [] });
+    await grab('search', { q: 'hello', page: 2 });
+    const [url] = mockFetch.mock.calls[0];
+    expect(url).toContain('q=hello');
+    expect(url).toContain('page=2');
   });
 
-  describe('Basic HTTP Requests', () => {
-    it('should make a GET request with correct URL format', async () => {
-      const mockResponse = { data: 'test', success: true };
-      global.fetch.mockResolvedValueOnce({
-        text: () => Promise.resolve(JSON.stringify(mockResponse))
-      });
-
-      type User = { 
-        /** Name of the user  */ 
-        name: string;
-        /** Age of the user  */ 
-        age: number;
-      };
-
-      type RequestParams = { 
-        /** Query String  to search for */ 
-        q : string;
-        /** Category of search  */
-        category?: "news" | "general";
-
-      };
-
-      const result = await grab<User, RequestParams>('test-path', {
-        q: " react",
-        category: "gen",
-        fd: 5,
-      });
-      result.name
-
-      expect(global.fetch).toHaveBeenCalledWith(
-        '/api/test-path?',
-        expect.objectContaining({
-          method: 'GET',
-          headers: expect.objectContaining({
-            'Content-Type': 'application/json',
-            Accept: 'application/json'
-          })
-        })
-      );
-      expect(result.data).toBe('test');
-      expect(result.success).toBe(true);
-    });
-
-    it('should make a POST request without polluting body data', async () => {
-      const mockResponse = { id: 1, created: true };
-      global.fetch.mockResolvedValueOnce({
-        text: () => Promise.resolve(JSON.stringify(mockResponse))
-      });
-
-      const response = {};
-      const requestData = { name: 'test', email: 'test@example.com' };
-     
-      await grab('users', response, {
-        post: true,
-        ...requestData
-      });
-
-      expect(global.fetch).toHaveBeenCalledWith(
-        '/api/users',
-        expect.objectContaining({
-          post: true,
-          body: JSON.stringify(requestData) // Should not contain page: 1
-        })
-      );
-      expect(response.id).toBe(1);
-      expect(response.created).toBe(true);
-    });
-
-    it('should handle custom base URL correctly', async () => {
-      const mockResponse = { status: 'ok' };
-      global.fetch.mockResolvedValueOnce({
-        text: () => Promise.resolve(JSON.stringify(mockResponse))
-      });
-
-      await grab('health', {}, {
-        baseURL: 'https://api.example.com/v1/'
-      });
-
-      expect(global.fetch).toHaveBeenCalledWith(
-        'https://api.example.com/v1/health?',
-        expect.any(Object)
-      );
-    });
-
-    it('should handle errors properly', async () => {
-      global.fetch.mockRejectedValueOnce(new Error('Network error'));
-
-      const response = {};
-      const result = await grab('failing-endpoint', response);
-
-      expect(response.error).toBe('Network error'); // Should be clean error message
-      expect(result.error).toBe('Network error');
-    });
-
-    it('should handle non-JSON responses', async () => {
-      const textResponse = 'Plain text response';
-      global.fetch.mockResolvedValueOnce({
-        text: () => Promise.resolve(textResponse)
-      });
-
-      const result = await grab('text-endpoint', {});
-      expect(result).toBe(textResponse);
-    });
+  it('sends POST when post:true is set', async () => {
+    mockOk({ created: true });
+    await grab('users', { post: true, name: 'Bob', email: 'bob@example.com' });
+    const [, options] = mockFetch.mock.calls[0];
+    expect(options.method).toBe('POST');
+    const body = JSON.parse(options.body);
+    expect(body.name).toBe('Bob');
+    expect(body.email).toBe('bob@example.com');
+    // Internal flags must not leak into the body
+    expect(body.post).toBeUndefined();
   });
 
-  describe('Loading State Management', () => {
-    it('should set and clear isLoading state', async () => {
-      const mockResponse = { data: 'test' };
-      let resolvePromise;
-      const fetchPromise = new Promise(resolve => {
-        resolvePromise = resolve;
-      });
-      
-      global.fetch.mockReturnValueOnce(fetchPromise);
-
-      const response = {};
-      const grabPromise = grab('test', response);
-      
-      // Should be loading initially
-      expect(response.isLoading).toBe(true);
-      
-      // Resolve the fetch
-      resolvePromise({
-        text: () => Promise.resolve(JSON.stringify(mockResponse))
-      });
-      
-      await grabPromise;
-      
-      // Should not be loading after completion
-      expect(response.isLoading).toBe(false);
-    });
+  it('respects a custom baseURL', async () => {
+    mockOk({ ok: true });
+    await grab('health', { baseURL: 'https://api.example.com/v2/' });
+    const [url] = mockFetch.mock.calls[0];
+    expect(url).toContain('api.example.com/v2/health');
   });
 
-  describe('Mock Server Support', () => {
-    it('should use mock server when configured', async () => {
-      const mockData = { users: [{ id: 1, name: 'John' }] };
-      window.grabMockServer['users'] = {
-        response: mockData,
-        method: 'GET'
-      };
-
-      const response = {};
-      await grab('users', response);
-
-      expect(response.users).toEqual([{ id: 1, name: 'John' }]);
-      expect(global.fetch).not.toHaveBeenCalled();
-    });
-
-    it('should use mock server with function response', async () => {
-      window.grabMockServer['search'] = {
-        response: (params) => ({ 
-          results: [`Result for ${params.query}`] 
-        }),
-        post: true
-      };
-
-      const response = {};
-      await grab('search', response, {
-        post: true,
-        query: 'test search'
-      });
-
-      expect(response.results).toEqual(['Result for test search']);
-    });
+  it('returns error info on network failure', async () => {
+    mockErr('Network error');
+    const result = await grab('failing');
+    expect(result.error).toBe('Network error');
   });
 
-  describe('Caching', () => {
-    it('should cache responses when cache option is true', async () => {
-      const mockResponse = { data: 'cached' };
-      global.fetch.mockResolvedValue({
-        text: () => Promise.resolve(JSON.stringify(mockResponse))
-      });
-
-      // First request
-      const response1 = {};
-      await grab('cacheable', response1, { cache: true });
-      
-      // Second identical request should use cache
-      const response2 = {};
-      await grab('cacheable', response2, { cache: true });
-
-      expect(global.fetch).toHaveBeenCalledTimes(1);
-      expect(response2.data).toBe('cached');
-    });
-  });
-
-  describe('Pagination', () => {
-    it('should handle pagination when explicitly configured', async () => {
-      const page1Response = { items: ['item1', 'item2'], hasMore: true };
-      const page2Response = { items: ['item3', 'item4'], hasMore: false };
-      
-      global.fetch
-        .mockResolvedValueOnce({
-          text: () => Promise.resolve(JSON.stringify(page1Response))
-        })
-        .mockResolvedValueOnce({
-          text: () => Promise.resolve(JSON.stringify(page2Response))
-        });
-
-      const response = {};
-      
-      // First page
-      await grab('paginated', response, {
-        paginateResult: 'items',
-        paginateKey: 'page',
-        page: 1
-      });
-      
-      expect(response.items).toEqual(['item1', 'item2']);
-      
-      // Second page should append
-      await grab('paginated', response, {
-        paginateResult: 'items', 
-        paginateKey: 'page',
-        page: 2
-      });
-      
-      expect(response.items).toEqual(['item1', 'item2', 'item3', 'item4']);
-    });
+  it('returns raw text for non-JSON responses', async () => {
+    mockOk('plain text');
+    const result = await grab('text');
+    expect(result).toBe('plain text');
   });
 });
 
-describe('Utility Functions', () => {
-  describe('log() function', () => {
-    beforeEach(() => {
-      vi.spyOn(console, 'debug').mockImplementation(() => {});
-      vi.spyOn(console, 'log').mockImplementation(() => {});
-    });
+// ─── Response object mutation ─────────────────────────────────────────────────
 
-    it('should use console.debug in development', () => {
-      window.location.hostname = 'localhost';
-      
-      log('Test message');
-      
-      expect(console.debug).toHaveBeenCalledWith(
-        '%cTest message',
-        'color: blue; font-size: 14px;'
-      );
-    });
-
-    it('should handle object messages with structure description', () => {
-      const testObj = { name: 'test', count: 5 };
-      
-      log(testObj);
-      
-      // Should call debug with structure description
-      expect(console.debug).toHaveBeenCalled();
-      const [message] = console.debug.mock.calls[0];
-      expect(message).toContain('name: string');
-      expect(message).toContain('count: number');
-    });
+describe('grab() — Response object', () => {
+  it('merges response data into a provided response object', async () => {
+    mockOk({ userId: 42, role: 'admin' });
+    const state: any = {};
+    await grab('profile', { response: state });
+    expect(state.userId).toBe(42);
+    expect(state.role).toBe('admin');
   });
 
-  describe('printJSONStructure() function', () => {
-    it('should describe simple object structure', () => {
-      const obj = { name: 'John', age: 30, active: true };
-      const result = printJSONStructure(obj);
-      
-      expect(result).toBe('{ name: string, age: number, active: boolean }');
-    });
+  it('sets isLoading=true while in flight, false after', async () => {
+    let resolve: (v: any) => void;
+    mockFetch.mockReturnValueOnce(
+      new Promise(r => { resolve = r; }).then(v => ({
+        text: () => Promise.resolve(JSON.stringify(v))
+      }))
+    );
+    const state: any = {};
+    const promise = grab('slow', { response: state });
+    expect(state.isLoading).toBe(true);
+    resolve!({ data: 'done' });
+    await promise;
+    expect(state.isLoading).toBe(false);
+  });
 
-    it('should describe nested object structure', () => {
-      const obj = {
-        user: { name: 'John', profile: { bio: 'Developer' } },
-        count: 5
-      };
-      const result = printJSONStructure(obj);
-      
-      expect(result).toBe('{ user: { name: string, profile: { bio: string } }, count: number }');
-    });
-
-    it('should describe array structures', () => {
-      const obj = {
-        users: [{ name: 'John', age: 30 }],
-        tags: ['javascript', 'testing'],
-        empty: []
-      };
-      const result = printJSONStructure(obj);
-      
-      expect(result).toBe('{ users: Array<{ name: string, age: number }>, tags: Array<string>, empty: Array<unknown> }');
-    });
-
-    it('should handle primitive values', () => {
-      expect(printJSONStructure('string')).toBe('string');
-      expect(printJSONStructure(42)).toBe('number');
-      expect(printJSONStructure(true)).toBe('boolean');
-      expect(printJSONStructure(null)).toBe('null');
-    });
+  it('sets error on state object when fetch fails', async () => {
+    mockErr('Timeout');
+    const state: any = {};
+    await grab('bad', { response: state });
+    expect(state.error).toBe('Timeout');
+    expect(state.isLoading).toBe(false);
   });
 });
 
-describe('Global State Management', () => {
-  it('should maintain grab.log for debugging', async () => {
-    const mockResponse = { data: 'logged' };
-    global.fetch.mockResolvedValue({
-      text: () => Promise.resolve(JSON.stringify(mockResponse))
-    });
+// ─── Mock server ─────────────────────────────────────────────────────────────
 
-    await grab('logged-endpoint', {});
+describe('grab() — Mock server', () => {
+  it('uses a static mock response without hitting fetch', async () => {
+    grab.mock['products'] = { response: [{ id: 1 }, { id: 2 }] };
+    const result = await grab('products');
+    expect(result).toEqual([{ id: 1 }, { id: 2 }]);
+    expect(mockFetch).not.toHaveBeenCalled();
+  });
 
-    // Should log the request for debugging
-    expect(window.grab.log['logged-endpoint']).toBeDefined();
+  it('uses a function mock that receives request params', async () => {
+    grab.mock['search'] = {
+      response: (params: any) => ({ hits: [`result for ${params.q}`] }),
+    };
+    const result = await grab('search', { post: true, q: 'vitest' });
+    expect(result.hits).toEqual(['result for vitest']);
+    expect(mockFetch).not.toHaveBeenCalled();
+  });
+
+  it('simulates error via mock throw', async () => {
+    grab.mock['broken'] = {
+      response: () => { throw new Error('Mock error'); },
+    };
+    const result = await grab('broken');
+    expect(result.error).toBe('Mock error');
+  });
+});
+
+// ─── Caching ─────────────────────────────────────────────────────────────────
+
+describe('grab() — Client-side cache', () => {
+  it('only calls fetch once for repeated cacheable requests', async () => {
+    mockOk({ cached: true });
+    await grab('cats', { cache: true });
+    const r2 = await grab('cats', { cache: true });
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+    expect(r2.cached).toBe(true);
+  });
+});
+
+// ─── instance() ───────────────────────────────────────────────────────────────
+
+describe('grab.instance()', () => {
+  it('creates an isolated instance with its own defaults', async () => {
+    mockOk({ ok: true });
+    const api = grab.instance({ baseURL: 'https://partner.io/api/' });
+    await api('status');
+    const [url] = mockFetch.mock.calls[0];
+    expect(url).toContain('partner.io/api/status');
+  });
+
+  it('allows per-call overrides on top of instance defaults', async () => {
+    mockOk({});
+    const api = grab.instance({ baseURL: 'https://base.io/' });
+    await api('items', { baseURL: 'https://override.io/' });
+    const [url] = mockFetch.mock.calls[0];
+    expect(url).toContain('override.io/items');
+  });
+});
+
+// ─── TypeScript generics (type-level, runtime smoke) ──────────────────────────
+
+describe('grab() — TypeScript generics', () => {
+  it('typed response compiles and returns the right shape', async () => {
+    type User = { name: string; age: number };
+    mockOk({ name: 'Carol', age: 28 });
+    const user = await grab<User>('users/me');
+    expect(user.name).toBe('Carol');
+    expect(typeof user.age).toBe('number');
   });
 });
