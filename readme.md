@@ -5,8 +5,8 @@
 <p align="center">
 
 <a href="https://discord.gg/SJdBqBz3tV"><img src="https://img.shields.io/discord/1110227955554209923.svg?label=Chat&logo=Discord&colorB=7289da&style=flat" alt="Join Discord" /></a>
-<a href="https://github.com/vtempest/GRAB-URL/actions/workflows/test.yml">
-<img src="https://github.com/vtempest/GRAB-URL/actions/workflows/test.yml/badge.svg" alt="Build Status" />
+<a href="https://github.com/vtempest/GRAB-URL/actions/workflows/tests.yml">
+<img src="https://github.com/vtempest/GRAB-URL/actions/workflows/tests.yml/badge.svg" alt="Build Status" />
 </a>
 <a href="https://github.com/vtempest/GRAB-URL/discussions">
 <img alt="GitHub Stars" src="https://img.shields.io/github/stars/vtempest/GRAB-URL" /></a>
