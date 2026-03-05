@@ -5,7 +5,7 @@ on:
     branches: [master] # a
 
 jobs:
-  publish:
+  npm-publish:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -20,7 +20,7 @@ jobs:
           registry-url: "https://registry.npmjs.org"
 
       - run: npm install
-      - run: npm run make
+      - run: npm run make:main
 
       - run: npm publish --provenance --access public
         env:

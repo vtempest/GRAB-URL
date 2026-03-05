@@ -19,8 +19,8 @@
 
 </p>
 <h3 align="center">
-  <a href="https://grab-url.vercel.app"> 📑 Docs </a>
-  <a href="https://grab-url.vercel.app/docs/examples/basic"> 🎯 Example Strategies </a>
+  <a href="https://grab.js.org"> 📑 Docs </a>
+  <a href="https://grab.js.org/docs/examples"> 🎯 Example Strategies </a>
 </h3>
 
 ```bash
@@ -36,7 +36,7 @@ npx grab-url https://releases.ubuntu.com/24.04.2/ubuntu-24.04.2-live-server-amd6
 1.  **GRAB is the FBEST Request Manager: Functionally Brilliant, Elegantly Simple Tool**: One Function, no dependencies, minimalist syntax, [more features than alternatives](https://grab.js.org/docs/Comparisons)
 2.  **Auto-JSON Convert**: Pass parameters and get response or error in JSON, handling other data types as is.
 3.  **isLoading Status**: Sets `.isLoading=true` on the pre-initialized response object so you can show a "Loading..." in any framework
-4.  **Debug Logging**: Adds global `log()` and prints colored JSON structure, response, timing for requests in test.
+4.  **[Claude Skill](https://grab.js.org/docs/claude-skill)** Copy this link as markdown and paste into ~/.claude/skills/use-grab-request/SKILL.md or similar for Antigravity, Cursor, Gemini, Codex, etc...
 5.  **Mock Server Support**: Configure `window.grab.mock` for development and testing environments
 6.  **Cancel Duplicates**: Prevent this request if one is ongoing to same path & params, or cancel the ongoing request.
 7.  **Timeout & Retry**: Customizable request timeout, default 30s, and auto-retry on error
@@ -48,8 +48,8 @@ npx grab-url https://releases.ubuntu.com/24.04.2/ubuntu-24.04.2-live-server-amd6
 13. **Regrab On Error**: Regrab on timeout error, or on window refocus, or on network change, or on stale data.
 14. **Framework Agnostic**: Alternatives like TanStack work only in component initialization and depend on React & others.
 15. **Globals**: Adds to window in browser or global in Node.js so you only import once: `grab()`, `log()`, `grab.log`, `grab.mock`, `grab.defaults`
-16. **TypeScript Tooltips**: Developers can hover over option names and autocomplete TypeScript.
-17. **Request Stategies**: [🎯 Examples](https://grab.js.org/docs/examples/basic) show common stategies like debounce, repeat, proxy, unit tests, interceptors, file upload, etc
+16. **Debug Logging**: Adds global `log()` and prints colored JSON structure, response, timing for requests in test.
+17. **Request Stategies**: [🎯 Examples](https://grab.js.org/docs/examples) show common stategies like debounce, repeat, proxy, unit tests, interceptors, file upload, etc
 18. **Rate Limiting**: Built-in rate limiting to prevent multi-click cascading responses, require to wait seconds between requests.
 19. **Repeat**: Repeat request this many times, or repeat every X seconds to poll for updates.
 20. **Loading Icons**: Import from `grab-url/icons` to get enhanced animated loading icons.

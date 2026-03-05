@@ -16,7 +16,6 @@ icon: List
 <th>Name</th>
 <th>Type</th>
 <th>Description</th>
-<th>Defined in</th>
 </tr>
 </thead>
 <tbody>
@@ -36,11 +35,6 @@ icon: List
 include headers and authorization in the request
 
 </td>
-<td>
-
-[grab-api.ts:590](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L590)
-
-</td>
 </tr>
 <tr>
 <td>
@@ -56,11 +50,6 @@ include headers and authorization in the request
 <td>
 
 Pre-initialized object which becomes response JSON, no need for .data
-
-</td>
-<td>
-
-[grab-api.ts:592](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L592)
 
 </td>
 </tr>
@@ -80,11 +69,6 @@ Pre-initialized object which becomes response JSON, no need for .data
 default="GET" The HTTP method to use
 
 </td>
-<td>
-
-[grab-api.ts:594](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L594)
-
-</td>
 </tr>
 <tr>
 <td>
@@ -100,11 +84,6 @@ default="GET" The HTTP method to use
 <td>
 
 default=false Whether to cache the request and from frontend cache
-
-</td>
-<td>
-
-[grab-api.ts:596](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L596)
 
 </td>
 </tr>
@@ -124,11 +103,6 @@ default=false Whether to cache the request and from frontend cache
 default=60 Seconds to consider data stale and invalidate cache
 
 </td>
-<td>
-
-[grab-api.ts:598](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L598)
-
-</td>
 </tr>
 <tr>
 <td>
@@ -144,11 +118,6 @@ default=60 Seconds to consider data stale and invalidate cache
 <td>
 
 default=30 The timeout for the request in seconds
-
-</td>
-<td>
-
-[grab-api.ts:600](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L600)
 
 </td>
 </tr>
@@ -168,11 +137,6 @@ default=30 The timeout for the request in seconds
 default='/api/' base url prefix, override with SERVER_API_URL env
 
 </td>
-<td>
-
-[grab-api.ts:602](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L602)
-
-</td>
 </tr>
 <tr>
 <td>
@@ -188,11 +152,6 @@ default='/api/' base url prefix, override with SERVER_API_URL env
 <td>
 
 default=true Cancel previous requests to same path
-
-</td>
-<td>
-
-[grab-api.ts:604](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L604)
 
 </td>
 </tr>
@@ -212,11 +171,6 @@ default=true Cancel previous requests to same path
 default=false Cancel if a request to path is in progress
 
 </td>
-<td>
-
-[grab-api.ts:606](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L606)
-
-</td>
 </tr>
 <tr>
 <td>
@@ -232,11 +186,6 @@ default=false Cancel if a request to path is in progress
 <td>
 
 default=false If set, how many seconds to wait between requests
-
-</td>
-<td>
-
-[grab-api.ts:608](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L608)
 
 </td>
 </tr>
@@ -256,11 +205,6 @@ default=false If set, how many seconds to wait between requests
 default=false Whether to log the request and response
 
 </td>
-<td>
-
-[grab-api.ts:610](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L610)
-
-</td>
 </tr>
 <tr>
 <td>
@@ -276,11 +220,6 @@ default=false Whether to log the request and response
 <td>
 
 default=null [page key, response field to concatenate, element with results]
-
-</td>
-<td>
-
-[grab-api.ts:612](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L612)
 
 </td>
 </tr>
@@ -300,11 +239,6 @@ default=null [page key, response field to concatenate, element with results]
 default=false Pass this with options to set those options as defaults for all requests
 
 </td>
-<td>
-
-[grab-api.ts:614](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L614)
-
-</td>
 </tr>
 <tr>
 <td>
@@ -320,11 +254,6 @@ default=false Pass this with options to set those options as defaults for all re
 <td>
 
 default=0 Retry failed requests this many times
-
-</td>
-<td>
-
-[grab-api.ts:616](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L616)
 
 </td>
 </tr>
@@ -344,11 +273,6 @@ default=0 Retry failed requests this many times
 default=log Custom logger to override the built-in color JSON log()
 
 </td>
-<td>
-
-[grab-api.ts:618](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L618)
-
-</td>
 </tr>
 <tr>
 <td>
@@ -364,11 +288,6 @@ default=log Custom logger to override the built-in color JSON log()
 <td>
 
 Set with defaults to modify each request data. Takes and returns in order: path, response, params, fetchParams
-
-</td>
-<td>
-
-[grab-api.ts:620](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L620)
 
 </td>
 </tr>
@@ -388,11 +307,6 @@ Set with defaults to modify each request data. Takes and returns in order: path,
 Set with defaults to modify each request data. Takes and returns in order: path, response, params, fetchParams
 
 </td>
-<td>
-
-[grab-api.ts:622](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L622)
-
-</td>
 </tr>
 <tr>
 <td>
@@ -408,11 +322,6 @@ Set with defaults to modify each request data. Takes and returns in order: path,
 <td>
 
 Set with defaults to modify each request data. Takes and returns in order: error, path, params
-
-</td>
-<td>
-
-[grab-api.ts:624](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L624)
 
 </td>
 </tr>
@@ -432,11 +341,6 @@ Set with defaults to modify each request data. Takes and returns in order: error
 Set with defaults to process the response as a stream (i.e., for instant unzip)
 
 </td>
-<td>
-
-[grab-api.ts:626](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L626)
-
-</td>
 </tr>
 <tr>
 <td>
@@ -452,11 +356,6 @@ Set with defaults to process the response as a stream (i.e., for instant unzip)
 <td>
 
 default=0 Repeat request this many times
-
-</td>
-<td>
-
-[grab-api.ts:628](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L628)
 
 </td>
 </tr>
@@ -476,11 +375,6 @@ default=0 Repeat request this many times
 default=null Repeat request every seconds
 
 </td>
-<td>
-
-[grab-api.ts:630](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L630)
-
-</td>
 </tr>
 <tr>
 <td>
@@ -496,11 +390,6 @@ default=null Repeat request every seconds
 <td>
 
 default=0 Seconds to debounce request, wait to execute so that other requests may override
-
-</td>
-<td>
-
-[grab-api.ts:632](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L632)
 
 </td>
 </tr>
@@ -520,11 +409,6 @@ default=0 Seconds to debounce request, wait to execute so that other requests ma
 default=false Refetch when cache is past cacheForTime
 
 </td>
-<td>
-
-[grab-api.ts:634](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L634)
-
-</td>
 </tr>
 <tr>
 <td>
@@ -540,11 +424,6 @@ default=false Refetch when cache is past cacheForTime
 <td>
 
 default=false Refetch on window refocus
-
-</td>
-<td>
-
-[grab-api.ts:636](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L636)
 
 </td>
 </tr>
@@ -564,11 +443,6 @@ default=false Refetch on window refocus
 default=false Refetch on network change
 
 </td>
-<td>
-
-[grab-api.ts:638](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L638)
-
-</td>
 </tr>
 <tr>
 <td>
@@ -584,11 +458,6 @@ default=false Refetch on network change
 <td>
 
 shortcut for method: "POST"
-
-</td>
-<td>
-
-[grab-api.ts:640](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L640)
 
 </td>
 </tr>
@@ -608,11 +477,6 @@ shortcut for method: "POST"
 shortcut for method: "PUT"
 
 </td>
-<td>
-
-[grab-api.ts:642](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L642)
-
-</td>
 </tr>
 <tr>
 <td>
@@ -630,11 +494,6 @@ shortcut for method: "PUT"
 shortcut for method: "PATCH"
 
 </td>
-<td>
-
-[grab-api.ts:644](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L644)
-
-</td>
 </tr>
 <tr>
 <td>
@@ -650,11 +509,6 @@ shortcut for method: "PATCH"
 <td>
 
 default=null The body of the POST/PUT/PATCH request (can be passed into main)
-
-</td>
-<td>
-
-[grab-api.ts:646](https://github.com/vtempest/GRAB-URL/tree/master/src/grab-api.ts#L646)
 
 </td>
 </tr>
