@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid" width="200" height="200" style="shape-rendering: auto; display: block; " xmlns:xlink="http://www.w3.org/1999/xlink"><g><g transform="translate(50,50)">
-  <g transform="scale(0.7)">
-  <circle fill="#e90c59" r="50" cy="0" cx="0"></circle>
-  <circle fill="#46dff0" r="15" cy="-28" cx="0">
-    <animateTransform values="0 0 0;360 0 0" keyTimes="0;1" repeatCount="indefinite" dur="1s" type="rotate" attributeName="transform"></animateTransform>
-  </circle>
-  </g>
-</g><g></g></g></svg>
