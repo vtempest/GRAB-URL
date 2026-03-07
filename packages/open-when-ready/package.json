@@ -21,6 +21,7 @@
   "dependencies": {
     "minimist": "^1.2.8",
     "open": "^10.1.0",
+    "opener": "^1.5.2",
     "wait-on": "^8.0.1"
   },
   "engines": {

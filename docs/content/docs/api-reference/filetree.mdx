@@ -1,94 +1,66 @@
 ---
-title: Code Filetree Structure
-description: Code filetree for GRAB
+title: Code Filetree & Types Structure
 icon: FolderTree
 ---
 
+import { FileTreeView } from '@/components/fumadocs/filetree-view';
 
+export const descriptions = {
+  // grab-api
+  "grab-api": "Core Grab API library",
+  "grab-api/index.ts": "Main entry point. Exports the grab() function and log utility, sets up global instances, and initializes browser devtools.",
+  "grab-api/common/types.ts": "All TypeScript definitions for request options, response shapes, and mock configurations.",
+  "grab-api/common/utils.ts": "Low-level utilities like debouncer, wait (sleep), and buildUrl.",
+  "grab-api/core/cache-pagination.ts": "Decides if a request should be served from cache and increments page numbers for infinite scrolling.",
+  "grab-api/core/core.ts": "The heart of the library. Orchestrates the flow from option merging to final response mapping.",
+  "grab-api/core/flow-control.ts": "Manages non-network request flow such as debouncing and repeating requests.",
+  "grab-api/core/regrab-events.ts": "Sets up listeners (window focus, online status) to automatically refetch data.",
+  "grab-api/core/request-executor.ts": "Handles the actual network fetch call or returns mock data if configured.",
+  "grab-api/devtools/devtools.ts": "Implements a floating visual alert/notification system for the browser.",
+  "grab-api/response/infinite-scroll.ts": "Logic for appending paginated results and saving/restoring scroll position in browsers.",
+  "grab-api/response/response-handler.ts": "Transforms raw fetch responses into the predictable GrabResponse format.",
+  // grab-url-cli
+  "grab-url-cli": "Command-Line Interface",
+  "grab-url-cli/index.ts": "Parses CLI arguments and switches between API Mode and Download Mode.",
+  "grab-url-cli/cli-args.ts": "A custom, lightweight alternative to yargs for parsing flags and positional URLs.",
+  "grab-url-cli/file-downloader.ts": "Orchestrator class that coordinates formatting, state, and keyboard modules for a unified download experience.",
+  "grab-url-cli/keyboard-controls.ts": "Listens for keypresses (like 'p' for pause) during active downloads.",
+  "grab-url-cli/download-spinners.ts": "Spinner animation configurations for download progress display.",
+  "grab-url-cli/display/progress-format.ts": "Pure functions for converting bytes to human-readable strings, calculating ETAs, and building progress bars.",
+  "grab-url-cli/display/spinner-config.ts": "Selects and animates randomized spinner frames for a polished CLI look.",
+  "grab-url-cli/transfer/single-file-transfer.ts": "The driver logic for streaming a single file to disk with progress updates.",
+  "grab-url-cli/transfer/multi-file-transfer.ts": "Manages a pool of concurrent downloads using a multi-progress bar display.",
+  "grab-url-cli/transfer/resume-state.ts": "Handles .download-state sidecar files to allow resuming interrupted downloads.",
+  // log-json
+  "log-json": "Output formatting and logging",
+  "log-json/colors.ts": "ANSI terminal colors.",
+  "log-json/log-json.ts": "Robust logger that outputs colorized, structured JSON to the console.",
+  "log-json/structure.ts": "TypeDoc-style JSON describer.",
+  // loading-animations
+  "loading-animations": "Assets & animations for CLI and browser",
+  "loading-animations/cli/loading-animations-emojis.js": "A collection of character-based animation frames for terminal spinners.",
+  "loading-animations/svg/index.ts": "Exports SVG animations as strings for use in grab-api devtools.",
+  // archiver-web
+  "archiver-web": "Web-based archive compression and extraction",
+  "archiver-web/src/index.ts": "Main entry point for archive operations.",
+  "archiver-web/src/types.ts": "TypeScript type definitions for archiver.",
+  "archiver-web/src/bin-compress.ts": "CLI binary for compressing files into archives.",
+  "archiver-web/src/bin-extract.ts": "CLI binary for extracting archive contents.",
+  // open-when-ready
+  "open-when-ready": "Opens browser when dev server is ready",
+};
 
-```text
-src/
-├── grab-api/                   # Core Grab API library
-│   ├── common/                 # Shared types and utilities
-│   │   ├── types.ts            # Core TypeScript interfaces/types
-│   │   └── utils.ts            # Common helper functions
-│   ├── core/                   # Main orchestration logic
-│   │   ├── cache-pagination.ts # Cache & infinite scroll state
-│   │   ├── core.ts             # Main grab() implementation
-│   │   ├── flow-control.ts     # Debounce & repeat logic
-│   │   ├── regrab-events.ts    # Refetch event listeners
-│   │   └── request-executor.ts # Fetch & mock execution
-│   ├── logging/                # Output formatting
-│   │   ├── colors.ts           # ANSI terminal colors
-│   │   ├── log-json.ts         # Colorized JSON logger
-│   │   └── structure.ts        # TypeDoc-style JSON describer
-│   ├── response/               # Post-fetch handling
-│   │   ├── infinite-scroll.ts  # DOM scroll & persistence
-│   │   └── response-handler.ts # Fetch result mapping
-│   ├── ui/                     # Browser-side UI
-│   │   └── devtools.ts         # Visual alert system
-│   └── index.ts                # Main library entry point
-│
-├── grab-url-cli/                # Command-Line Interface
-│   ├── index.ts                # CLI entry point
-│   ├── cli-args.ts             # Minimal argument parser
-│   ├── file-downloader.ts      # High-level CLI orchestrator
-│   ├── keyboard-controls.ts    # Interactive keyboard controls
-│   ├── display/                # UI & progress formatting
-│   │   ├── progress-format.ts  # Byte/speed/ETA formatting
-│   │   └── spinner-config.ts   # Spinner animations & bar colors
-│   └── transfer/               # Download engine
-│       ├── single-file-transfer.ts  # Single file download driver
-│       ├── multi-file-transfer.ts   # Concurrent multi-file downloader
-│       └── resume-state.ts          # Resume-state persistence
-│
-└── loading-animations/          # Assets & animations
-    ├── cli/
-    │   └── loading-animations-emojis.js  # CLI spinner frames
-    └── svg/                     # SVG loading animations
-        ├── index.ts             # SVG string exports
-        └── (various).svg        # Individual SVG assets
-```
+<FileTreeView
+  dir="../packages"
+  ghBase="https://github.com/vtempest/grab-url/tree/master/packages"
+  descriptions={descriptions}
+  ignore={["bun.lock"]}
+/>
 
----
+import { DependencyGraph } from '@/components/fumadocs/dependency-graph';
 
-## 📄 Component Descriptions
+## Module Dependency Graph
 
-### Grab API (src/grab-api/)
+Click any node to scroll to its file in the tree above.
 
-The core library used to generate API requests. It supports both Browser and Node.js environments.
-
-- **`index.ts`**: The main entry point. It exports the `grab` function and `log` utility, sets up global instances, and initializes browser devtools.
-- **`common/types.ts`**: Contains all TypeScript definitions for request options, response shapes, and mock configurations.
-- **`common/utils.ts`**: Provides low-level utilities like `debouncer`, `wait` (sleep), and `buildUrl`.
-- **`core/core.ts`**: The heart of the library. Orchestrates the flow from option merging to final response mapping.
-- **`core/flow-control.ts`**: Manages non-network request flow such as debouncing and repeating requests.
-- **`core/request-executor.ts`**: Handles the actual network `fetch` call or returns mock data if configured.
-- **`core/cache-pagination.ts`**: Decides if a request should be served from cache and increments page numbers for infinite scrolling.
-- **`core/regrab-events.ts`**: Sets up listeners (window focus, online status) to automatically refetch data.
-- **`logging/log-json.ts`**: A robust logger that outputs colorized, structured JSON to the console.
-- **`response/response-handler.ts`**: Transforms raw fetch responses into the predictable `GrabResponse` format.
-- **`response/infinite-scroll.ts`**: Logic for appending paginated results and saving/restoring scroll position in browsers.
-- **`devtools/devtools.ts`**: Implements a floating visual alert/notification system for the browser.
-
-### Grab-URL CLI (`src/grab-url-cli/`)
-
-The command-line tool built on top of the Grab API, specializing in file downloads and quick API prototyping.
-
-- **`index.ts`**: Parses CLI arguments and switches between "API Mode" (fetching data) and "Download Mode" (multi-file progress bars).
-- **`cli-args.ts`**: A custom, lightweight alternative to yargs for parsing flags and positional URLs.
-- **`file-downloader.ts`**: An orchestrator class that coordinates formatting, state, and keyboard modules for a unified download experience.
-- **`keyboard-controls.ts`**: Listens for keypresses (like 'p' for pause) during active downloads.
-- **`display/progress-format.ts`**: Pure functions for converting bytes to human-readable strings, calculating ETAs, and building progress bars.
-- **`display/spinner-config.ts`**: Selects and animates randomized spinner frames for a polished CLI look.
-- **`transfer/single-file-transfer.ts`**: The driver logic for streaming a single file to disk with progress updates.
-- **`transfer/multi-file-transfer.ts`**: Manages a pool of concurrent downloads using a multi-progress bar display.
-- **`transfer/resume-state.ts`**: Handles `.download-state` sidecar files to allow resuming interrupted downloads.
-
-### Loading Animations (`src/loading-animations/`)
-
-Shared visual components for both CLI and Browser UIs.
-
-- **`cli/loading-animations-emojis.js`**: A collection of character-based animation frames for terminal spinners.
-- **`svg/index.ts`**: Exports SVG animations as strings, allowing them to be easily imported and used in the `grab-api` devtools.
-- **`svg/*.svg`**: Raw SVG files for various loading animations (pacman, ripple, etc.).
+<DependencyGraph dir="../packages" ignore={["bun.lock"]} />

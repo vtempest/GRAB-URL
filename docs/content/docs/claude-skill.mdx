@@ -1,8 +1,7 @@
 ---
-title:  Claude Skill & AI Code Editors
+title: Claude Skill & AI Code Editors
 icon: Bot
 ---
-
 
 **Instructions: Copy this file as markdown and paste into `~/.claude/skills/use-grab-request/SKILL.md` or similar for Antigravity, Cursor, Gemini, Codex, etc...**
 
@@ -386,37 +385,115 @@ Do not enforce `grab` in contexts where:
 
 - The user explicitly wants `fetch`, `axios`, or another library by name.
 
-
 ### GRAB Options Reference
 
-| Name | Type | Description |
-| --- | --- | --- |
-| `headers?` | `Record<string, string>` | include headers and authorization in the request |
-| `response?` | `TResponse` \| (`params`: `TParams`) => `TResponse` \| `any` | Pre-initialized object which becomes response JSON, no need for .data |
-| `method?` | `"GET"` \| `"POST"` \| `"PUT"` \| `"PATCH"` \| `"DELETE"` \| `"OPTIONS"` \| `"HEAD"` | default="GET" The HTTP method to use |
-| `cache?` | `boolean` | default=false Whether to cache the request and from frontend cache |
-| `cacheForTime?` | `number` | default=60 Seconds to consider data stale and invalidate cache |
-| `timeout?` | `number` | default=30 The timeout for the request in seconds |
-| `baseURL?` | `string` | default='/api/' base url prefix, override with SERVER_API_URL env |
-| `cancelOngoingIfNew?` | `boolean` | default=true Cancel previous requests to same path |
-| `cancelNewIfOngoing?` | `boolean` | default=false Cancel if a request to path is in progress |
-| `rateLimit?` | `number` | default=false If set, how many seconds to wait between requests |
-| `debug?` | `boolean` | default=false Whether to log the request and response |
-| `infiniteScroll?` | \[`string`, `string`, `string`\] | default=null [page key, response field to concatenate, element with results] |
-| `setDefaults?` | `boolean` | default=false Pass this with options to set those options as defaults for all requests |
-| `retryAttempts?` | `number` | default=0 Retry failed requests this many times |
-| `logger()?` | (...`args`: `any`[]) => `void` | default=log Custom logger to override the built-in color JSON log() |
-| `onRequest()?` | (...`args`: `any`[]) => `any` | Set with defaults to modify each request data. Takes and returns in order: path, response, params, fetchParams |
-| `onResponse()?` | (...`args`: `any`[]) => `any` | Set with defaults to modify each request data. Takes and returns in order: path, response, params, fetchParams |
-| `onError()?` | (...`args`: `any`[]) => `any` | Set with defaults to modify each request data. Takes and returns in order: error, path, params |
-| `onStream()?` | (...`args`: `any`[]) => `any` | Set with defaults to process the response as a stream (i.e., for instant unzip) |
-| `repeat?` | `number` | default=0 Repeat request this many times |
-| `repeatEvery?` | `number` | default=null Repeat request every seconds |
-| `debounce?` | `number` | default=0 Seconds to debounce request, wait to execute so that other requests may override |
-| `regrabOnStale?` | `boolean` | default=false Refetch when cache is past cacheForTime |
-| `regrabOnFocus?` | `boolean` | default=false Refetch on window refocus |
-| `regrabOnNetwork?` | `boolean` | default=false Refetch on network change |
-| `post?` | `boolean` | shortcut for method: "POST" |
-| `put?` | `boolean` | shortcut for method: "PUT" |
-| `patch?` | `boolean` | shortcut for method: "PATCH" |
-| `body?` | `any` | default=null The body of the POST/PUT/PATCH request (can be passed into main) |
+| Name                  | Type                                                                                 | Description                                                                                                    |
+| --------------------- | ------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
+| `headers?`            | `Record<string, string>`                                                             | include headers and authorization in the request                                                               |
+| `response?`           | `TResponse` \| (`params`: `TParams`) => `TResponse` \| `any`                         | Pre-initialized object which becomes response JSON, no need for .data                                          |
+| `method?`             | `"GET"` \| `"POST"` \| `"PUT"` \| `"PATCH"` \| `"DELETE"` \| `"OPTIONS"` \| `"HEAD"` | default="GET" The HTTP method to use                                                                           |
+| `cache?`              | `boolean`                                                                            | default=false Whether to cache the request and from frontend cache                                             |
+| `cacheForTime?`       | `number`                                                                             | default=60 Seconds to consider data stale and invalidate cache                                                 |
+| `timeout?`            | `number`                                                                             | default=30 The timeout for the request in seconds                                                              |
+| `baseURL?`            | `string`                                                                             | default='/api/' base url prefix, override with SERVER_API_URL env                                              |
+| `cancelOngoingIfNew?` | `boolean`                                                                            | default=true Cancel previous requests to same path                                                             |
+| `cancelNewIfOngoing?` | `boolean`                                                                            | default=false Cancel if a request to path is in progress                                                       |
+| `rateLimit?`          | `number`                                                                             | default=false If set, how many seconds to wait between requests                                                |
+| `debug?`              | `boolean`                                                                            | default=false Whether to log the request and response                                                          |
+| `infiniteScroll?`     | \[`string`, `string`, `string`\]                                                     | default=null [page key, response field to concatenate, element with results]                                   |
+| `setDefaults?`        | `boolean`                                                                            | default=false Pass this with options to set those options as defaults for all requests                         |
+| `retryAttempts?`      | `number`                                                                             | default=0 Retry failed requests this many times                                                                |
+| `logger()?`           | (...`args`: `any`[]) => `void`                                                       | default=log Custom logger to override the built-in color JSON log()                                            |
+| `onRequest()?`        | (...`args`: `any`[]) => `any`                                                        | Set with defaults to modify each request data. Takes and returns in order: path, response, params, fetchParams |
+| `onResponse()?`       | (...`args`: `any`[]) => `any`                                                        | Set with defaults to modify each request data. Takes and returns in order: path, response, params, fetchParams |
+| `onError()?`          | (...`args`: `any`[]) => `any`                                                        | Set with defaults to modify each request data. Takes and returns in order: error, path, params                 |
+| `onStream()?`         | (...`args`: `any`[]) => `any`                                                        | Set with defaults to process the response as a stream (i.e., for instant unzip)                                |
+| `repeat?`             | `number`                                                                             | default=0 Repeat request this many times                                                                       |
+| `repeatEvery?`        | `number`                                                                             | default=null Repeat request every seconds                                                                      |
+| `debounce?`           | `number`                                                                             | default=0 Seconds to debounce request, wait to execute so that other requests may override                     |
+| `regrabOnStale?`      | `boolean`                                                                            | default=false Refetch when cache is past cacheForTime                                                          |
+| `regrabOnFocus?`      | `boolean`                                                                            | default=false Refetch on window refocus                                                                        |
+| `regrabOnNetwork?`    | `boolean`                                                                            | default=false Refetch on network change                                                                        |
+| `post?`               | `boolean`                                                                            | shortcut for method: "POST"                                                                                    |
+| `put?`                | `boolean`                                                                            | shortcut for method: "PUT"                                                                                     |
+| `patch?`              | `boolean`                                                                            | shortcut for method: "PATCH"                                                                                   |
+| `body?`               | `any`                                                                                | default=null The body of the POST/PUT/PATCH request (can be passed into main)                                  |
+
+### Best Practices
+
+### 1. **Use Response Objects for UI State**
+
+```javascript
+let userProfile = {};
+await grab("users/me", { response: userProfile });
+
+// Direct assignment is supported but loses .isLoading status
+let user = await grab("users/me");
+```
+
+### 2. **Configure Defaults Early**
+
+```javascript
+grab("", {
+  setDefaults: true,
+  baseURL: process.env.API_URL,
+  timeout: 30,
+  debug: process.env.NODE_ENV === "development",
+});
+```
+
+### 3. **Use Mocks for Development**
+
+```javascript
+if (process.env.NODE_ENV === "development") {
+  grab.mock = {
+    "users/me": { response: mockUser },
+    posts: { response: mockPosts },
+    settings: { response: mockSettings },
+  };
+}
+```
+
+### 4. **Handle Loading States**
+
+```javascript
+{
+  state.isLoading ? (
+    <LoadingSpinner />
+  ) : state.error ? (
+    <ErrorMessage error={state.error} />
+  ) : (
+    <DataComponent data={state.data} />
+  );
+}
+```
+
+### 5. **Use Rate Limiting for User Interactions**
+
+```javascript
+await grab("save-data", {
+  post: true,
+  rateLimit: 2, // 2 seconds between saves
+  data: formData,
+});
+```
+
+### 6. **Development vs Production**
+
+```javascript
+// config.js
+const isDevelopment = process.env.NODE_ENV === "development";
+
+// Configure GRAB for different environments
+grab("", {
+  setDefaults: true,
+  baseURL: isDevelopment
+    ? "http://localhost:3001/api"
+    : "https://api.myapp.com/v1",
+  debug: isDevelopment,
+  timeout: isDevelopment ? 60 : 30,
+  cache: !isDevelopment,
+  retryAttempts: isDevelopment ? 0 : 2,
+});
+```
+````

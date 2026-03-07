@@ -106,7 +106,7 @@ if (__isMain) {
 
       const downloadObjects = urls.map((url, i) => {
         let filename =
-          i === 0 && outputFile ? outputFile : downloader.generateFilename(url);
+          i === 0 && outputFile ? outputFile : downloader.generateFilename(url, process.cwd());
         const outputPath = path.isAbsolute(filename)
           ? filename
           : path.join(process.cwd(), filename);

@@ -77,7 +77,7 @@ export async function promptForNewUrl(callbacks: KeyboardCallbacks): Promise<voi
         );
 
         if (newUrl && isValidUrl(newUrl)) {
-            const filename = generateFilename(newUrl);
+            const filename = generateFilename(newUrl, process.cwd());
             const outputPath = path.isAbsolute(filename) ? filename : path.join(process.cwd(), filename);
 
             try {
@@ -119,9 +119,22 @@ export function isValidUrl(url: string): boolean {
 }
 
 /** Derive a local filename from a URL pathname. */
-export function generateFilename(url: string): string {
-    try { return path.basename(new URL(url).pathname) || 'downloaded-file'; }
-    catch { return 'downloaded-file'; }
+export function generateFilename(url: string, dir?: string): string {
+    let base: string;
+    try { base = path.basename(new URL(url).pathname) || 'downloaded-file'; }
+    catch { base = 'downloaded-file'; }
+
+    if (!dir) return base;
+
+    const ext = path.extname(base);
+    const name = ext ? base.slice(0, -ext.length) : base;
+    let candidate = base;
+    let i = 1;
+    while (fs.existsSync(path.join(dir, candidate))) {
+        candidate = `${name}(${i})${ext}`;
+        i++;
+    }
+    return candidate;
 }
 
 /** Extract the file extension from a URL pathname. */

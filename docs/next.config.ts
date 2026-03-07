@@ -1,5 +1,4 @@
 import { createMDX } from 'fumadocs-mdx/next';
-import type { NextConfig } from 'next';
 
 
 const withMDX = createMDX({
@@ -10,9 +9,9 @@ const withMDX = createMDX({
   // },
 });
 
+type MDXNextConfig = NonNullable<Parameters<typeof withMDX>[0]>;
 
-
-export const config: NextConfig = {
+export const config = {
   // output: 'export',
   // distDir: './dist',
   async rewrites() {
@@ -33,5 +32,5 @@ export const config: NextConfig = {
     ],
     unoptimized: true,
   },
-};
+} satisfies MDXNextConfig;
 export default withMDX(config);

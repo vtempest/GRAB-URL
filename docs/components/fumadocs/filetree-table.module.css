@@ -1,0 +1,170 @@
+.searchBox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  padding: 0.45rem 0.7rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--fd-border, #27272a);
+  background: transparent;
+  transition: border-color 0.15s;
+}
+
+.searchBox:focus-within {
+  border-color: var(--fd-primary, rgb(59, 130, 246));
+}
+
+.searchIcon {
+  color: var(--fd-muted-foreground, #a1a1aa);
+  flex-shrink: 0;
+}
+
+.searchInput {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--fd-foreground, #fafafa);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.searchInput::placeholder {
+  color: var(--fd-muted-foreground, #71717a);
+}
+
+.highlight {
+  background: rgba(250, 204, 21, 0.3);
+  color: inherit;
+  border-radius: 2px;
+  padding: 0 1px;
+}
+
+.noResults {
+  padding: 2rem 0.6rem;
+  text-align: center;
+  color: var(--fd-muted-foreground, #71717a);
+  font-size: 0.88rem;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.thead th {
+  text-align: left;
+  padding: 0.5rem 0.6rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--fd-muted-foreground, #a1a1aa);
+  border-bottom: 1px solid var(--fd-border, #27272a);
+  position: sticky;
+  top: 0;
+  background: transparent;
+  z-index: 2;
+}
+
+.row {
+  border-bottom: 1px solid var(--fd-border, rgba(39, 39, 42, 0.4));
+}
+
+.row:hover {
+  background: var(--fd-accent, rgba(39, 39, 42, 0.3));
+}
+
+.rowFolder {
+  composes: row;
+  cursor: pointer;
+  user-select: none;
+}
+
+.rowFolder:hover {
+  background: var(--fd-accent, rgba(39, 39, 42, 0.4));
+}
+
+.cell {
+  padding: 0.45rem 0.6rem;
+  vertical-align: top;
+}
+
+.cellName {
+  composes: cell;
+  font-weight: 500;
+}
+
+.descLine {
+  font-size: 0.88rem;
+  font-weight: 400;
+  color: var(--fd-secondary-foreground, #27272a);
+  margin-top: 0.15rem;
+  line-height: 1.5;
+}
+
+:global([data-theme="dark"]) .descLine,
+:global(.dark) .descLine {
+  color: var(--fd-secondary-foreground, #e4e4e7);
+}
+
+.cellBadges {
+  composes: cell;
+}
+
+.badgeWrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem;
+}
+
+.folderToggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  margin-right: 0.25rem;
+  color: var(--fd-muted-foreground, #a1a1aa);
+  transition: transform 0.15s;
+  flex-shrink: 0;
+}
+
+.folderToggleOpen {
+  composes: folderToggle;
+  transform: rotate(90deg);
+}
+
+.folderName {
+  font-weight: 600;
+  color: var(--fd-primary, rgb(59, 130, 246));
+}
+
+.fileName {
+  color: var(--fd-muted-foreground, #a1a1aa);
+  text-decoration: none;
+}
+
+.fileName:hover {
+  color: var(--fd-primary, rgb(59, 130, 246));
+  text-decoration: underline;
+}
+
+.colName {
+  width: 36%;
+  min-width: 200px;
+}
+
+.colImports {
+  width: 22%;
+}
+
+.colInternal {
+  width: 21%;
+}
+
+.colExports {
+  width: 21%;
+}

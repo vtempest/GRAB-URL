@@ -43,5 +43,6 @@ test/test-downloads
 .grab-downloads/
 docs/dist/
 .claude
+build.log
 pnpm-lock.yaml
 .turbo
