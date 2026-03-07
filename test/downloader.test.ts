@@ -1,9 +1,9 @@
 /**
  * @file downloader.test.ts
  * @description Unit tests for the CLI downloader helper modules:
- *   - download-format.ts   (pure formatting functions)
- *   - download-state.ts    (state file I/O + resume decision)
- *   - download-spinners.ts (spinner frame lookup + bar colors)
+ *   - display/progress-format.ts   (pure formatting functions)
+ *   - transfer/resume-state.ts     (state file I/O + resume decision)
+ *   - display/spinner-config.ts    (spinner frame lookup + bar colors)
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
@@ -17,7 +17,7 @@ import {
     formatBytesCompact, formatBytesPlain,
     formatETA, formatTotalDisplay, formatSpeed, formatSpeedDisplay,
     truncateFilename, formatProgress,
-} from '../src/grab-url-cli/download-format.js';
+} from '../packages/grab-url-cli/display/progress-format.js';
 
 describe('download-format — formatBytesCompact()', () => {
     it('formats 0 as "0B"', () => expect(formatBytesCompact(0)).toBe('0B'));
@@ -87,7 +87,7 @@ import {
     loadDownloadState, saveDownloadState, cleanupStateFile,
     getPartialFileSize, resolveResumeDecision,
     type DownloadState, type ServerInfo,
-} from '../src/grab-url-cli/download-state.js';
+} from '../packages/grab-url-cli/transfer/resume-state.js';
 
 describe('download-state — directory helpers', () => {
     it('getStateDirectory() respects GRAB_DOWNLOAD_STATE_DIR env var', () => {
@@ -226,7 +226,7 @@ import {
     spinnerTypes, getSpinnerFrames, getRandomSpinner,
     getSpinnerWidth, calculateBarSize, getRandomBarColor, getRandomBarGlueColor,
     barColors, barGlueColors,
-} from '../src/grab-url-cli/download-spinners.js';
+} from '../packages/grab-url-cli/display/spinner-config.js';
 
 describe('download-spinners — spinner data', () => {
     it('loads a non-empty list of spinner types', () => {
@@ -277,17 +277,17 @@ describe('download-spinners — color pickers', () => {
     });
 });
 
-// ─── ColorFileDownloader (integration smoke) ───────────────────────────────────
+// ─── MultiColorFileDownloaderCLI (integration smoke) ───────────────────────────────────
 
-import { ColorFileDownloader } from '../src/grab-url-cli/downloader.js';
+import { MultiColorFileDownloaderCLI } from '../packages/grab-url-cli/file-downloader.js';
 
-describe('ColorFileDownloader — instance', () => {
+describe('MultiColorFileDownloaderCLI — instance', () => {
     it('constructs without error', () => {
-        expect(() => new ColorFileDownloader()).not.toThrow();
+        expect(() => new MultiColorFileDownloaderCLI()).not.toThrow();
     });
 
     it('delegates formatBytes correctly', () => {
-        const d = new ColorFileDownloader();
+        const d = new MultiColorFileDownloaderCLI();
         // The delegated method should produce colored but non-empty output
         const out = d.formatBytes(1024 * 1024);
         expect(typeof out).toBe('string');
@@ -295,13 +295,13 @@ describe('ColorFileDownloader — instance', () => {
     });
 
     it('delegates generateFilename from URL', () => {
-        const d = new ColorFileDownloader();
+        const d = new MultiColorFileDownloaderCLI();
         expect(d.generateFilename('https://example.com/archive.tar.gz')).toBe('archive.tar.gz');
         expect(d.generateFilename('https://example.com/')).toBe('downloaded-file');
     });
 
     it('pause / resume cycle works', () => {
-        const d = new ColorFileDownloader();
+        const d = new MultiColorFileDownloaderCLI();
         expect(d.isPaused).toBe(false);
         d.pauseAll();
         expect(d.isPaused).toBe(true);
@@ -310,7 +310,7 @@ describe('ColorFileDownloader — instance', () => {
     });
 
     it('cleanup() does not throw when nothing is running', () => {
-        const d = new ColorFileDownloader();
+        const d = new MultiColorFileDownloaderCLI();
         expect(() => d.cleanup()).not.toThrow();
     });
 });

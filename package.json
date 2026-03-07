@@ -1,19 +1,23 @@
 {
   "name": "grab-url",
-  "description": "📥 Generate Request to API from Browser",
+  "description": "Generate Request to API from Browser",
   "type": "module",
-  "version": "1.5.6",
+  "version": "1.6.0",
+  "packageManager": "bun@1.3.10",
   "author": "vtempest",
   "license": "rights.institute/prosper",
   "repository": {
     "type": "git",
     "url": "https://github.com/vtempest/GRAB-URL"
   },
+  "workspaces": [
+    "packages/*"
+  ],
   "main": "./dist/grab-api.cjs.js",
   "types": "./dist/grab-api.d.ts",
   "module": "./dist/grab-api.es.js",
   "bin": {
-    "grab-url": "./src/grab-url-cli/grab-url.ts"
+    "grab-url": "./dist/grab-url-cli.cjs.js"
   },
   "exports": {
     ".": {
@@ -21,12 +25,12 @@
       "import": "./dist/grab-api.es.js",
       "require": "./dist/grab-api.cjs.js"
     },
-    "./icons": {
+    "./loading-animations": {
       "types": "./dist/icons.d.ts",
       "import": "./dist/icons.es.js",
       "require": "./dist/icons.cjs.js"
     },
-    "./icons/*": {
+    "./loading-animations/*": {
       "types": "./dist/*.d.ts",
       "import": "./dist/*.js",
       "require": "./dist/*.js"
@@ -35,20 +39,23 @@
       "types": "./dist/log.d.ts",
       "import": "./dist/log.es.js",
       "require": "./dist/log.cjs.js"
+    },
+    "./cli": {
+      "types": "./dist/grab-url-cli.d.ts",
+      "import": "./dist/grab-url-cli.es.js",
+      "require": "./dist/grab-url-cli.cjs.js"
     }
   },
   "files": [
     "dist",
     "src",
-    "src/grab-api.ts",
-    "bin/grab-url.js",
-    "src/icons/cli/spinners.json"
+    "src/loading-animations/cli/loading-animations-emojis.js"
   ],
   "scripts": {
-    "make": "npm run make:icons; npm run make:docs; npm run make:main",
+    "build": "vite build --config vite.config.ts",
+    "make": "npm run make:icons && npm run make:docs && npm run build",
     "make:docs": "cd docs && npm run build",
-    "make:icons": "npx export-svg-typescript@latest -i ./src/icons/svg -o ./src/icons/svg/index.ts",
-    "make:main": "vite build",
+    "make:icons": "npx export-svg-typescript@latest -i ./src/loading-animations/svg -o ./src/loading-animations/svg/index.ts",
     "ship": "bun x standard-version --release-as patch;rm CHANGELOG.md; npm publish",
     "test:ui": "vitest --ui",
     "test": "vitest",
@@ -58,6 +65,7 @@
     "@vitest/ui": "^4.0.18",
     "export-svg-typescript": "^0.1.15",
     "terser": "^5.46.0",
+    "turbo": "^1.13.4",
     "typescript": "^5.9.3",
     "vite": "^7.3.1",
     "vite-plugin-dts": "^4.5.4",

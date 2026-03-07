@@ -11,7 +11,7 @@ import path from 'path';
 import os from 'os';
 import http from 'http';
 
-import { ColorFileDownloader } from '../src/grab-url-cli/downloader.js';
+import { MultiColorFileDownloaderCLI } from '../packages/grab-url-cli/file-downloader.js';
 
 // ─── Tiny local HTTP server ───────────────────────────────────────────────────
 
@@ -93,11 +93,11 @@ afterAll(async () => {
 // ─── Per-test setup ───────────────────────────────────────────────────────────
 
 let testDir: string;
-let downloader: ColorFileDownloader;
+let downloader: MultiColorFileDownloaderCLI;
 
 beforeEach(() => {
     testDir = fs.mkdtempSync(path.join(os.tmpdir(), 'grab-cmd-'));
-    downloader = new ColorFileDownloader();
+    downloader = new MultiColorFileDownloaderCLI();
     vi.spyOn(console, 'log').mockImplementation(() => { });
     vi.spyOn(console, 'error').mockImplementation(() => { });
 });

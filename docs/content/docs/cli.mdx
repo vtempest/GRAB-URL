@@ -29,3 +29,77 @@ npx grab-url https://api.example.com/download --x
 # Request with params and --x flag
 npx grab-url https://api.example.com/download id=123 name=John --x
 ```
+
+---
+
+### Programmatic Usage
+
+The file downloader can be imported directly into your own Node.js projects,
+bypassing the CLI argument parsing entirely.
+
+
+```ts
+import { MultiColorFileDownloaderCLI } from 'grab-url/cli';
+
+const downloader = new MultiColorFileDownloaderCLI();
+
+// Download a single file
+await downloader.downloadFile(
+  'https://example.com/archive.tar.gz',
+  './downloads/archive.tar.gz'
+);
+
+// Download multiple files concurrently with progress bars
+await downloader.downloadMultipleFiles([
+  { url: 'https://example.com/a.zip', outputPath: './a.zip', filename: 'a.zip' },
+  { url: 'https://example.com/b.zip', outputPath: './b.zip', filename: 'b.zip' },
+]);
+
+// Clean up listeners and abort controllers when done
+downloader.cleanup();
+```
+
+#### Adding Downloads Dynamically
+
+Start a multi-file session, then add more files while it's running:
+
+```ts
+import { MultiColorFileDownloaderCLI, generateFilename } from 'grab-url/cli';
+
+const downloader = new MultiColorFileDownloaderCLI();
+
+// Start with one file (runs in background)
+const initialDownload = downloader.downloadMultipleFiles([
+  { url: 'https://example.com/large-file.iso', outputPath: './large-file.iso', filename: 'large-file.iso' },
+]);
+
+// Later, add another file to the running session
+setTimeout(async () => {
+  const url = 'https://example.com/extra-data.zip';
+  const filename = generateFilename(url); // => 'extra-data.zip'
+  await downloader.addToMultipleDownloads(url, `./${filename}`, filename);
+}, 5000);
+
+// Wait for all downloads to finish
+await initialDownload;
+downloader.cleanup();
+```
+
+#### Available Exports
+
+| Export | Description |
+|--------|-------------|
+| `MultiColorFileDownloaderCLI` | Orchestrator class with progress bars, pause/resume, and resume support |
+| `Download` | TypeScript type for download objects (`{ url, outputPath, filename }`) |
+| `generateFilename(url)` | Derive a local filename from a URL |
+| `getFileExtension(url)` | Extract the file extension from a URL |
+| `isValidUrl(url)` | Check whether a string is a valid URL |
+| `isFileUrl(url)` | Detect whether a URL points to a downloadable file |
+| `ArgParser` | Lightweight CLI argument parser (if you need it) |
+
+#### Key Features
+
+- **Resume support** — interrupted downloads pick up where they left off via `.download-state` sidecar files
+- **Concurrent downloads** — multiple files download in parallel with a shared multi-progress bar
+- **Keyboard controls** — press `p` to pause/resume, `a` to add a URL mid-session
+- **Randomized spinners** — each session gets a unique spinner and color scheme

@@ -30,22 +30,24 @@ src/
 │   └── index.ts                # Main library entry point
 │
 ├── grab-url-cli/                # Command-Line Interface
-│   ├── arg-parser.ts           # Minimal argument parser
-│   ├── download-format.ts      # UI/Progress formatting
-│   ├── download-keyboard.ts    # Interactive controls
-│   ├── download-multi.ts       # Concurrent file downloader
-│   ├── download-single.ts      # Single file download driver
-│   ├── download-spinners.ts    # Spinner animations logic
-│   ├── download-state.ts       # Resume-state persistence
-│   ├── downloader.ts           # High-level CLI orchestrator
-│   └── index.ts                # CLI entry point
+│   ├── index.ts                # CLI entry point
+│   ├── cli-args.ts             # Minimal argument parser
+│   ├── file-downloader.ts      # High-level CLI orchestrator
+│   ├── keyboard-controls.ts    # Interactive keyboard controls
+│   ├── display/                # UI & progress formatting
+│   │   ├── progress-format.ts  # Byte/speed/ETA formatting
+│   │   └── spinner-config.ts   # Spinner animations & bar colors
+│   └── transfer/               # Download engine
+│       ├── single-file-transfer.ts  # Single file download driver
+│       ├── multi-file-transfer.ts   # Concurrent multi-file downloader
+│       └── resume-state.ts          # Resume-state persistence
 │
-└── icons/                      # Assets & animations
+└── loading-animations/          # Assets & animations
     ├── cli/
-    │   └── spinners.js         # CLI spinner frames
-    └── svg/                    # SVG loading animations
-        ├── index.ts            # SVG string exports
-        └── (various).svg       # Individual SVG assets
+    │   └── loading-animations-emojis.js  # CLI spinner frames
+    └── svg/                     # SVG loading animations
+        ├── index.ts             # SVG string exports
+        └── (various).svg        # Individual SVG assets
 ```
 
 ---
@@ -67,26 +69,26 @@ The core library used to generate API requests. It supports both Browser and Nod
 - **`logging/log-json.ts`**: A robust logger that outputs colorized, structured JSON to the console.
 - **`response/response-handler.ts`**: Transforms raw fetch responses into the predictable `GrabResponse` format.
 - **`response/infinite-scroll.ts`**: Logic for appending paginated results and saving/restoring scroll position in browsers.
-- **`ui/devtools.ts`**: Implements a floating visual alert/notification system for the browser.
+- **`devtools/devtools.ts`**: Implements a floating visual alert/notification system for the browser.
 
 ### Grab-URL CLI (`src/grab-url-cli/`)
 
 The command-line tool built on top of the Grab API, specializing in file downloads and quick API prototyping.
 
 - **`index.ts`**: Parses CLI arguments and switches between "API Mode" (fetching data) and "Download Mode" (multi-file progress bars).
-- **`arg-parser.ts`**: A custom, lightweight alternative to yargs for parsing flags and positional URLs.
-- **`downloader.ts`**: An orchestrator class that coordinates formatting, state, and keyboard modules for a unified download experience.
-- **`download-format.ts`**: Pure functions for converting bytes to human-readable strings, calculating ETAs, and building progress bars.
-- **`download-state.ts`**: Handles `.download-state` sidecar files to allow resuming interrupted downloads.
-- **`download-keyboard.ts`**: Listens for keypresses (like 'p' for pause) during active downloads.
-- **`download-multi.ts`**: Manages a pool of concurrent downloads using a multi-progress bar display.
-- **`download-single.ts`**: The driver logic for streaming a single file to disk with progress updates.
-- **`download-spinners.ts`**: Selects and animates randomized spinner frames for a polished CLI look.
+- **`cli-args.ts`**: A custom, lightweight alternative to yargs for parsing flags and positional URLs.
+- **`file-downloader.ts`**: An orchestrator class that coordinates formatting, state, and keyboard modules for a unified download experience.
+- **`keyboard-controls.ts`**: Listens for keypresses (like 'p' for pause) during active downloads.
+- **`display/progress-format.ts`**: Pure functions for converting bytes to human-readable strings, calculating ETAs, and building progress bars.
+- **`display/spinner-config.ts`**: Selects and animates randomized spinner frames for a polished CLI look.
+- **`transfer/single-file-transfer.ts`**: The driver logic for streaming a single file to disk with progress updates.
+- **`transfer/multi-file-transfer.ts`**: Manages a pool of concurrent downloads using a multi-progress bar display.
+- **`transfer/resume-state.ts`**: Handles `.download-state` sidecar files to allow resuming interrupted downloads.
 
-### Icons & Assets (`src/icons/`)
+### Loading Animations (`src/loading-animations/`)
 
 Shared visual components for both CLI and Browser UIs.
 
-- **`cli/spinners.js`**: A collection of character-based animation frames for terminal spinners.
+- **`cli/loading-animations-emojis.js`**: A collection of character-based animation frames for terminal spinners.
 - **`svg/index.ts`**: Exports SVG animations as strings, allowing them to be easily imported and used in the `grab-api` devtools.
 - **`svg/*.svg`**: Raw SVG files for various loading animations (pacman, ripple, etc.).

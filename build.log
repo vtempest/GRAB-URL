@@ -1,0 +1,28 @@
+$ vite build --config vite.config.ts
+vite v7.3.1 building client environment for production...
+transforming...
+✓ 28 modules transformed.
+✗ Build failed in 2.00s
+error during build:
+[vite:esbuild-transpile] Transform failed with 1 error:
+grab-url-cli.es.js:2:1: ERROR: Syntax error "!"
+file: grab-url-cli.es.js:2:1
+
+Syntax error "!"
+1  |  #!/usr/bin/env node
+2  |  #!/usr/bin/env node
+   |   ^
+3  |  
+4  |  import fs__default from 'fs';
+
+    at failureErrorWithLog (/run/media/admin/Data/Projects/grab-url/node_modules/.bun/esbuild@0.27.2/node_modules/esbuild/lib/main.js:1467:15)
+    at /run/media/admin/Data/Projects/grab-url/node_modules/.bun/esbuild@0.27.2/node_modules/esbuild/lib/main.js:736:50
+    at responseCallbacks.<computed> (/run/media/admin/Data/Projects/grab-url/node_modules/.bun/esbuild@0.27.2/node_modules/esbuild/lib/main.js:603:9)
+    at handleIncomingPacket (/run/media/admin/Data/Projects/grab-url/node_modules/.bun/esbuild@0.27.2/node_modules/esbuild/lib/main.js:658:12)
+    at Socket.readFromStdout (/run/media/admin/Data/Projects/grab-url/node_modules/.bun/esbuild@0.27.2/node_modules/esbuild/lib/main.js:581:7)
+    at Socket.emit (node:events:508:20)
+    at addChunk (node:internal/streams/readable:564:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:515:3)
+    at Readable.push (node:internal/streams/readable:395:5)
+    at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+error: script "build" exited with code 1
