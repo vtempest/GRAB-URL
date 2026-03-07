@@ -42,7 +42,6 @@ test/test-downloads
 .next/
 .grab-downloads/
 docs/dist/
-devtools/
 .claude
 pnpm-lock.yaml
 .turbo
