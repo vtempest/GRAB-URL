@@ -55,6 +55,7 @@
     "src/loading-animations/cli/loading-animations-emojis.js"
   ],
   "scripts": {
+    "postinstall": "node scripts/dedup-fumadocs-core.mjs",
     "build": "vite build --config vite.config.ts",
     "make": "npm run make:icons && npm run make:docs && npm run build",
     "make:docs": "cd docs && npm run build",
@@ -74,6 +75,10 @@
     "vite": "^7.3.1",
     "vite-plugin-dts": "^4.5.4",
     "vitest": "^4.0.18"
+  },
+  "trustedDependencies": ["fumadocs-mdx"],
+  "overrides": {
+    "fumadocs-core": "16.6.10"
   },
   "keywords": [
     "api",
