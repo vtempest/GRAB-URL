@@ -10,8 +10,16 @@ import { cn } from '@/lib/utils';
 import {
   Popover,
   PopoverContent,
-  PopoverTrigger,
+  PopoverTrigger as PopoverTriggerBase,
 } from 'fumadocs-ui/components/ui/popover';
+import { forwardRef, type ReactNode, type ComponentProps } from 'react';
+
+const PopoverTrigger = forwardRef<
+  HTMLButtonElement,
+  ComponentProps<typeof PopoverTriggerBase> & { children?: ReactNode }
+>(({ children, ...props }, ref) => (
+  <PopoverTriggerBase ref={ref} {...props}>{children}</PopoverTriggerBase>
+));
 import { cva } from 'class-variance-authority';
 import { buttonVariants } from '../ui/button';
 
