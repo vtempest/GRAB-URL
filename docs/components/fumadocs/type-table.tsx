@@ -2,6 +2,7 @@
  * @file type-table.tsx
  * @description Component for displaying property/type tables in documentation.
  */
+// @ts-nocheck - Radix UI types incompatible with React 19 children prop
 'use client';
 
 import { ChevronDown } from 'lucide-react';
