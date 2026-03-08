@@ -68,6 +68,7 @@
   "devDependencies": {
     "@vitest/ui": "^4.0.18",
     "export-svg-typescript": "^0.1.15",
+    "lucide-react": "^0.555.0",
     "terser": "^5.46.0",
     "turbo": "^1.13.4",
     "@types/node": "^25.3.3",
