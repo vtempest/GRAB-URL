@@ -15,9 +15,10 @@ function VideoModal({
 }
 
 function VideoModalTrigger({
+  children,
   ...props
-}: React.ComponentProps<typeof DialogPrimitive.Trigger>) {
-  return <DialogPrimitive.Trigger data-slot="video-modal-trigger" {...props} />
+}: React.ComponentProps<typeof DialogPrimitive.Trigger> & { children?: React.ReactNode }) {
+  return <DialogPrimitive.Trigger data-slot="video-modal-trigger" {...props}>{children}</DialogPrimitive.Trigger>
 }
 
 function VideoModalPortal({
