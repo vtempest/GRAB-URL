@@ -58,7 +58,7 @@
     "postinstall": "node scripts/dedup-fumadocs-core.mjs",
     "build": "vite build --config vite.config.ts",
     "make": "npm run make:icons && npm run make:docs && npm run build",
-    "make:docs": "cd docs && npm run build",
+    "make:docs": "npx turbo run build --filter=grab-url-docs",
     "make:icons": "npx export-svg-typescript@latest -i ./src/loading-animations/svg -o ./src/loading-animations/svg/index.ts",
     "ship": "bun x standard-version --release-as patch;rm CHANGELOG.md; npm publish",
     "test:ui": "vitest --ui",
