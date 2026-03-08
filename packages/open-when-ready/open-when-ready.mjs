@@ -22,6 +22,18 @@ const logPath = fs.existsSync(nextDir)
 
 console.log(`📁 Log: ${logPath} | Poll: ${pollDelay}ms`);
 
+/**
+ * Extract an error context for Perplexity query.
+ * 
+ * - Finds the **error** line
+ * - Takes `16` lines of *context*
+ * - Cleans up special characters
+ * 
+ * @example
+ * ```js
+ * const ctx = getErrorContext(log);
+ * ```
+ */
 function getErrorContext(log) {
   const lines = log.split(/\n/);
   const errorRegex = /⨯|[Ss]yntax[Ee]rror|error|failed|exception/i;

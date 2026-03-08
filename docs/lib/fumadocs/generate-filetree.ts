@@ -22,6 +22,11 @@ export interface AnalysisItem {
 
 export interface FileAnalysis {
   localImports: string[];
+  localImportSymbols: {
+    source: string;
+    valueNames: string[];
+    typeNames: string[];
+  }[];
   npmImports: string[];
   exports: AnalysisItem[];
   functions: AnalysisItem[];
@@ -69,6 +74,11 @@ function analyzeFile(filePath: string): FileAnalysis | undefined {
   );
 
   const localImports: string[] = [];
+  const localImportSymbols: {
+    source: string;
+    valueNames: string[];
+    typeNames: string[];
+  }[] = [];
   const npmImports: string[] = [];
   const exports: AnalysisItem[] = [];
   const functions: AnalysisItem[] = [];
@@ -239,6 +249,34 @@ function analyzeFile(filePath: string): FileAnalysis | undefined {
       const isLocal = mod.startsWith(".") || mod.startsWith("/");
       const list = isLocal ? localImports : npmImports;
       if (!list.includes(mod)) list.push(mod);
+
+      if (isLocal && node.importClause) {
+        const symbolEntry = {
+          source: mod,
+          valueNames: [] as string[],
+          typeNames: [] as string[],
+        };
+
+        if (node.importClause.name && !node.importClause.isTypeOnly) {
+          symbolEntry.valueNames.push(node.importClause.name.text);
+        }
+
+        const bindings = node.importClause.namedBindings;
+        if (bindings && ts.isNamedImports(bindings)) {
+          for (const el of bindings.elements) {
+            const importedName = el.propertyName?.text || el.name.text;
+            if (node.importClause.isTypeOnly || el.isTypeOnly) {
+              symbolEntry.typeNames.push(importedName);
+            } else {
+              symbolEntry.valueNames.push(importedName);
+            }
+          }
+        }
+
+        if (symbolEntry.valueNames.length > 0 || symbolEntry.typeNames.length > 0) {
+          localImportSymbols.push(symbolEntry);
+        }
+      }
     }
 
     // Export declarations (export { foo, bar })
@@ -308,11 +346,11 @@ function analyzeFile(filePath: string): FileAnalysis | undefined {
     }
   });
 
-  const hasContent = localImports.length > 0 || npmImports.length > 0 ||
+  const hasContent = localImports.length > 0 || localImportSymbols.length > 0 || npmImports.length > 0 ||
     exports.length > 0 || functions.length > 0 || types.length > 0;
   if (!hasContent) return undefined;
 
-  return { localImports, npmImports, exports, functions, types };
+  return { localImports, localImportSymbols, npmImports, exports, functions, types };
 }
 
 function matchesIgnore(relPath: string, patterns: Set<string>): boolean {

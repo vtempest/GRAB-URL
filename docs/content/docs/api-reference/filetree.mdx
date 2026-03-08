@@ -1,14 +1,15 @@
 ---
-title: Code Filetree & Types Structure
+title: Code Type Tree & Dependency Graph
 icon: FolderTree
 ---
 
 import { FileTreeView } from '@/components/fumadocs/filetree-view';
+import { InlineTOC } from 'fumadocs-ui/components/inline-toc';
 
 export const descriptions = {
   // grab-api
   "grab-api": "Core Grab API library",
-  "grab-api/index.ts": "Main entry point. Exports the grab() function and log utility, sets up global instances, and initializes browser devtools.",
+  "grab-api/index.ts": "Main entry point. Exports the `grab()` function and **log utility**, sets up global instances, and initializes [browser devtools](https://developer.chrome.com/docs/devtools/).",
   "grab-api/common/types.ts": "All TypeScript definitions for request options, response shapes, and mock configurations.",
   "grab-api/common/utils.ts": "Low-level utilities like debouncer, wait (sleep), and buildUrl.",
   "grab-api/core/cache-pagination.ts": "Decides if a request should be served from cache and increments page numbers for infinite scrolling.",
@@ -22,7 +23,7 @@ export const descriptions = {
   // grab-url-cli
   "grab-url-cli": "Command-Line Interface",
   "grab-url-cli/index.ts": "Parses CLI arguments and switches between API Mode and Download Mode.",
-  "grab-url-cli/cli-args.ts": "A custom, lightweight alternative to yargs for parsing flags and positional URLs.",
+  "grab-url-cli/cli-args.ts": "A custom, _lightweight_ alternative to `yargs` for parsing flags and positional URLs.",
   "grab-url-cli/file-downloader.ts": "Orchestrator class that coordinates formatting, state, and keyboard modules for a unified download experience.",
   "grab-url-cli/keyboard-controls.ts": "Listens for keypresses (like 'p' for pause) during active downloads.",
   "grab-url-cli/download-spinners.ts": "Spinner animation configurations for download progress display.",
@@ -50,6 +51,48 @@ export const descriptions = {
   "open-when-ready": "Opens browser when dev server is ready",
 };
 
+export const instructions = (
+  <ul className="space-y-3 list-none p-0">
+    <li>
+      <strong>Dependency Mapping</strong>: The graph visualizes package files, local imports, and optional npm dependencies.
+    </li>
+    <li>
+      <strong>Graph Controls</strong>: Use the legend dropdown to toggle nodes for **Npm Imports**, **Types**, and **Functions**.
+    </li>
+    <li>
+      <strong>Navigation</strong>: <strong>Drag</strong> to pan the view, or hold <code>Ctrl</code> while <strong>scrolling</strong> to zoom.
+    </li>
+    <li>
+      <strong>Interactivity</strong>: <strong>Click</strong> any node to automatically scroll to its matching entry in the file tree below.
+    </li>
+    <li>
+      <strong>Detailed Insights</strong>: <strong>Hover</strong> over graph nodes or file tree badges to see **Markdown-parsed tooltips** with descriptions and property details.
+    </li>
+    <li>
+      <strong>Filtering</strong>: Use the **Search Box** in the file tree to find specific files or symbols instantly.
+    </li>
+  </ul>
+);
+
+<InlineTOC items={toc} defaultOpen="true" />
+
+
+## Code Dependency Graph
+
+<DependencyGraph 
+  dir="../packages" 
+  ghBase="https://github.com/vtempest/grab-url/tree/master/packages"
+  descriptions={descriptions}
+  instructions={instructions}
+  ignore={["bun.lock"]}
+  showLegend={true}
+  showNpmImports={false}
+  showTypes={false}
+  showPrivateFunctions={false}
+  showExportedFunctions={false} />
+
+## Code Type Tree
+
 <FileTreeView
   dir="../packages"
   ghBase="https://github.com/vtempest/grab-url/tree/master/packages"
@@ -58,9 +101,3 @@ export const descriptions = {
 />
 
 import { DependencyGraph } from '@/components/fumadocs/dependency-graph';
-
-## Module Dependency Graph
-
-Click any node to scroll to its file in the tree above.
-
-<DependencyGraph dir="../packages" ignore={["bun.lock"]} />

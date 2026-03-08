@@ -1,9 +1,10 @@
 "use client";
 
 import { useRef, useState, useCallback, useEffect } from "react";
-import { Package, FunctionSquare, Braces, FileOutput, FileInput, Box, Blocks, ExternalLink } from "lucide-react";
+import { Package, FunctionSquare, Braces, FileOutput, FileInput, Box, Blocks } from "lucide-react";
 import type { TypeProperty } from "@/lib/fumadocs/generate-filetree";
 import styles from "./badge-tooltip.module.css";
+import { Markdown } from "./markdown";
 
 const icons = {
   package: Package,
@@ -17,6 +18,12 @@ const icons = {
 
 export type BadgeIconName = keyof typeof icons;
 
+export interface BadgeTooltipSection {
+  label: string;
+  colorClassName: string;
+  items: string[];
+}
+
 export function Badge({
   bg,
   color,
@@ -26,6 +33,7 @@ export function Badge({
   signature,
   properties,
   href,
+  sections,
 }: {
   bg: string;
   color: string;
@@ -35,11 +43,13 @@ export function Badge({
   signature?: string;
   href?: string;
   properties?: TypeProperty[];
+  sections?: BadgeTooltipSection[];
 }) {
   const Icon = icons[icon];
-  const hasPopover = tooltip || signature || (properties && properties.length > 0);
+  const hasSections = Boolean(sections && sections.length > 0);
+  const hasPopover = tooltip || signature || (properties && properties.length > 0) || hasSections;
   const wrapperRef = useRef<HTMLSpanElement>(null);
-  const tooltipRef = useRef<HTMLSpanElement>(null);
+  const tooltipRef = useRef<HTMLDivElement>(null);
   const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
   const [pinned, setPinned] = useState(false);
 
@@ -61,6 +71,7 @@ export function Badge({
 
   const togglePin = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
+    e.preventDefault();
     if (pinned) {
       setPinned(false);
       setPos(null);
@@ -69,6 +80,11 @@ export function Badge({
       setPos(calcPos());
     }
   }, [pinned, calcPos]);
+
+  const openSource = useCallback(() => {
+    if (!href) return;
+    window.open(href, "_blank", "noopener,noreferrer");
+  }, [href]);
 
   // Close on outside click
   useEffect(() => {
@@ -115,7 +131,6 @@ export function Badge({
       ref={wrapperRef}
       onMouseEnter={showTooltip}
       onMouseLeave={hideTooltip}
-      onClick={togglePin}
       style={{
         display: "inline-flex",
         alignItems: "center",
@@ -127,13 +142,21 @@ export function Badge({
         lineHeight: "1.4",
         backgroundColor: bg,
         color,
-        cursor: "pointer",
+        cursor: href ? "pointer" : "default",
         position: "relative",
       }}
     >
-      <Icon size={12} /> {label}
+      <button
+        type="button"
+        onClick={togglePin}
+        aria-label={`${pinned ? "Unpin" : "Pin"} tooltip for ${label}`}
+        className={styles.iconPinButton}
+      >
+        <Icon size={12} />
+      </button>
+      <span onClick={href ? openSource : undefined}>{label}</span>
       {pos && (
-        <span
+        <div
           ref={tooltipRef}
           className={styles.tooltip}
           style={{
@@ -146,17 +169,27 @@ export function Badge({
             opacity: 1,
           }}
         >
-          {(tooltip || href) && (
+          {tooltip && (
             <div className={styles.tooltipHeader}>
-              {tooltip && <span className={styles.desc}>{tooltip}</span>}
-              {href && (
-                <a href={href} target="_blank" rel="noopener noreferrer" className={styles.sourceLink}>
-                  <ExternalLink size={11} /> Source
-                </a>
-              )}
+              <Markdown text={tooltip} className={styles.desc} />
             </div>
           )}
-          {properties && properties.length > 0 ? (
+          {hasSections ? (
+            <div className={styles.sectionList}>
+              {sections?.map((section) => (
+                <div key={section.label} className={styles.sectionGroup}>
+                  <div className={styles.sectionTitle}>{section.label}</div>
+                  <div className={styles.sectionChips}>
+                    {section.items.map((item) => (
+                      <span key={`${section.label}-${item}`} className={`${styles.sectionChip} ${section.colorClassName}`}>
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : properties && properties.length > 0 ? (
             <div className={styles.propList}>
               {properties.map((p) => (
                 <div key={p.name} className={styles.propItem}>
@@ -167,7 +200,7 @@ export function Badge({
                     <code className={styles.propType}>{p.type}</code>
                   </div>
                   {p.description && (
-                    <div className={styles.propDesc}>{p.description}</div>
+                    <Markdown text={p.description} className={styles.propDesc} />
                   )}
                 </div>
               ))}
@@ -178,7 +211,7 @@ export function Badge({
               <span className={styles.sigType}>{signature}</span>
             </span>
           ) : null}
-        </span>
+        </div>
       )}
     </span>
   );
