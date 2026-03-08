@@ -11,7 +11,8 @@
     "url": "https://github.com/vtempest/GRAB-URL"
   },
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "docs"
   ],
   "main": "./dist/grab-api.cjs.js",
   "types": "./dist/grab-api.d.ts",
