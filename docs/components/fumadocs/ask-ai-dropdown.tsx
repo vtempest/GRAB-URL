@@ -2,6 +2,7 @@
  * @file ask-ai-dropdown.tsx
  * @description Dropdown component providing links to various AI providers for page interaction.
  */
+// @ts-nocheck - Radix UI types incompatible with React 19 children prop
 'use client';
 
 import React, { useMemo } from 'react';

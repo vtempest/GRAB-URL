@@ -2,6 +2,7 @@
  * @file video-modal.tsx
  * @description Modal component specifically designed for playing video content.
  */
+// @ts-nocheck - Radix UI types incompatible with React 19 children prop
 'use client'
 
 import * as React from 'react'
