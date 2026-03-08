@@ -194,17 +194,22 @@ export function DependencyGraphClient({
         </div>
       )}
 
-      <div className="relative">
-        {isPending && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-slate-950/50 backdrop-blur-[1px]">
-            <div className="flex flex-col items-center gap-3 rounded-2xl border border-slate-800 bg-slate-900/80 p-8 shadow-2xl">
-              <Loader2 size={32} className="animate-spin text-sky-400" />
-              <div className="text-sm font-medium text-slate-200">Analyzing Architecture...</div>
+      <details open>
+        <summary className="cursor-pointer select-none rounded-lg border border-slate-800 bg-slate-900/60 px-4 py-2.5 text-sm font-semibold text-slate-200 transition hover:border-slate-600 hover:text-white">
+          Code Dependency Graph
+        </summary>
+        <div className="relative mt-2">
+          {isPending && (
+            <div className="absolute inset-0 z-10 flex items-center justify-center bg-slate-950/50 backdrop-blur-[1px]">
+              <div className="flex flex-col items-center gap-3 rounded-2xl border border-slate-800 bg-slate-900/80 p-8 shadow-2xl">
+                <Loader2 size={32} className="animate-spin text-sky-400" />
+                <div className="text-sm font-medium text-slate-200">Analyzing Architecture...</div>
+              </div>
             </div>
-          </div>
-        )}
-        <MermaidClient chart={chart} nodeTooltips={nodeTooltips} highlightQuery={search} />
-      </div>
+          )}
+          <MermaidClient chart={chart} nodeTooltips={nodeTooltips} highlightQuery={search} />
+        </div>
+      </details>
     </div>
   );
 }

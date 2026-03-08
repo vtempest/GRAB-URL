@@ -272,7 +272,7 @@ export function buildChart(files: FileInfo[], options: GraphDisplayOptions): str
 
   lines.push("");
   for (const [key, style] of Object.entries(NODE_STYLES)) {
-    const fontSize = key === "npm" ? "18px" : key === "functionNode" || key === "exportedFunctionNode" || key === "typeNode" ? "16px" : "22px";
+    const fontSize = key === "npm" ? "26px" : key === "functionNode" || key === "exportedFunctionNode" || key === "typeNode" ? "24px" : "32px";
     lines.push(
       `  classDef ${key} fill:${style.fill},stroke:${style.stroke},stroke-width:3px,color:${style.color},font-size:${fontSize},font-weight:bold`,
     );

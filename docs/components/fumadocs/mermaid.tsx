@@ -148,12 +148,12 @@ function Mermaid({
         theme: 'dark',
         themeVariables: {
           fontFamily: 'ui-sans-serif, system-ui, sans-serif',
-          fontSize: '22px',
+          fontSize: '32px',
           primaryTextColor: '#f8fafc',
           lineColor: '#94a3b8',
           clusterBkg: '#0f172a',
           clusterBorder: '#475569',
-          clusterTextSize: '22px',
+          clusterTextSize: '32px',
         },
         flowchart: { curve: 'basis' },
         securityLevel: 'loose',
@@ -315,7 +315,7 @@ function Mermaid({
         </div>
         <div
           ref={ref}
-          className="flex justify-center overflow-hidden [&_.cluster-label]:overflow-visible [&_.cluster-label]:text-[22px] [&_.cluster-label]:font-bold [&_.cluster-label]:leading-[1.15] [&_.cluster-label_span]:px-3 [&_.cluster-label_span]:leading-[1.15] [&_.edgeLabel]:text-base [&_.label]:text-[22px] [&_.label]:font-bold [&_.node]:cursor-pointer [&_svg]:max-w-none"
+          className="flex justify-center overflow-hidden [&_.cluster-label]:overflow-visible [&_.cluster-label]:text-[32px] [&_.cluster-label]:font-bold [&_.cluster-label]:leading-[1.15] [&_.cluster-label_span]:px-3 [&_.cluster-label_span]:leading-[1.15] [&_.edgeLabel]:text-lg [&_.label]:text-[32px] [&_.label]:font-bold [&_.node]:cursor-pointer [&_svg]:max-w-full [&_svg]:min-h-[700px]"
         />
 
         <Tooltip open={!!tooltip}>

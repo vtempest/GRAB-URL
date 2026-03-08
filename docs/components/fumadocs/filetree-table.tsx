@@ -12,7 +12,7 @@ const FILE_EXTENSIONS = [".ts", ".tsx", ".js", ".jsx", ".mjs"];
 
 const exportStyles: Record<string, { bg: string; color: string; icon: BadgeIconName }> = {
   function: { bg: "rgba(249,115,22,0.15)", color: "rgb(249,115,22)", icon: "function" },
-  class:    { bg: "rgba(236,72,153,0.15)", color: "rgb(236,72,153)", icon: "class" },
+  class: { bg: "rgba(236,72,153,0.15)", color: "rgb(236,72,153)", icon: "class" },
   constant: { bg: "rgba(14,165,233,0.15)", color: "rgb(14,165,233)", icon: "constant" },
 };
 const defaultExportStyle = exportStyles.function;
@@ -23,7 +23,7 @@ function getExportStyle(m: AnalysisItem) {
 
 const internalStyles: Record<string, { bg: string; color: string; icon: BadgeIconName }> = {
   function: { bg: "rgba(34,197,94,0.15)", color: "rgb(34,197,94)", icon: "function" },
-  class:    { bg: "rgba(236,72,153,0.12)", color: "rgb(219,100,155)", icon: "class" },
+  class: { bg: "rgba(236,72,153,0.12)", color: "rgb(219,100,155)", icon: "class" },
 };
 
 function ghLineUrl(ghBase: string, filePath: string, line?: number): string | undefined {
@@ -561,11 +561,11 @@ export function FileTreeTable({
           count += exportFilter === "all"
             ? meta.exports.filter((e) => e.kind !== "type").length
             : meta.exports.filter((e) => {
-                if (e.kind === "type") return false;
-                if (exportFilter === "functions") return e.kind === "function";
-                if (exportFilter === "classes") return e.kind === "class";
-                return e.kind === "constant";
-              }).length;
+              if (e.kind === "type") return false;
+              if (exportFilter === "functions") return e.kind === "function";
+              if (exportFilter === "classes") return e.kind === "class";
+              return e.kind === "constant";
+            }).length;
           break;
       }
     }
@@ -597,7 +597,7 @@ export function FileTreeTable({
       if (valA !== valB) {
         return sortConfig.order === "asc" ? valA - valB : valB - valA;
       }
-      
+
       // If values are equal, fallback to folders first, then name
       if (a.type !== b.type) return a.type === "folder" ? -1 : 1;
       return a.name.localeCompare(b.name);
@@ -615,11 +615,11 @@ export function FileTreeTable({
     const filterRes = !query
       ? tree
       : filterTreeByPaths(
-          tree,
-          new Set(
-            fuse.search(query).map((result) => result.item.path),
-          ),
-        );
+        tree,
+        new Set(
+          fuse.search(query).map((result) => result.item.path),
+        ),
+      );
     return sortNodes(filterRes);
   }, [tree, query, fuse, sortNodes]);
 
