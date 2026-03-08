@@ -4,7 +4,7 @@
  */
 'use client';
 
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { ChevronDown, ExternalLinkIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
@@ -12,16 +12,10 @@ import {
   PopoverContent,
   PopoverTrigger as PopoverTriggerBase,
 } from 'fumadocs-ui/components/ui/popover';
-import { forwardRef, type ReactNode, type ComponentProps } from 'react';
-
-const PopoverTrigger = forwardRef<
-  HTMLButtonElement,
-  ComponentProps<typeof PopoverTriggerBase> & { children?: ReactNode }
->(({ children, ...props }, ref) => (
-  <PopoverTriggerBase ref={ref} {...props}>{children}</PopoverTriggerBase>
-));
 import { cva } from 'class-variance-authority';
 import { buttonVariants } from '../ui/button';
+
+const PopoverTrigger = PopoverTriggerBase as any;
 
 const optionVariants = cva(
   'text-sm p-2 rounded-lg inline-flex items-center gap-2 hover:text-fd-accent-foreground hover:bg-fd-accent [&_svg]:size-4',
