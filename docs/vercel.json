@@ -1,7 +1,7 @@
 {
-  "buildCommand": "cd ../.. && npx turbo run build --filter=grab-url-docs",
-  "devCommand": "cd ../.. && npx turbo run dev --filter=grab-url-docs",
-  "installCommand": "cd ../.. && npm ci",
+  "buildCommand": "cd ../.. && bun x turbo run build --filter=grab-url-docs",
+  "devCommand": "cd ../.. && bun x turbo run dev --filter=grab-url-docs",
+  "installCommand": "cd ../.. && bun i",
   "outputDirectory": ".next",
   "framework": "nextjs"
 }
