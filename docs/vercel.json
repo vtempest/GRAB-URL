@@ -1,7 +1,4 @@
 {
   "buildCommand": "cd .. && bun x turbo run build --filter=grab-url-docs",
-  "devCommand": "cd .. && bun x turbo run dev --filter=grab-url-docs",
-  "installCommand": "cd .. && bun i",
-  "outputDirectory": ".next",
-  "framework": "nextjs"
+  "installCommand": "cd .. && bun i"
 }
