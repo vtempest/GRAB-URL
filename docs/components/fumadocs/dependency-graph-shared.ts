@@ -87,6 +87,10 @@ function makeSymbolNodeId(fileId: string, prefix: "private_fn" | "exported_fn" |
   return `${fileId}__${prefix}_${name.replace(/[^a-zA-Z0-9]/g, "_")}`;
 }
 
+function escapeMermaidLabel(value: string): string {
+  return value.replace(/"/g, "&quot;");
+}
+
 export function buildChart(files: FileInfo[], options: GraphDisplayOptions): string {
   const lines: string[] = [
     "flowchart LR",
@@ -123,6 +127,28 @@ export function buildChart(files: FileInfo[], options: GraphDisplayOptions): str
     lines.push("  end");
   }
 
+  const fileEdges = new Map<string, {
+    from: string;
+    to: string;
+    valueNames: Set<string>;
+    typeNames: Set<string>;
+  }>();
+
+  const getFileEdge = (from: string, to: string) => {
+    const key = `${from}=>${to}`;
+    let edge = fileEdges.get(key);
+    if (!edge) {
+      edge = {
+        from,
+        to,
+        valueNames: new Set<string>(),
+        typeNames: new Set<string>(),
+      };
+      fileEdges.set(key, edge);
+    }
+    return edge;
+  };
+
   const edges = new Set<string>();
   for (const f of files) {
     if (!f.analysis) continue;
@@ -130,18 +156,12 @@ export function buildChart(files: FileInfo[], options: GraphDisplayOptions): str
       const resolved = resolveImport(f.path, imp);
       const targetId = pathLookup.get(resolved);
       if (targetId && targetId !== f.id) {
-        const edge = `${f.id} --> ${targetId}`;
-        if (!edges.has(edge)) {
-          edges.add(edge);
-          lines.push(`  ${edge}`);
-        }
+        getFileEdge(f.id, targetId);
       }
     }
   }
 
   if (options.showPrivateFunctions || options.showExportedFunctions || options.showTypes) {
-    const symbolOwners = new Map<string, string>();
-
     for (const f of files) {
       if (!f.analysis) continue;
 
@@ -158,22 +178,6 @@ export function buildChart(files: FileInfo[], options: GraphDisplayOptions): str
         }
       }
 
-      if (options.showExportedFunctions) {
-        const exportedFunctionNames = uniqueNames(
-          f.analysis.exports
-            .filter((item) => item.kind === "function" || item.kind === "class")
-            .map((item) => item.name),
-        );
-
-        for (const fnName of exportedFunctionNames) {
-          const nodeId = makeSymbolNodeId(f.id, "exported_fn", fnName);
-          symbolOwners.set(`${f.path}::value::${fnName}`, nodeId);
-          lines.push(`  ${nodeId}["${fnName}"]:::exportedFunctionNode`);
-          lines.push(`  ${nodeId} --> ${f.id}`);
-          lines.push(`  click ${nodeId} "#file-${f.path.replace(/[^a-zA-Z0-9]/g, "-")}"`);
-        }
-      }
-
       if (options.showTypes) {
         const typeNames = uniqueNames([
           ...f.analysis.types.map((item) => item.name),
@@ -182,7 +186,6 @@ export function buildChart(files: FileInfo[], options: GraphDisplayOptions): str
 
         for (const typeName of typeNames) {
           const nodeId = makeSymbolNodeId(f.id, "type", typeName);
-          symbolOwners.set(`${f.path}::type::${typeName}`, nodeId);
           lines.push(`  ${nodeId}["${typeName}"]:::typeNode`);
           lines.push(`  ${f.id} -.-> ${nodeId}`);
           lines.push(`  click ${nodeId} "#file-${f.path.replace(/[^a-zA-Z0-9]/g, "-")}"`);
@@ -194,32 +197,49 @@ export function buildChart(files: FileInfo[], options: GraphDisplayOptions): str
       if (!f.analysis) continue;
       for (const imported of f.analysis.localImportSymbols ?? []) {
         const resolved = resolveImport(f.path, imported.source);
-        const targetPath = files.find((candidate) => candidate.path === resolved || candidate.path.replace(/\.[^.]+$/, "") === resolved)?.path;
-        if (!targetPath) continue;
+        const targetFile = files.find((candidate) => candidate.path === resolved || candidate.path.replace(/\.[^.]+$/, "") === resolved);
+        if (!targetFile || targetFile.id === f.id) continue;
+
+        const fileEdge = getFileEdge(f.id, targetFile.id);
 
         if (options.showExportedFunctions) {
           for (const valueName of imported.valueNames) {
-            const symbolId = symbolOwners.get(`${targetPath}::value::${valueName}`);
-            if (!symbolId) continue;
-            const edge = `${f.id} --> ${symbolId}`;
-            if (!edges.has(edge)) {
-              edges.add(edge);
-              lines.push(`  ${edge}`);
-            }
+            fileEdge.valueNames.add(valueName);
           }
         }
 
         if (options.showTypes) {
           for (const typeName of imported.typeNames) {
-            const symbolId = symbolOwners.get(`${targetPath}::type::${typeName}`);
-            if (!symbolId) continue;
-            const edge = `${f.id} -.-> ${symbolId}`;
-            if (!edges.has(edge)) {
-              edges.add(edge);
-              lines.push(`  ${edge}`);
-            }
+            fileEdge.typeNames.add(typeName);
           }
         }
+      }
+    }
+  }
+
+  for (const edge of fileEdges.values()) {
+    const valueLabel = options.showExportedFunctions
+      ? uniqueNames([...edge.valueNames]).slice(0, 5).join(", ")
+      : "";
+    const typeLabel = options.showTypes
+      ? uniqueNames([...edge.typeNames]).slice(0, 3).map((name) => `type ${name}`).join(", ")
+      : "";
+
+    if (valueLabel) {
+      lines.push(`  ${edge.from} -->|"${escapeMermaidLabel(valueLabel)}"| ${edge.to}`);
+    } else {
+      const plainEdge = `${edge.from} --> ${edge.to}`;
+      if (!edges.has(plainEdge)) {
+        edges.add(plainEdge);
+        lines.push(`  ${plainEdge}`);
+      }
+    }
+
+    if (typeLabel) {
+      const dashedEdge = `${edge.from} -. "${escapeMermaidLabel(typeLabel)}" .-> ${edge.to}`;
+      if (!edges.has(dashedEdge)) {
+        edges.add(dashedEdge);
+        lines.push(`  ${dashedEdge}`);
       }
     }
   }

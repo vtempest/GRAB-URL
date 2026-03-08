@@ -8,13 +8,29 @@ import * as React from 'react'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { cn } from "@/lib/utils"
 
-const VideoModal = DialogPrimitive.Root
+function VideoModal({
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Root>) {
+  return <DialogPrimitive.Root data-slot="video-modal" {...props} />
+}
 
-const VideoModalTrigger = DialogPrimitive.Trigger
+function VideoModalTrigger({
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Trigger>) {
+  return <DialogPrimitive.Trigger data-slot="video-modal-trigger" {...props} />
+}
 
-const VideoModalPortal = DialogPrimitive.Portal
+function VideoModalPortal({
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Portal>) {
+  return <DialogPrimitive.Portal data-slot="video-modal-portal" {...props} />
+}
 
-const VideoModalClose = DialogPrimitive.Close
+function VideoModalClose({
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Close>) {
+  return <DialogPrimitive.Close data-slot="video-modal-close" {...props} />
+}
 
 const VideoModalOverlay = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Overlay>,
