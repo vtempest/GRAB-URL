@@ -51,29 +51,6 @@ export const descriptions = {
   "open-when-ready": "Opens browser when dev server is ready",
 };
 
-export const instructions = (
-  <ul className="space-y-3 list-none p-0">
-    <li>
-      <strong>Dependency Mapping</strong>: The graph visualizes package files, local imports, and optional npm dependencies.
-    </li>
-    <li>
-      <strong>Graph Controls</strong>: Use the legend dropdown to toggle nodes for **Npm Imports**, **Types**, and **Functions**.
-    </li>
-    <li>
-      <strong>Navigation</strong>: <strong>Drag</strong> to pan the view, or hold <code>Ctrl</code> while <strong>scrolling</strong> to zoom.
-    </li>
-    <li>
-      <strong>Interactivity</strong>: <strong>Click</strong> any node to automatically scroll to its matching entry in the file tree below.
-    </li>
-    <li>
-      <strong>Detailed Insights</strong>: <strong>Hover</strong> over graph nodes or file tree badges to see **Markdown-parsed tooltips** with descriptions and property details.
-    </li>
-    <li>
-      <strong>Filtering</strong>: Use the **Search Box** in the file tree to find specific files or symbols instantly.
-    </li>
-  </ul>
-);
-
 <InlineTOC items={toc} defaultOpen="true" />
 
 
@@ -83,7 +60,6 @@ export const instructions = (
   dir="../packages" 
   ghBase="https://github.com/vtempest/grab-url/tree/master/packages"
   descriptions={descriptions}
-  instructions={instructions}
   ignore={["bun.lock"]}
   showLegend={true}
   showNpmImports={false}

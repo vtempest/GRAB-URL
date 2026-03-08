@@ -50,6 +50,8 @@ const IGNORE = new Set([
   "tsconfig.json",
   "README.md",
   "package-lock.json",
+  "bun.lock",
+  "bun.lockb"
 ]);
 
 const PARSEABLE_EXTS = new Set([".ts", ".tsx", ".js", ".jsx", ".mjs"]);
@@ -105,7 +107,6 @@ function analyzeFile(filePath: string): FileAnalysis | undefined {
     const jsDocNodes = (node as any).jsDoc as ts.JSDoc[] | undefined;
     if (jsDocNodes && jsDocNodes.length > 0) {
       const doc = jsDocNodes[0];
-      // Check main comment
       let comment: string | undefined;
       if (typeof doc.comment === "string") {
         comment = doc.comment;
@@ -113,7 +114,6 @@ function analyzeFile(filePath: string): FileAnalysis | undefined {
         comment = doc.comment.map((part: any) => part.text || "").join("").trim() || undefined;
       }
       if (comment) return comment;
-      // Check @description tag
       if (doc.tags) {
         for (const tag of doc.tags) {
           if (tag.tagName.text === "description" && typeof tag.comment === "string") {
@@ -122,7 +122,6 @@ function analyzeFile(filePath: string): FileAnalysis | undefined {
         }
       }
     }
-    // Fallback: check leading // comment on the line before
     const fullText = sourceFile.getFullText();
     const nodeStart = node.getFullStart();
     const textBefore = fullText.substring(0, nodeStart);
@@ -139,14 +138,11 @@ function analyzeFile(filePath: string): FileAnalysis | undefined {
   }
 
   function getSignature(node: ts.Node): string | undefined {
-    // Function declarations: fn(a: string, b: number): ReturnType
     if (ts.isFunctionDeclaration(node)) {
       const params = node.parameters.map(p => p.getText(sourceFile)).join(", ");
       const ret = node.type ? `: ${node.type.getText(sourceFile)}` : "";
       return `(${params})${ret}`;
     }
-
-    // Arrow functions / function expressions in variable declarations
     if (ts.isVariableStatement(node)) {
       for (const decl of node.declarationList.declarations) {
         if (decl.initializer && (ts.isArrowFunction(decl.initializer) || ts.isFunctionExpression(decl.initializer))) {
@@ -155,60 +151,36 @@ function analyzeFile(filePath: string): FileAnalysis | undefined {
           const ret = fn.type ? `: ${fn.type.getText(sourceFile)}` : "";
           return `(${params})${ret}`;
         }
-        // Typed const: const x: SomeType = ...
-        if (decl.type) {
-          return decl.type.getText(sourceFile);
-        }
+        if (decl.type) return decl.type.getText(sourceFile);
       }
     }
-
-    // Type alias: show the full right-hand side
-    if (ts.isTypeAliasDeclaration(node)) {
-      return node.type.getText(sourceFile);
-    }
-
-    // Interface: show full member signatures
+    if (ts.isTypeAliasDeclaration(node)) return node.type.getText(sourceFile);
     if (ts.isInterfaceDeclaration(node)) {
-      const members = node.members
-        .map(m => m.getText(sourceFile).replace(/;$/, ""))
-        .filter(Boolean);
+      const members = node.members.map(m => m.getText(sourceFile).replace(/;$/, "")).filter(Boolean);
       if (members.length === 0) return undefined;
       return `{\n  ${members.join(";\n  ")}\n}`;
     }
-
-    // Enum: show members
     if (ts.isEnumDeclaration(node)) {
-      const members = node.members
-        .map(m => m.getText(sourceFile))
-        .filter(Boolean);
+      const members = node.members.map(m => m.getText(sourceFile)).filter(Boolean);
       if (members.length === 0) return undefined;
       return `{ ${members.join(", ")} }`;
     }
-
-    // Class: list method names
     if (ts.isClassDeclaration(node)) {
-      const methods = node.members
-        .filter(ts.isMethodDeclaration)
-        .map(m => m.name?.getText(sourceFile))
-        .filter(Boolean);
+      const methods = node.members.filter(ts.isMethodDeclaration).map(m => m.name?.getText(sourceFile)).filter(Boolean);
       if (methods.length === 0) return undefined;
       return `{ ${methods.join(", ")} }`;
     }
-
     return undefined;
   }
 
   function getProperties(node: ts.Node): TypeProperty[] | undefined {
     let members: ts.NodeArray<ts.TypeElement> | undefined;
-
     if (ts.isInterfaceDeclaration(node)) {
       members = node.members;
     } else if (ts.isTypeAliasDeclaration(node) && ts.isTypeLiteralNode(node.type)) {
       members = node.type.members;
     }
-
     if (!members || members.length === 0) return undefined;
-
     const props: TypeProperty[] = [];
     for (const member of members) {
       if (!ts.isPropertySignature(member) || !member.name) continue;
@@ -220,7 +192,6 @@ function analyzeFile(filePath: string): FileAnalysis | undefined {
       if (propDoc) prop.description = propDoc;
       props.push(prop);
     }
-
     return props.length > 0 ? props : undefined;
   }
 
@@ -242,25 +213,17 @@ function analyzeFile(filePath: string): FileAnalysis | undefined {
   }
 
   ts.forEachChild(sourceFile, (node) => {
-    // Imports — split into local vs npm, skip system/node builtins
     if (ts.isImportDeclaration(node) && node.moduleSpecifier) {
       const mod = (node.moduleSpecifier as ts.StringLiteral).text;
       if (SYSTEM_MODULES.has(mod)) return;
       const isLocal = mod.startsWith(".") || mod.startsWith("/");
       const list = isLocal ? localImports : npmImports;
       if (!list.includes(mod)) list.push(mod);
-
       if (isLocal && node.importClause) {
-        const symbolEntry = {
-          source: mod,
-          valueNames: [] as string[],
-          typeNames: [] as string[],
-        };
-
+        const symbolEntry = { source: mod, valueNames: [] as string[], typeNames: [] as string[] };
         if (node.importClause.name && !node.importClause.isTypeOnly) {
           symbolEntry.valueNames.push(node.importClause.name.text);
         }
-
         const bindings = node.importClause.namedBindings;
         if (bindings && ts.isNamedImports(bindings)) {
           for (const el of bindings.elements) {
@@ -272,21 +235,16 @@ function analyzeFile(filePath: string): FileAnalysis | undefined {
             }
           }
         }
-
         if (symbolEntry.valueNames.length > 0 || symbolEntry.typeNames.length > 0) {
           localImportSymbols.push(symbolEntry);
         }
       }
     }
-
-    // Export declarations (export { foo, bar })
     if (ts.isExportDeclaration(node) && node.exportClause && ts.isNamedExports(node.exportClause)) {
       for (const el of node.exportClause.elements) {
         exports.push(item(el.name.text, node));
       }
     }
-
-    // Exported functions
     if (ts.isFunctionDeclaration(node) && node.name) {
       if (hasExportModifier(node)) {
         exports.push(item(node.name.text, node, "function"));
@@ -294,8 +252,6 @@ function analyzeFile(filePath: string): FileAnalysis | undefined {
         functions.push(item(node.name.text, node, "function"));
       }
     }
-
-    // Variable statements (arrow functions, consts, etc.)
     if (ts.isVariableStatement(node)) {
       const isExported = hasExportModifier(node);
       const stmtDoc = getJsDoc(node);
@@ -303,8 +259,7 @@ function analyzeFile(filePath: string): FileAnalysis | undefined {
       for (const decl of node.declarationList.declarations) {
         if (decl.name && ts.isIdentifier(decl.name)) {
           const declDoc = getJsDoc(decl) || stmtDoc;
-          const isFunc = decl.initializer &&
-            (ts.isArrowFunction(decl.initializer) || ts.isFunctionExpression(decl.initializer));
+          const isFunc = decl.initializer && (ts.isArrowFunction(decl.initializer) || ts.isFunctionExpression(decl.initializer));
           const kind: AnalysisKind = isFunc ? "function" : "constant";
           const entry: AnalysisItem = { name: decl.name.text, kind, line: getLine(node) };
           if (declDoc) entry.jsdoc = declDoc;
@@ -319,8 +274,6 @@ function analyzeFile(filePath: string): FileAnalysis | undefined {
         }
       }
     }
-
-    // Classes
     if (ts.isClassDeclaration(node) && node.name) {
       if (hasExportModifier(node)) {
         exports.push(item(node.name.text, node, "class"));
@@ -328,34 +281,20 @@ function analyzeFile(filePath: string): FileAnalysis | undefined {
         functions.push(item(node.name.text, node, "class"));
       }
     }
-
-    // Type aliases, interfaces, and enums — only in types, not exports
-    if (ts.isTypeAliasDeclaration(node)) {
-      types.push(item(node.name.text, node, "type"));
-    }
-    if (ts.isInterfaceDeclaration(node)) {
-      types.push(item(node.name.text, node, "type"));
-    }
-    if (ts.isEnumDeclaration(node)) {
-      types.push(item(node.name.text, node, "type"));
-    }
-
-    // export default
-    if (ts.isExportAssignment(node)) {
-      exports.push(item("default", node));
-    }
+    if (ts.isTypeAliasDeclaration(node)) types.push(item(node.name.text, node, "type"));
+    if (ts.isInterfaceDeclaration(node)) types.push(item(node.name.text, node, "type"));
+    if (ts.isEnumDeclaration(node)) types.push(item(node.name.text, node, "type"));
+    if (ts.isExportAssignment(node)) exports.push(item("default", node));
   });
 
   const hasContent = localImports.length > 0 || localImportSymbols.length > 0 || npmImports.length > 0 ||
     exports.length > 0 || functions.length > 0 || types.length > 0;
   if (!hasContent) return undefined;
-
   return { localImports, localImportSymbols, npmImports, exports, functions, types };
 }
 
 function matchesIgnore(relPath: string, patterns: Set<string>): boolean {
   if (patterns.has(relPath)) return true;
-  // Check if any parent segment matches (e.g. "src" ignores all "*/src/*")
   for (const seg of relPath.split("/")) {
     if (patterns.has(seg)) return true;
   }
@@ -365,31 +304,23 @@ function matchesIgnore(relPath: string, patterns: Set<string>): boolean {
 function scanDir(dirPath: string, basePath: string, extraIgnore: Set<string>): FileTreeNode[] {
   const entries = fs.readdirSync(dirPath, { withFileTypes: true });
   const nodes: FileTreeNode[] = [];
-
   for (const entry of entries) {
     if (IGNORE.has(entry.name) || entry.name.startsWith(".")) continue;
-
     const fullPath = path.join(dirPath, entry.name);
     const relPath = path.relative(basePath, fullPath).replace(/\\/g, "/");
-
     if (matchesIgnore(relPath, extraIgnore)) continue;
-
     if (entry.isDirectory()) {
       const children = scanDir(fullPath, basePath, extraIgnore);
-      if (children.length > 0) {
-        nodes.push({ name: entry.name, type: "folder", path: relPath, children });
-      }
+      if (children.length > 0) nodes.push({ name: entry.name, type: "folder", path: relPath, children });
     } else {
       const analysis = analyzeFile(fullPath);
       nodes.push({ name: entry.name, type: "file", path: relPath, analysis });
     }
   }
-
   nodes.sort((a, b) => {
     if (a.type !== b.type) return a.type === "folder" ? -1 : 1;
     return a.name.localeCompare(b.name);
   });
-
   return nodes;
 }
 
@@ -397,40 +328,46 @@ function scanDir(dirPath: string, basePath: string, extraIgnore: Set<string>): F
 function inferFileDescription(filePath: string): string | undefined {
   const ext = path.extname(filePath);
   if (!PARSEABLE_EXTS.has(ext)) return undefined;
-
   let content: string;
   try {
     content = fs.readFileSync(filePath, "utf8");
   } catch {
     return undefined;
   }
-
-  // Try JSDoc /** ... */ at the top
   const jsdocMatch = content.match(/^\s*\/\*\*\s*\n?([\s\S]*?)\*\//);
   if (jsdocMatch) {
     const body = jsdocMatch[1];
-    // Look for @description or @file tag
-    const tagMatch = body.match(/@(?:description|file)\s+(.+)/);
-    if (tagMatch) return tagMatch[1].trim();
-    // Otherwise use the first non-tag, non-empty line
+    const tagMatch = body.match(/@(?:description|file)\s+([\s\S]+?)(?=\n\s*\*?\s*@|$)/);
+    if (tagMatch) {
+      return tagMatch[1].split("\n").map(l => l.replace(/^\s*\*\s?/, "").trim()).join("\n").trim();
+    }
+    const lines: string[] = [];
+    let foundContent = false;
     for (const line of body.split("\n")) {
       const cleaned = line.replace(/^\s*\*\s?/, "").trim();
-      if (cleaned && !cleaned.startsWith("@")) return cleaned;
+      if (cleaned.startsWith("@")) break;
+      if (cleaned) {
+        foundContent = true;
+        lines.push(cleaned);
+      } else if (foundContent) {
+        lines.push("");
+      }
     }
+    if (lines.length > 0) return lines.join("\n").trim();
   }
-
-  // Try leading // comments on the first few lines
-  const lines = content.split("\n").slice(0, 5);
+  const descLines: string[] = [];
+  const lines = content.split("\n").slice(0, 10);
   for (const line of lines) {
     const trimmed = line.trim();
     if (trimmed === "" || trimmed.startsWith("'use") || trimmed.startsWith('"use')) continue;
     if (trimmed.startsWith("//")) {
       const comment = trimmed.replace(/^\/\/\s*/, "").trim();
-      if (comment) return comment;
+      if (comment) descLines.push(comment);
+      continue;
     }
     break;
   }
-
+  if (descLines.length > 0) return descLines.join("\n").trim();
   return undefined;
 }
 
@@ -442,7 +379,6 @@ function applyDescriptions(
 ): FileTreeNode[] {
   return nodes.map((node) => {
     const updated = { ...node };
-    // Custom descriptions take precedence
     const desc = descriptions[node.path];
     if (desc) {
       updated.description = desc;
@@ -465,7 +401,6 @@ export function parseIgnoreFile(filePath: string): Set<string> {
     for (const line of content.split("\n")) {
       const trimmed = line.trim();
       if (trimmed && !trimmed.startsWith("#")) {
-        // Strip trailing slashes
         patterns.add(trimmed.replace(/\/+$/, ""));
       }
     }

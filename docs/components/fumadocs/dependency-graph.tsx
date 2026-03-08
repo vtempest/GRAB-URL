@@ -3,6 +3,29 @@ import path from "path";
 import { DependencyGraphClient } from "./dependency-graph-client";
 import type { FileInfo, GraphDisplayOptions } from "./dependency-graph-shared";
 
+const DEFAULT_INSTRUCTIONS = (
+  <ul className="space-y-3 list-none p-0">
+    <li>
+      <strong>Dependency Mapping</strong>: The graph visualizes package files, local imports, and optional npm dependencies.
+    </li>
+    <li>
+      <strong>Graph Controls</strong>: Use the toggle buttons to show or hide <strong>External</strong>, <strong>Types</strong>, <strong>Private</strong>, and <strong>Exported</strong> nodes.
+    </li>
+    <li>
+      <strong>Navigation</strong>: <strong>Drag</strong> to pan the view, or hold <code>Ctrl</code> while <strong>scrolling</strong> to zoom.
+    </li>
+    <li>
+      <strong>Interactivity</strong>: <strong>Click</strong> any node to automatically scroll to its matching entry in the file tree below.
+    </li>
+    <li>
+      <strong>Detailed Insights</strong>: <strong>Hover</strong> over graph nodes or file tree badges to see <strong>Markdown-parsed tooltips</strong> with descriptions, exports, and property details.
+    </li>
+    <li>
+      <strong>Filtering</strong>: Use the <strong>Search Box</strong> in the graph or file tree to find specific files or symbols instantly.
+    </li>
+  </ul>
+);
+
 function collectFiles(nodes: FileTreeNode[], result: FileInfo[] = []): FileInfo[] {
   for (const node of nodes) {
     if (node.type === "file" && node.analysis) {
@@ -52,5 +75,5 @@ export function DependencyGraph({
     showExportedFunctions,
   };
 
-  return <DependencyGraphClient files={files} showLegend={showLegend} initialOptions={initialOptions} helpContent={instructions} />;
+  return <DependencyGraphClient files={files} showLegend={showLegend} initialOptions={initialOptions} helpContent={instructions ?? DEFAULT_INSTRUCTIONS} />;
 }
