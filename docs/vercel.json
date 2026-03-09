@@ -1,4 +1,0 @@
-{
-  "buildCommand": "cd .. && npx turbo run build --filter=grab-url-docs",
-  "installCommand": "cd .. && bun install"
-}
