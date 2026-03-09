@@ -12,7 +12,8 @@ import {
 import { notFound } from 'next/navigation';
 import { getMDXComponents } from '@/mdx-components';
 import type { Metadata } from 'next';
-import { AskAIDropdown, LLMCopyButton } from '@/components/fumadocs/page-actions';
+import { AskAIDropdown } from '@/components/fumadocs/ai/ask-ai-dropdown';
+import { LLMCopyButton } from '@/components/fumadocs/ai/llm-copy-button';
 import { docsConfig } from '@/lib/fumadocs/customize-docs';
 
 export default async function Page(props: {

@@ -14,7 +14,7 @@ import {
   PopoverTrigger as PopoverTriggerBase,
 } from 'fumadocs-ui/components/ui/popover';
 import { cva } from 'class-variance-authority';
-import { buttonVariants } from '../ui/button';
+import { buttonVariants } from '../../ui/button';
 
 const PopoverTrigger = PopoverTriggerBase as any;
 

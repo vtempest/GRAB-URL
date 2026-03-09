@@ -2,6 +2,9 @@
   "name": "@grab-url/loading-animations",
   "private": true,
   "type": "module",
+  "exports": {
+    "./*": "./src/*.ts"
+  },
   "scripts": {
     "build": "vite build --config vite.config.ts"
   }

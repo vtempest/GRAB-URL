@@ -1,15 +1,15 @@
 ---
-title: Code Type Tree & Dependency Graph
+title: Codebase Tree & Dependency Graph
 icon: FolderTree
 ---
 
-import { FileTreeView } from '@/components/fumadocs/filetree-view';
+import { FileTreeView } from '@/components/fumadocs/file-tree/filetree-view';
 import { InlineTOC } from 'fumadocs-ui/components/inline-toc';
 
 export const descriptions = {
   // grab-api
   "grab-api": "Core Grab API library",
-  "grab-api/index.ts": "Main entry point. Exports the `grab()` function and **log utility**, sets up global instances, and initializes [browser devtools](https://developer.chrome.com/docs/devtools/).",
+  "grab-api/index.ts": "Main entry point. Exports the grab() function and log utility, sets up global instances, and initializes browser devtools.",
   "grab-api/common/types.ts": "All TypeScript definitions for request options, response shapes, and mock configurations.",
   "grab-api/common/utils.ts": "Low-level utilities like debouncer, wait (sleep), and buildUrl.",
   "grab-api/core/cache-pagination.ts": "Decides if a request should be served from cache and increments page numbers for infinite scrolling.",
@@ -23,7 +23,7 @@ export const descriptions = {
   // grab-url-cli
   "grab-url-cli": "Command-Line Interface",
   "grab-url-cli/index.ts": "Parses CLI arguments and switches between API Mode and Download Mode.",
-  "grab-url-cli/cli-args.ts": "A custom, _lightweight_ alternative to `yargs` for parsing flags and positional URLs.",
+  "grab-url-cli/cli-args.ts": "A custom, lightweight alternative to yargs for parsing flags and positional URLs.",
   "grab-url-cli/file-downloader.ts": "Orchestrator class that coordinates formatting, state, and keyboard modules for a unified download experience.",
   "grab-url-cli/keyboard-controls.ts": "Listens for keypresses (like 'p' for pause) during active downloads.",
   "grab-url-cli/download-spinners.ts": "Spinner animation configurations for download progress display.",
@@ -65,7 +65,7 @@ export const descriptions = {
   showNpmImports={false}
   showTypes={false}
   showPrivateFunctions={false}
-  showExportedFunctions={true} />
+  showExportedFunctions={false} />
 
 ## Code Type Tree
 
@@ -74,6 +74,10 @@ export const descriptions = {
   ghBase="https://github.com/vtempest/grab-url/tree/master/packages"
   descriptions={descriptions}
   ignore={["bun.lock"]}
+  defaultImportFilter="all"
+  defaultInternalFilter="all"
+  defaultExportFilter="functions"
+  defaultCollapseDepth={4}
 />
 
-import { DependencyGraph } from '@/components/fumadocs/dependency-graph';
+import { DependencyGraph } from '@/components/fumadocs/graph/dependency-graph';

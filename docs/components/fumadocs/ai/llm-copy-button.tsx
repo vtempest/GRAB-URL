@@ -8,7 +8,7 @@ import { useState } from 'react';
 import { Check, Copy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCopyButton } from 'fumadocs-ui/utils/use-copy-button';
-import { buttonVariants } from '../ui/button';
+import { buttonVariants } from '../../ui/button';
 
 const cache = new Map<string, string>();
 

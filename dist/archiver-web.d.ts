@@ -1,5 +1,3 @@
-export declare type ArchiveCompression = "NONE" | "GZIP" | "BZIP2" | "LZMA" | "XZ";
-
 /**
  * Created archive result.
  */
@@ -12,24 +10,18 @@ export declare interface ArchiveFile {
     downloadName: string;
 }
 
-export declare type ArchiveFormat = "ZIP" | "USTAR" | "_7ZIP" | "RAW" | "XAR" | "CPIO_NEWC";
-
 /**
- * Create archive from files array.
+ * Create a ZIP archive from files array.
  * @param options - Create configuration
- * @param options.files - Array of {path: string, content: string|Uint8Array|ArrayBuffer|Blob}
- * @param options.outputName - Archive filename (e.g., 'out.tar.gz')
- * @param options.format - Archive format (defaults USTAR)
- * @param options.compression - Compression (defaults NONE)
- * @param options.compressionLevel - 1-9 (defaults 6, format-dependent)
- * @param options.passphrase - Optional password
- * @returns Blob of archive (download/save as)
- * @throws Error on invalid options
+ * @param options.files - Array of {path, content} pairs
+ * @param options.outputName - Archive filename (e.g., 'out.zip')
+ * @param options.compressionLevel - 1-9 (defaults 6)
+ * @returns Blob of archive
  */
 export declare function compress(options: CreateOptions): Promise<ArchiveFile>;
 
 /**
- * Options for createArchive.
+ * Options for compress().
  */
 export declare interface CreateOptions {
     /** Files to pack: path/content pairs */
@@ -37,26 +29,19 @@ export declare interface CreateOptions {
         path: string;
         content: string | Uint8Array | ArrayBuffer | Blob;
     }>;
-    /** Output filename (.tar.gz etc.) */
+    /** Output filename (.zip) */
     outputName: string;
-    /** Archive format */
-    format?: ArchiveFormat;
-    /** Compression type */
-    compression?: ArchiveCompression;
-    /** Compression level 1-9 */
+    /** Compression level 1-9 (default 6) */
     compressionLevel?: number;
-    /** Password */
-    passphrase?: string;
 }
 
 /**
- * Extract files from an archive ArrayBuffer.
+ * Extract files from a ZIP ArrayBuffer.
  * @param options - Extract configuration
  * @param options.archiveBuffer - The archive to extract (ArrayBuffer)
  * @param options.folderPath - Folder to extract (e.g., 'src/'), empty=root
- * @param options.password - Optional password
+ * @param options.password - Optional password (not supported by JSZip - throws if provided)
  * @returns Array of extracted files
- * @throws Error on unsupported format
  */
 export declare function extract(options: {
     archiveBuffer: ArrayBuffer;
@@ -77,7 +62,5 @@ export declare interface ExtractEvent {
     /** MIME type */
     mime: string;
 }
-
-/* Excluded from this release type: _setArchiveClass */
 
 export { }

@@ -9,6 +9,7 @@ import { ComparisonTable } from "@/components/DocsHomepage/comparison-table"
 import { Footer } from "@/components/DocsHomepage/footer"
 // import API2AILanding from "@/components/DocsHomepage/api2ai-section"
 import { Inter } from "next/font/google"
+import "./docs-home.css"
 
 const inter = Inter({
   subsets: ['latin'],

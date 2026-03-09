@@ -174,3 +174,226 @@ const searchUsers = async () => {
 
 </Tab>
 </Tabs>
+
+
+
+### TypeScript ToolTips & Error Check on Request & Response
+
+```javascript
+type User = { 
+  /** Name of the user  */ 
+  name: string;
+  /** Age of the user  */ 
+  age: number;
+};
+
+type RequestParams = { 
+  /** Query String  to search for */ 
+  q : string;
+  /** Category of search  */
+  category?: "news" | "general";
+
+};
+
+const result = await grab<User, RequestParams>('test-path', {
+  q: " react",
+  category: "general"
+});
+
+log(result.name)
+
+// instant error highlight and description tooltips over "category" and "name"
+
+```
+
+
+### Pagination with Infinite Scroll
+
+```javascript
+let productList = $state({}) as {
+  products: Array<{name:string}>,
+  isLoading: boolean
+}
+
+await grab("products", {
+  response: productList,
+  infiniteScroll: ["page", "products", ".results-container"]
+});
+
+<div class="results-container">
+  {productList.products.map(product => (
+    <div className="product-item">
+      <h3>{product.name}</h3>
+    </div>
+  ))}
+  {productList.isLoading && <div className="loading">Loading more products...</div>}
+</div>
+
+```
+
+### Debounced Search
+
+```javascript
+// Seconds to debounce request, wait to execute so that other requests may override
+
+await grab("search", {
+  response: searchResults,
+  debounce: 2,
+  query: query,
+  cancelOngoingIfNew: true, // Cancel previous searches
+});
+```
+
+### Client Cache in User Memory
+
+```javascript
+// Enable caching for static data
+const categories = await grab("categories", {
+  cache: true,
+});
+
+const categoriesAgain = await grab("categories", {
+  cache: true,
+}); 
+// Instant response from frontend cache, no server call
+```
+
+### Rate Limiting
+
+```javascript
+// Prevent user's multi-click cascading requests
+let searchResults = {};
+
+async function searchWithRateLimit(query) {
+  await grab("search", {
+    response: searchResults,
+    query: query,
+    rateLimit: 2, // Wait 2 seconds between requests
+  });
+}
+searchWithRateLimit("python"); // Executes immediately
+searchWithRateLimit("golang"); // fails, needs to wait
+```
+
+### Duplicate Cancellation
+
+```javascript
+let currentSearch = {};
+
+async function searchProducts(query) {
+  // Cancel previous search when new one starts
+  await grab("products/search", {
+    response: currentSearch,
+    query: query,
+    cancelOngoingIfNew: true, // Default behavior
+  });
+}
+
+// Prevent new requests if one is ongoing
+async function preventDuplicateRequests(userId) {
+  await grab(`users/${userId}`, {
+    cancelNewIfOngoing: true, // Prevents duplicate requests
+  });
+}
+```
+
+### Error Handling and Retry
+
+```javascript
+let apiData = {};
+
+// Automatic retry on failure
+await grab("unreliable-endpoint", {
+  response: apiData,
+  retryAttempts: 3, // Retry 3 times on failure
+  timeout: 10, // 10 second timeout
+});
+
+// Manual error handling
+try {
+  const result = await grab("api/data");
+  console.log("Success:", result);
+} catch (error) {
+  if (error.message.includes("timeout")) {
+    console.log("Request timed out");
+  } else if (error.message.includes("rate limit")) {
+    console.log("Too many requests");
+  } else {
+    console.log("Other error:", error.message);
+  }
+}
+```
+
+### Request Hooks and Interceptors
+
+```javascript
+// Global request interceptor
+grab.defaults.onRequest = (path, response, params, fetchParams) => {
+  // Add authentication header
+  fetchParams.headers.Authorization = `Bearer ervv0sf9vs0v0sv`;
+
+  // Modify request data
+  if (params.userId) {
+    params.user_id = '2525';
+  }
+
+  return [path, response, params, fetchParams];
+};
+
+```
+
+### Proxy
+
+```javascript
+//polyfill fetch with node-fetch
+import fetch, { Headers, Request, Response } from 'node-fetch';
+
+if (!globalThis.fetch) {
+  globalThis.fetch = fetch;
+  globalThis.Headers = Headers;
+  globalThis.Request = Request;
+  globalThis.Response = Response;
+}
+
+//get proxy
+import { HttpsProxyAgent } from "https-proxy-agent";
+const agent = new HttpsProxyAgent("http://username:password@proxyhost:port");
+
+let res = await grab("/path", { agent });
+```
+
+### File Upload
+
+```javascript
+const formData = new FormData();
+formData.append("file", file);
+
+const response = await grab("/api/upload", {
+  post: true,
+  body: formData,
+  headers: {
+    Authorization: `Bearer ${getAuthToken()}`,
+  },
+});
+
+// Alternative: Convert file to base64 for JSON API
+async function uploadFileAsJSON(file) {
+  const base64 = await fileToBase64(file);
+
+  return await grab("files/upload", {
+    post: true,
+    filename: file.name,
+    content: base64,
+    mimeType: file.type,
+  });
+}
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result.split(",")[1]);
+    reader.onerror = (error) => reject(error);
+  });
+}
+```

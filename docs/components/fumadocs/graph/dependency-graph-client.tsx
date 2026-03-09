@@ -1,6 +1,9 @@
 'use client';
 
-import { useMemo, useState, useTransition, type ReactNode } from "react";
+/**
+ * Client component responsible for rendering the interactive dependency graph and fetching live npm metadata.
+ */
+import { useMemo, useState, useTransition, useRef, useEffect, type ReactNode } from "react";
 import { Boxes, FunctionSquare, Package, Search, Share2, Settings, Cloud, Loader2, X, Download, HelpCircle } from "lucide-react";
 import { MermaidClient } from "./mermaid";
 import { buildChart, buildNodeTooltips, type FileInfo, type GraphDisplayOptions } from "./dependency-graph-shared";
@@ -25,6 +28,40 @@ export function DependencyGraphClient({
   const [repoUrl, setRepoUrl] = useState("");
   const [isPending, startTransition] = useTransition();
 
+  const [npmMetadata, setNpmMetadata] = useState<Record<string, any>>({});
+  const requestedNpmPkgs = useRef(new Set<string>());
+
+  useEffect(() => {
+    if (!options.showNpmImports) return;
+
+    const packages = new Set<string>();
+    for (const f of files) {
+      for (const pkg of f.analysis?.npmImports ?? []) {
+        packages.add(pkg);
+      }
+    }
+
+    packages.forEach((pkg) => {
+      if (!requestedNpmPkgs.current.has(pkg)) {
+        requestedNpmPkgs.current.add(pkg);
+        // mark as loading initially
+        setNpmMetadata(prev => ({ ...prev, [pkg]: { _loading: true } }));
+        
+        fetch(`https://registry.npmjs.org/${pkg}`, {
+          headers: { 'Accept': 'application/vnd.npm.install-v1+json' }
+        })
+        .then(res => res.json())
+        .then(data => {
+          setNpmMetadata(prev => ({ ...prev, [pkg]: data }));
+        })
+        .catch(e => {
+          console.error("Failed to fetch npm data for", pkg, e);
+          setNpmMetadata(prev => ({ ...prev, [pkg]: { _error: true } }));
+        });
+      }
+    });
+  }, [files, options.showNpmImports]);
+
   const handleRemoteLoad = () => {
     if (!repoUrl) return;
     
@@ -40,7 +77,7 @@ export function DependencyGraphClient({
   };
 
   const chart = useMemo(() => buildChart(files, options), [files, options]);
-  const nodeTooltips = useMemo(() => buildNodeTooltips(files, options), [files, options]);
+  const nodeTooltips = useMemo(() => buildNodeTooltips(files, options, npmMetadata), [files, options, npmMetadata]);
 
   return (
     <div className="space-y-3">

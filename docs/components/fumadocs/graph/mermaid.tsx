@@ -4,8 +4,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Crosshair, ExternalLink } from 'lucide-react';
 import type { MermaidTooltipData } from './dependency-graph-shared';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
-import { Markdown } from './markdown';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../ui/tooltip';
+import { Markdown } from '../typography/markdown';
 
 export { Mermaid as MermaidClient };
 
@@ -17,7 +17,7 @@ type PanZoomController = {
 };
 
 const PAN_STEP = 140;
-const CLUSTER_LABEL_EXTRA_WIDTH = 64;
+const CLUSTER_LABEL_EXTRA_WIDTH = 96;
 
 function widenClusterLabels(container: HTMLDivElement) {
   container.querySelectorAll('g.cluster').forEach((cluster) => {
@@ -91,16 +91,20 @@ function enablePanAndZoom(container: HTMLDivElement): PanZoomController | undefi
 
   const onPointerDown = (event: PointerEvent) => {
     dragging = true;
-    startX = event.clientX - panX;
-    startY = event.clientY - panY;
+    startX = event.clientX;
+    startY = event.clientY;
     svg.style.cursor = 'grabbing';
     svg.setPointerCapture(event.pointerId);
   };
 
   const onPointerMove = (event: PointerEvent) => {
     if (!dragging) return;
-    panX = event.clientX - startX;
-    panY = event.clientY - startY;
+    const deltaX = event.clientX - startX;
+    const deltaY = event.clientY - startY;
+    panX += deltaX * 1.5;
+    panY += deltaY * 1.5;
+    startX = event.clientX;
+    startY = event.clientY;
     applyTransform();
   };
 
@@ -149,12 +153,12 @@ function Mermaid({
         theme: 'dark',
         themeVariables: {
           fontFamily: 'ui-sans-serif, system-ui, sans-serif',
-          fontSize: '32px',
+          fontSize: '42px',
           primaryTextColor: '#f8fafc',
           lineColor: '#94a3b8',
           clusterBkg: '#0f172a',
-          clusterBorder: '#475569',
-          clusterTextSize: '32px',
+          clusterBorder: '#64748b',
+          clusterTextSize: '52px',
         },
         flowchart: { curve: 'basis' },
         securityLevel: 'loose',
@@ -316,7 +320,7 @@ function Mermaid({
         </div>
         <div
           ref={ref}
-          className="flex justify-center overflow-hidden [&_.cluster-label]:overflow-visible [&_.cluster-label]:text-[32px] [&_.cluster-label]:font-bold [&_.cluster-label]:leading-[1.15] [&_.cluster-label_span]:px-3 [&_.cluster-label_span]:leading-[1.15] [&_.edgeLabel]:text-lg [&_.label]:text-[32px] [&_.label]:font-bold [&_.node]:cursor-pointer [&_svg]:max-w-full [&_svg]:min-h-[700px]"
+          className="flex justify-center overflow-hidden [&_.cluster-label]:overflow-visible [&_.cluster-label]:text-[42px] [&_.cluster-label]:font-black [&_.cluster-label]:leading-[1.15] [&_.cluster-label]:!fill-sky-300 [&_.cluster-label_span]:px-4 [&_.cluster-label_span]:py-1 [&_.cluster-label_span]:leading-[1.15] [&_.cluster-label_span]:text-sky-300 [&_.edgeLabel]:text-lg [&_.label]:text-[32px] [&_.label]:font-bold [&_.node]:cursor-pointer [&_svg]:max-w-full [&_svg]:min-h-[700px] [&_.cluster_rect]:!stroke-sky-500/50 [&_.cluster_rect]:!stroke-[3px]"
         />
 
         <Tooltip open={!!tooltip}>

@@ -1,66 +1,21 @@
 /**
  * @file archiver.test.ts
  * @description Unit tests for the archiver-web `extract` and `compress` functions.
- *
- * `libarchive.js` relies on a WASM worker which is unavailable in Node/Vitest,
- * so we mock the entire module and test that our wrappers:
- *   - call the correct libarchive.js APIs
- *   - correctly filter files by folderPath
- *   - handle passwords, binary content, binary detection fallback
- *   - correctly map `compress` arguments onto Archive.write()
- *   - surface errors cleanly
+ * Uses JSZip directly (pure JS, no WASM) so no mocking needed.
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { extract, compress, _setArchiveClass } from '../packages/archiver-web/src/index.js';
+import { describe, it, expect } from 'vitest';
+import { extract, compress } from '../packages/archiver-web/src/index.js';
 
 // ─── helpers ─────────────────────────────────────────────────────────────────
 
-function makeFileBlob(text: string, mime = 'text/plain') {
-  return {
-    text: () => Promise.resolve(text),
-    size: text.length,
-    type: mime,
-  };
-}
-
-function makeBinaryBlob(bytes: Uint8Array) {
-  return {
-    text: () => Promise.reject(new Error('binary')),
-    arrayBuffer: () => Promise.resolve(bytes.buffer),
-    size: bytes.length,
-    type: 'application/octet-stream',
-  };
-}
-
-// ─── libarchive.js mock ──────────────────────────────────────────────────────
-
-const mockUsePassword = vi.fn();
-const mockGetFilesObject = vi.fn();
-const mockArchiveWrite   = vi.fn();
-const mockArchiveOpen    = vi.fn();
-
-const MockArchive = {
-  open: mockArchiveOpen,
-  write: mockArchiveWrite,
-  init: vi.fn(),
-};
-
-// ─── setup ───────────────────────────────────────────────────────────────────
-
-beforeEach(() => {
-  vi.clearAllMocks();
-
-  // Inject mock Archive class to bypass dynamic import of libarchive.js
-  _setArchiveClass(MockArchive);
-
-  mockArchiveOpen.mockResolvedValue({
-    usePassword: mockUsePassword,
-    getFilesObject: mockGetFilesObject,
+async function makeZipBuffer(files: Record<string, string | Uint8Array>): Promise<ArrayBuffer> {
+  const result = await compress({
+    files: Object.entries(files).map(([path, content]) => ({ path, content })),
+    outputName: 'test.zip',
   });
-  mockUsePassword.mockResolvedValue(undefined);
-  mockArchiveWrite.mockResolvedValue(new Blob(['ARCHIVE_DATA']));
-});
+  return result.blob.arrayBuffer();
+}
 
 // ─── extract() ───────────────────────────────────────────────────────────────
 
@@ -72,12 +27,12 @@ describe('extract()', () => {
   });
 
   it('extracts all root files when folderPath is empty string', async () => {
-    mockGetFilesObject.mockResolvedValue({
-      'readme.md': { extract: () => Promise.resolve(makeFileBlob('# Hello')) },
-      'index.ts':  { extract: () => Promise.resolve(makeFileBlob('export {}')) },
+    const buf = await makeZipBuffer({
+      'readme.md': '# Hello',
+      'index.ts': 'export {}',
     });
 
-    const result = await extract({ archiveBuffer: new ArrayBuffer(8) });
+    const result = await extract({ archiveBuffer: buf });
 
     expect(result).toHaveLength(2);
     const paths = result.map(f => f.path).sort();
@@ -87,70 +42,53 @@ describe('extract()', () => {
   });
 
   it('filters files by folderPath prefix', async () => {
-    mockGetFilesObject.mockResolvedValue({
-      src: {
-        'index.ts':  { extract: () => Promise.resolve(makeFileBlob('export {}')) },
-        'utils.ts':  { extract: () => Promise.resolve(makeFileBlob('export const x = 1')) },
-      },
-      'readme.md': { extract: () => Promise.resolve(makeFileBlob('# Hello')) },
+    const buf = await makeZipBuffer({
+      'src/index.ts': 'export {}',
+      'src/utils.ts': 'export const x = 1',
+      'readme.md': '# Hello',
     });
 
     const result = await extract({
-      archiveBuffer: new ArrayBuffer(8),
+      archiveBuffer: buf,
       folderPath: 'src/',
     });
 
     expect(result).toHaveLength(2);
     expect(result.every(f => !f.path.startsWith('src/'))).toBe(true);
+    expect(result.map(f => f.path).sort()).toEqual(['index.ts', 'utils.ts']);
   });
 
-  it('calls usePassword when password is provided', async () => {
-    mockGetFilesObject.mockResolvedValue({});
+  it('throws when password is provided', async () => {
+    const buf = await makeZipBuffer({});
 
-    await extract({
-      archiveBuffer: new ArrayBuffer(8),
-      password: 's3cr3t',
+    await expect(
+      extract({ archiveBuffer: buf, password: 's3cr3t' })
+    ).rejects.toThrow('Password-protected archives are not supported');
+  });
+
+  it('populates size correctly for each file', async () => {
+    const buf = await makeZipBuffer({
+      'notes.md': 'hello world',
     });
 
-    expect(mockUsePassword).toHaveBeenCalledWith('s3cr3t');
-  });
-
-  it('skips usePassword when no password is given', async () => {
-    mockGetFilesObject.mockResolvedValue({});
-
-    await extract({ archiveBuffer: new ArrayBuffer(8) });
-
-    expect(mockUsePassword).not.toHaveBeenCalled();
-  });
-
-  it('base64-encodes binary content when text() throws', async () => {
-    const bytes = Uint8Array.from([0x00, 0xff, 0x10, 0xab]);
-    mockGetFilesObject.mockResolvedValue({
-      'data.bin': { extract: () => Promise.resolve(makeBinaryBlob(bytes)) },
-    });
-
-    const result = await extract({ archiveBuffer: new ArrayBuffer(8) });
-    expect(result).toHaveLength(1);
-    // Content should be a non-empty base64 string
-    expect(result[0].content.length).toBeGreaterThan(0);
-  });
-
-  it('populates size and mime correctly for each file', async () => {
-    const blob = makeFileBlob('hello world', 'text/markdown');
-    mockGetFilesObject.mockResolvedValue({
-      'notes.md': { extract: () => Promise.resolve(blob) },
-    });
-
-    const result = await extract({ archiveBuffer: new ArrayBuffer(8) });
+    const result = await extract({ archiveBuffer: buf });
     expect(result[0].size).toBe('hello world'.length);
-    expect(result[0].mime).toBe('text/markdown');
   });
 
   it('returns empty array when archive has no files', async () => {
-    mockGetFilesObject.mockResolvedValue({});
+    const buf = await makeZipBuffer({});
 
-    const result = await extract({ archiveBuffer: new ArrayBuffer(8) });
+    const result = await extract({ archiveBuffer: buf });
     expect(result).toHaveLength(0);
+  });
+
+  it('handles binary content', async () => {
+    const bytes = new Uint8Array([0x00, 0xff, 0x10, 0xab]);
+    const buf = await makeZipBuffer({ 'data.bin': bytes });
+
+    const result = await extract({ archiveBuffer: buf });
+    expect(result).toHaveLength(1);
+    expect(result[0].size).toBe(4);
   });
 });
 
@@ -168,62 +106,49 @@ describe('compress()', () => {
     expect(result.downloadName).toBe('archive.zip');
   });
 
-  it('passes files to Archive.write', async () => {
-    await compress({
-      files: [{ path: 'a.txt', content: 'AAA' }],
-      outputName: 'out.tar',
-      format: 'USTAR',
-      compression: 'GZIP',
-    });
-
-    expect(mockArchiveWrite).toHaveBeenCalledOnce();
-    const call = mockArchiveWrite.mock.calls[0][0];
-    expect(call.outputFileName).toBe('out.tar');
-    expect(call.format).toBe('USTAR');
-    expect(call.compression).toBe('GZIP');
-    expect(call.files[0].pathname).toBe('a.txt');
-    expect(call.files[0].file).toBeInstanceOf(Blob);
-  });
-
-  it('converts string content to a Blob', async () => {
-    await compress({
-      files: [{ path: 'str.txt', content: 'text content' }],
+  it('creates a valid zip that can be extracted', async () => {
+    const result = await compress({
+      files: [
+        { path: 'a.txt', content: 'AAA' },
+        { path: 'b.txt', content: 'BBB' },
+      ],
       outputName: 'out.zip',
     });
 
-    const { files } = mockArchiveWrite.mock.calls[0][0];
-    expect(files[0].file).toBeInstanceOf(Blob);
+    const buf = await result.blob.arrayBuffer();
+    const extracted = await extract({ archiveBuffer: buf });
+    expect(extracted).toHaveLength(2);
+    expect(extracted.find(f => f.path === 'a.txt')?.content).toBe('AAA');
+    expect(extracted.find(f => f.path === 'b.txt')?.content).toBe('BBB');
   });
 
-  it('converts Uint8Array content to a Blob', async () => {
-    await compress({
+  it('handles Uint8Array content', async () => {
+    const result = await compress({
       files: [{ path: 'bytes.bin', content: new Uint8Array([1, 2, 3]) }],
       outputName: 'out.zip',
     });
 
-    const { files } = mockArchiveWrite.mock.calls[0][0];
-    expect(files[0].file).toBeInstanceOf(Blob);
+    expect(result.blob).toBeInstanceOf(Blob);
+    expect(result.blob.size).toBeGreaterThan(0);
   });
 
-  it('converts ArrayBuffer content to a Blob', async () => {
-    await compress({
+  it('handles ArrayBuffer content', async () => {
+    const result = await compress({
       files: [{ path: 'buf.bin', content: new ArrayBuffer(4) }],
       outputName: 'out.zip',
     });
 
-    const { files } = mockArchiveWrite.mock.calls[0][0];
-    expect(files[0].file).toBeInstanceOf(Blob);
+    expect(result.blob).toBeInstanceOf(Blob);
   });
 
-  it('passes a Blob directly without wrapping', async () => {
+  it('handles Blob content', async () => {
     const rawBlob = new Blob(['already a blob']);
-    await compress({
+    const result = await compress({
       files: [{ path: 'blob.txt', content: rawBlob }],
       outputName: 'out.zip',
     });
 
-    const { files } = mockArchiveWrite.mock.calls[0][0];
-    expect(files[0].file).toBe(rawBlob);
+    expect(result.blob).toBeInstanceOf(Blob);
   });
 
   it('throws on unsupported content type', async () => {
@@ -235,30 +160,8 @@ describe('compress()', () => {
     ).rejects.toThrow('Unsupported content type');
   });
 
-  it('passes passphrase to Archive.write', async () => {
-    await compress({
-      files: [{ path: 'secure.txt', content: 'secret' }],
-      outputName: 'locked.zip',
-      passphrase: 'my-pass',
-    });
-
-    const call = mockArchiveWrite.mock.calls[0][0];
-    expect(call.passphrase).toBe('my-pass');
-  });
-
-  it('passes compressionLevel to Archive.write', async () => {
-    await compress({
-      files: [{ path: 'a.txt', content: 'hi' }],
-      outputName: 'compressed.zip',
-      compressionLevel: 9,
-    });
-
-    const call = mockArchiveWrite.mock.calls[0][0];
-    expect(call.compressionLevel).toBe(9);
-  });
-
   it('handles multiple files in a single call', async () => {
-    await compress({
+    const result = await compress({
       files: [
         { path: 'a.txt', content: 'AAA' },
         { path: 'b.txt', content: 'BBB' },
@@ -267,8 +170,8 @@ describe('compress()', () => {
       outputName: 'multi.zip',
     });
 
-    const { files } = mockArchiveWrite.mock.calls[0][0];
-    expect(files).toHaveLength(3);
-    expect(files.map((f: any) => f.pathname)).toEqual(['a.txt', 'b.txt', 'c.txt']);
+    const buf = await result.blob.arrayBuffer();
+    const extracted = await extract({ archiveBuffer: buf });
+    expect(extracted).toHaveLength(3);
   });
 });

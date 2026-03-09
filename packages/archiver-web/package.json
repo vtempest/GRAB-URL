@@ -1,7 +1,7 @@
 {
   "name": "archiver-web",
-  "version": "1.0.0",
-  "description": "Universal Archive Extractor & Creator using libarchive.js (WASM). Supports ZIP/7z/RAR4/5/TAR + GZIP/BZIP2/LZMA.",
+  "version": "1.1.0",
+  "description": "Universal Archive Extractor & Creator using JSZip. Frontend-only, no WASM.",
   "type": "module",
   "main": "./src/index.ts",
   "bin": {
@@ -17,10 +17,9 @@
     "test": "tsx test.ts"
   },
   "dependencies": {
-    "libarchive.js": "^2.0.2"
+    "jszip": "^3.10.1"
   },
   "devDependencies": {
-    "@types/libarchive.js": "^1.3.4",
     "tsx": "^4.7.0",
     "typescript": "^5.4.0",
     "vite": "^7.3.1",

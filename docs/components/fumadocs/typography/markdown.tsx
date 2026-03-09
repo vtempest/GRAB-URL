@@ -1,7 +1,10 @@
 "use client";
 
+/**
+ * Component to safely render Markdown content, supporting keyword highlighting and external links.
+ */
 import { marked } from "marked";
-import styles from "./filetree-table.module.css";
+import styles from "../file-tree/filetree-table.module.css";
 
 function escapeHtml(value: string): string {
   return value

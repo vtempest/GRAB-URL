@@ -5,9 +5,9 @@
   "private": true,
   "packageManager": "npm@11.7.0",
   "scripts": {
-    "dev": "npx concurrently \"next dev  --turbo \" \"npx wait-on http://localhost:3000 && npx opener http://localhost:3000\"",
+    "dev": "rm -rf .next/; open-ready next dev  --turbo",
     "build": "next build",
-    "build:preview": "next build; npx concurrently \"next start \" \"npx wait-on http://localhost:3000 && npx opener http://localhost:3000\"",
+    "build:preview": "next build; open-ready next start",
     "build:api": "node ./lib/fumadocs/generate-api-docs.ts",
     "check": "fumadocs-mdx && tsc --noEmit",
     "favicon": "npm create favicon public/favicon-512.png public/ -- --overwrite"
@@ -19,6 +19,7 @@
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-slot": "^1.2.4",
     "@radix-ui/react-tooltip": "^1.2.8",
+    "@typescript-eslint/typescript-estree": "^8.56.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "fumadocs-core": "16.6.10",
@@ -46,6 +47,7 @@
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "baseline-browser-mapping": "^2.8.32",
+    "open-ready": "^0.1.2",
     "postcss": "^8.5.6",
     "rimraf": "^6.1.2",
     "tailwindcss": "^4.1.17",

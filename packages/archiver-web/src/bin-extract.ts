@@ -1,4 +1,3 @@
-
 import { parseArgs } from "util";
 import * as fs from "fs";
 import * as path from "path";
@@ -15,15 +14,14 @@ async function readStreamToBuffer(stream: NodeJS.ReadStream): Promise<Buffer> {
 async function main() {
   const options = {
     out: { type: "string" as const, short: "o" },
-    password: { type: "string" as const, short: "p" },
     folder: { type: "string" as const, short: "d", default: "" },
-    help: { type: "boolean" as const, short: "h" }
+    help: { type: "boolean" as const, short: "h" },
   };
 
   const { values, positionals } = parseArgs({
     args: process.argv.slice(2),
     options,
-    allowPositionals: true
+    allowPositionals: true,
   });
 
   if (values.help) {
@@ -31,7 +29,6 @@ async function main() {
     console.error("If [archive-file] is omitted, reads from stdin.");
     console.error("Options:");
     console.error("  -o, --out <dir>         Output directory. If absent, outputs to stdout (only works if 1 file).");
-    console.error("  -p, --password <pwd>    Password for the archive.");
     console.error("  -d, --folder <dir>      Folder to extract from archive.");
     process.exit(0);
   }
@@ -39,10 +36,8 @@ async function main() {
   let archiveBuffer: Buffer;
 
   if (positionals.length > 0) {
-    const inputFile = positionals[0];
-    archiveBuffer = fs.readFileSync(path.resolve(inputFile));
+    archiveBuffer = fs.readFileSync(path.resolve(positionals[0]));
   } else {
-    // Read from stdin
     if (process.stdin.isTTY) {
       console.error("Error: Must provide an archive file or pipe input via stdin.");
       process.exit(1);
@@ -52,13 +47,12 @@ async function main() {
 
   const arrayBuf = archiveBuffer.buffer.slice(
     archiveBuffer.byteOffset,
-    archiveBuffer.byteOffset + archiveBuffer.byteLength
+    archiveBuffer.byteOffset + archiveBuffer.byteLength,
   ) as ArrayBuffer;
 
   const files = await extract({
     archiveBuffer: arrayBuf,
     folderPath: values.folder,
-    password: values.password
   });
 
   if (values.out) {
@@ -66,11 +60,11 @@ async function main() {
       const outPath = path.join(values.out, file.path);
       fs.mkdirSync(path.dirname(outPath), { recursive: true });
       let buf: Buffer;
-      if (file.content.startsWith("data:") || file.content.match(/^[A-Za-z0-9+/=]+$/)) {
+      if (file.content.match(/^[A-Za-z0-9+/=]+$/) && file.content.length > 50) {
         try {
-           buf = Buffer.from(file.content, "base64");
+          buf = Buffer.from(file.content, "base64");
         } catch {
-           buf = Buffer.from(file.content, "utf8");
+          buf = Buffer.from(file.content, "utf8");
         }
       } else {
         buf = Buffer.from(file.content, "utf8");
@@ -79,13 +73,12 @@ async function main() {
     }
     console.error("Extracted " + files.length + " files to " + values.out);
   } else {
-    // Write to stdout
     if (files.length === 1) {
       let buf: Buffer;
       if (files[0].content.match(/^[A-Za-z0-9+/=]*$/) && files[0].content.length > 50) {
-         buf = Buffer.from(files[0].content, "base64");
+        buf = Buffer.from(files[0].content, "base64");
       } else {
-         buf = Buffer.from(files[0].content, "utf8");
+        buf = Buffer.from(files[0].content, "utf8");
       }
       process.stdout.write(buf);
     } else {

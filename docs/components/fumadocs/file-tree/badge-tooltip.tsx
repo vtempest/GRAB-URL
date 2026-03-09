@@ -1,10 +1,13 @@
 "use client";
 
+/**
+ * Reusable badge component with an interactive tooltip for displaying rich metadata.
+ */
 import { useRef, useState, useCallback, useEffect } from "react";
 import { Package, FunctionSquare, Braces, FileOutput, FileInput, Box, Blocks } from "lucide-react";
 import type { TypeProperty } from "@/lib/fumadocs/generate-filetree";
 import styles from "./badge-tooltip.module.css";
-import { Markdown } from "./markdown";
+import { Markdown } from "../typography/markdown";
 
 const icons = {
   package: Package,

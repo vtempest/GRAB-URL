@@ -5,7 +5,7 @@ import path from 'path';
 import os from 'os';
 import { execSync } from 'child_process';
 import { generateFileTree, type FileTreeNode } from '@/lib/fumadocs/generate-filetree';
-import type { FileInfo } from '@/components/fumadocs/dependency-graph-shared';
+import type { FileInfo } from '@/components/fumadocs/graph/dependency-graph-shared';
 
 function collectFiles(nodes: FileTreeNode[], result: FileInfo[] = []): FileInfo[] {
   for (const node of nodes) {

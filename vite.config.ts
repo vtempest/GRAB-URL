@@ -28,13 +28,7 @@ const nodeBuiltins = [
   "worker_threads",
 ];
 
-const externalPkgs = [
-  "chalk",
-  "cli-table3",
-  "cli-progress",
-  "cli-spinners",
-  "ora",
-];
+const externalPkgs = ["chalk", "cli-table3", "cli-progress", "cli-spinners"];
 
 export default defineConfig({
   resolve: {
@@ -88,8 +82,7 @@ export default defineConfig({
       external: (id) => {
         if (id.startsWith("node:") || nodeBuiltins.includes(id)) return true;
         if (externalPkgs.includes(id)) return true;
-        if (id === "libarchive.js" || id.startsWith("libarchive.js/"))
-          return true;
+        if (id === "jszip") return true;
         // Externalize internal package references
         if (id.startsWith("@grab-url/")) return true;
         return false;

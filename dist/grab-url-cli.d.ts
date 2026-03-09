@@ -102,7 +102,7 @@ declare function formatTotalDisplay(total: number, colTotal?: number): string;
 declare function formatTotalSpeed(bytesPerSecond: number, colSpeed?: number): string;
 
 /** Derive a local filename from a URL pathname. */
-export declare function generateFilename(url: string): string;
+export declare function generateFilename(url: string, dir?: string): string;
 
 /** Extract the file extension from a URL pathname. */
 export declare function getFileExtension(url: string): string;

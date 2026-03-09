@@ -1,3 +1,6 @@
+/**
+ * Shared utility functions, logic, and tooltip builders for the dependency graph and its components.
+ */
 import type { FileAnalysis } from "@/lib/fumadocs/generate-filetree";
 
 export interface FileInfo {
@@ -109,8 +112,10 @@ export function buildChart(files: FileInfo[], options: GraphDisplayOptions): str
     pathLookup.set(f.path.replace(/\.[^.]+$/, ""), f.id);
   }
 
+  const subgraphIds: string[] = [];
   for (const [pkg, pkgFiles] of pkgs) {
     const pkgId = `pkg_${pkg.replace(/[^a-zA-Z0-9_]/g, "_")}`;
+    subgraphIds.push(pkgId);
     lines.push(`  subgraph ${pkgId} ["${pkg}"]`);
     lines.push("    direction TB");
     for (const f of pkgFiles) {
@@ -253,7 +258,7 @@ export function buildChart(files: FileInfo[], options: GraphDisplayOptions): str
           const nodeId = `npm_${pkg.replace(/[^a-zA-Z0-9]/g, "_")}`;
           npmNodes.set(pkg, nodeId);
           lines.push(`  ${nodeId}["${pkg}"]:::npm`);
-          lines.push(`  click ${nodeId} "https://npmjs.org/package/${pkg}"`);
+          lines.push(`  click ${nodeId} "https://npmgraph.js.org/?q=${pkg}"`);
         }
         const targetId = npmNodes.get(pkg)!;
         const edge = `${f.id} -.-> ${targetId}`;
@@ -272,16 +277,22 @@ export function buildChart(files: FileInfo[], options: GraphDisplayOptions): str
 
   lines.push("");
   for (const [key, style] of Object.entries(NODE_STYLES)) {
-    const fontSize = key === "npm" ? "26px" : key === "functionNode" || key === "exportedFunctionNode" || key === "typeNode" ? "24px" : "32px";
+    const fontSize = key === "npm" ? "34px" : key === "functionNode" || key === "exportedFunctionNode" || key === "typeNode" ? "30px" : "40px";
     lines.push(
       `  classDef ${key} fill:${style.fill},stroke:${style.stroke},stroke-width:3px,color:${style.color},font-size:${fontSize},font-weight:bold`,
+    );
+  }
+
+  for (const sgId of subgraphIds) {
+    lines.push(
+      `  style ${sgId} fill:#0f172a,stroke:#0ea5e9,stroke-width:1px,color:#7dd3fc,font-size:32px`,
     );
   }
 
   return lines.join("\n");
 }
 
-export function buildNodeTooltips(files: FileInfo[], options: GraphDisplayOptions): Record<string, MermaidTooltipData> {
+export function buildNodeTooltips(files: FileInfo[], options: GraphDisplayOptions, npmMetadata?: Record<string, any>): Record<string, MermaidTooltipData> {
   const tooltips: Record<string, MermaidTooltipData> = {};
 
   for (const file of files) {
@@ -351,10 +362,25 @@ export function buildNodeTooltips(files: FileInfo[], options: GraphDisplayOption
 
     for (const pkg of packages) {
       const nodeId = `npm_${pkg.replace(/[^a-zA-Z0-9]/g, "_")}`;
+      let description = "npm package dependency";
+      
+      if (npmMetadata && npmMetadata[pkg]) {
+        const meta = npmMetadata[pkg];
+        if (!meta._loading && !meta._error && meta.name) {
+          description = `**${meta.name}**\n\n${meta.description || ''}\n`;
+          const latest = meta['dist-tags']?.latest;
+          if (latest) description += `\n**Latest:** \`${latest}\``;
+          if (meta.author?.name) description += `\n**Author:** ${meta.author.name}`;
+          if (meta.license) description += `\n**License:** ${meta.license}`;
+        } else if (meta._loading) {
+          description = "Loading package metadata...";
+        }
+      }
+
       tooltips[nodeId] = {
         title: pkg,
-        description: "npm package dependency",
-        href: `https://npmjs.org/package/${pkg}`,
+        description,
+        href: `https://npmgraph.js.org/?q=${pkg}`,
       };
     }
   }

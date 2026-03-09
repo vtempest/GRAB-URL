@@ -1,11 +1,3 @@
-
-/*
- * libarchive.js compression types
- */
-export type ArchiveFormat = "ZIP" | "USTAR" | "_7ZIP" | "RAW" | "XAR" | "CPIO_NEWC";
-
-export type ArchiveCompression = "NONE" | "GZIP" | "BZIP2" | "LZMA" | "XZ";
-
 /**
  * Extracted file info.
  */
@@ -21,7 +13,7 @@ export interface ExtractEvent {
 }
 
 /**
- * Options for createArchive.
+ * Options for compress().
  */
 export interface CreateOptions {
   /** Files to pack: path/content pairs */
@@ -29,16 +21,10 @@ export interface CreateOptions {
     path: string;
     content: string | Uint8Array | ArrayBuffer | Blob;
   }>;
-  /** Output filename (.tar.gz etc.) */
+  /** Output filename (.zip) */
   outputName: string;
-  /** Archive format */
-  format?: ArchiveFormat;
-  /** Compression type */
-  compression?: ArchiveCompression;
-  /** Compression level 1-9 */
+  /** Compression level 1-9 (default 6) */
   compressionLevel?: number;
-  /** Password */
-  passphrase?: string;
 }
 
 /**

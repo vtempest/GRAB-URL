@@ -1,3 +1,6 @@
+/**
+ * Client-side component wrapping the standard file tree view with interactivity.
+ */
 import { generateFileTree, parseIgnoreFile } from "@/lib/fumadocs/generate-filetree";
 import { FileTreeTable } from "./filetree-table";
 import path from "path";
@@ -9,6 +12,10 @@ export function FileTreeView({
   ignore = [],
   ignoreFile,
   inferDescriptions = true,
+  defaultImportFilter,
+  defaultInternalFilter,
+  defaultExportFilter,
+  defaultCollapseDepth,
 }: {
   /** Absolute or relative (to cwd) path to the directory to scan */
   dir: string;
@@ -22,6 +29,14 @@ export function FileTreeView({
   ignoreFile?: string;
   /** Infer file descriptions from JSDoc/comments at the top of source files (default: true) */
   inferDescriptions?: boolean;
+  /** Default import filter: "all" | "local" | "npm" */
+  defaultImportFilter?: "all" | "local" | "npm";
+  /** Default internal filter: "all" | "declared-types" | "exported-types" | "functions" | "classes" */
+  defaultInternalFilter?: "all" | "declared-types" | "exported-types" | "functions" | "classes";
+  /** Default export filter: "all" | "functions" | "classes" | "constants" */
+  defaultExportFilter?: "all" | "functions" | "classes" | "constants";
+  /** Default collapse depth level */
+  defaultCollapseDepth?: number;
 }) {
   const resolvedDir = path.isAbsolute(dir) ? dir : path.resolve(process.cwd(), dir);
 
@@ -35,5 +50,14 @@ export function FileTreeView({
 
   const tree = generateFileTree(resolvedDir, descriptions, ignorePatterns, inferDescriptions);
 
-  return <FileTreeTable tree={tree} ghBase={ghBase} />;
+  return (
+    <FileTreeTable
+      tree={tree}
+      ghBase={ghBase}
+      defaultImportFilter={defaultImportFilter}
+      defaultInternalFilter={defaultInternalFilter}
+      defaultExportFilter={defaultExportFilter}
+      defaultCollapseDepth={defaultCollapseDepth}
+    />
+  );
 }
