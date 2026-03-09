@@ -52,7 +52,7 @@ export function DependencyGraph({
   showExportedFunctions = false,
   instructions,
 }: {
-  dir: string;
+  dir: string | string[];
   ignore?: string[];
   ignoreFile?: string;
   showLegend?: boolean;
@@ -62,15 +62,19 @@ export function DependencyGraph({
   showExportedFunctions?: boolean;
   instructions?: React.ReactNode;
 }) {
-  const resolvedDir = path.isAbsolute(dir) ? dir : path.resolve(process.cwd(), dir);
+  const dirs = Array.isArray(dir) ? dir : [dir];
   const ignorePatterns = new Set(ignore);
   if (ignoreFile) {
     const filePath = path.isAbsolute(ignoreFile) ? ignoreFile : path.resolve(process.cwd(), ignoreFile);
     for (const p of parseIgnoreFile(filePath)) ignorePatterns.add(p);
   }
 
-  const tree = generateFileTree(resolvedDir, {}, ignorePatterns, false);
-  const files = collectFiles(tree);
+  const files: FileInfo[] = [];
+  for (const d of dirs) {
+    const resolvedDir = path.isAbsolute(d) ? d : path.resolve(process.cwd(), d);
+    const tree = generateFileTree(resolvedDir, {}, ignorePatterns, false);
+    collectFiles(tree, files);
+  }
   const initialOptions: GraphDisplayOptions = {
     showNpmImports,
     showTypes,

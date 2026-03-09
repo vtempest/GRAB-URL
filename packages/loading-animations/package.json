@@ -3,7 +3,8 @@
   "private": true,
   "type": "module",
   "exports": {
-    "./*": "./src/*.ts"
+    "./svg": "./svg/index.ts",
+    "./cli/*": "./cli/*.js"
   },
   "scripts": {
     "build": "vite build --config vite.config.ts"
