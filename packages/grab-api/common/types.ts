@@ -26,7 +26,7 @@ export type GrabResponse<TResponse = any> = TResponse & {
  * @template TResponse The expected shape of the response data.
  * @template TParams The shape of the request parameters.
  */
-export type GrabOptions<TResponse = any, TParams = any> = TParams & {
+export type GrabOptions<TResponse = any, TParams = any> = {
   /** include headers and authorization in the request */
   headers?: Record<string, string>;
   /** Pre-initialized object which becomes response JSON, no need for .data */
@@ -88,6 +88,8 @@ export type GrabOptions<TResponse = any, TParams = any> = TParams & {
   /** All other params become GET params, POST body, and other methods */
   [key: string]: TParams | any;
 };
+
+// & TParams
 
 /**
  * Mock server configuration for testing.

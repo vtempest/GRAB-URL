@@ -1,8 +1,8 @@
 /**
  * Utility functions, types, and shared constants supporting the file tree components.
  */
-import type { FileTreeNode, AnalysisItem } from "@/lib/fumadocs/generate-filetree";
-import { type BadgeTooltipSection, type BadgeIconName } from "./badge-tooltip";
+import type { FileTreeNode, AnalysisItem, AnalysisKind } from "@/lib/fumadocs/generate-filetree";
+import { type BadgeTooltipSection, type BadgeTooltipSectionItem, type BadgeIconName } from "./badge-tooltip";
 import { Markdown } from "../typography/markdown";
 import styles from "./filetree-table.module.css";
 
@@ -73,6 +73,25 @@ export function collectFileNodeMap(nodes: FileTreeNode[], result = new Map<strin
   return result;
 }
 
+const kindToIcon: Record<string, BadgeIconName> = {
+  function: "function",
+  class: "class",
+  constant: "constant",
+  type: "braces",
+};
+
+function buildSectionItem(
+  name: string,
+  kind: AnalysisKind | undefined,
+  exportMap: Map<string, { kind?: AnalysisKind; signature?: string }>,
+): BadgeTooltipSectionItem {
+  const entry = exportMap.get(name);
+  const resolvedKind = kind ?? entry?.kind ?? "constant";
+  const item: BadgeTooltipSectionItem = { name, icon: kindToIcon[resolvedKind] };
+  if (entry?.signature) item.signature = entry.signature;
+  return item;
+}
+
 export function getLocalImportSections(
   sourceNode: FileTreeNode,
   importPath: string,
@@ -84,21 +103,29 @@ export function getLocalImportSections(
   if (!importSymbols) return undefined;
 
   const targetNode = resolvedPath ? fileNodeMap.get(resolvedPath) : undefined;
-  const exportKinds = new Map(
-    (targetNode?.analysis?.exports ?? []).map((item) => [item.name, item.kind ?? "constant"] as const),
+  const targetExports = targetNode?.analysis?.exports ?? [];
+  const exportMap = new Map(
+    targetExports.map((item) => [item.name, { kind: item.kind, signature: item.signature }] as const),
   );
 
-  const functions = importSymbols.valueNames.filter((name) => exportKinds.get(name) === "function");
-  const classes = importSymbols.valueNames.filter((name) => exportKinds.get(name) === "class");
-  const values = importSymbols.valueNames.filter((name) => {
-    const kind = exportKinds.get(name);
-    return !kind || kind === "constant";
-  });
-  const types = importSymbols.typeNames;
+  const functions = importSymbols.valueNames
+    .filter((name) => (exportMap.get(name)?.kind ?? "constant") === "function")
+    .map((name) => buildSectionItem(name, "function", exportMap));
+  const classes = importSymbols.valueNames
+    .filter((name) => exportMap.get(name)?.kind === "class")
+    .map((name) => buildSectionItem(name, "class", exportMap));
+  const values = importSymbols.valueNames
+    .filter((name) => {
+      const kind = exportMap.get(name)?.kind;
+      return !kind || kind === "constant";
+    })
+    .map((name) => buildSectionItem(name, "constant", exportMap));
+  const types = importSymbols.typeNames
+    .map((name) => buildSectionItem(name, "type", exportMap));
 
   const sections: BadgeTooltipSection[] = [];
-  if (types.length > 0) sections.push({ label: "Types", colorClassName: styles.sectionType, items: types });
   if (functions.length > 0) sections.push({ label: "Functions", colorClassName: styles.sectionFunction, items: functions });
+  if (types.length > 0) sections.push({ label: "Types", colorClassName: styles.sectionType, items: types });
   if (classes.length > 0) sections.push({ label: "Classes", colorClassName: styles.sectionClass, items: classes });
   if (values.length > 0) sections.push({ label: "Values", colorClassName: styles.sectionValue, items: values });
   return sections.length > 0 ? sections : undefined;

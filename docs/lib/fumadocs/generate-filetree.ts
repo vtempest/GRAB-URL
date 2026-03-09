@@ -58,12 +58,16 @@ const IGNORE = new Set([
 
 const PARSEABLE_EXTS = new Set([".ts", ".tsx", ".js", ".jsx", ".mjs"]);
 
-function analyzeFileEstree(filePath: string): FileAnalysis | undefined {
+function analyzeFileEstree(filePath: string, providedContent?: string): FileAnalysis | undefined {
   let content: string;
-  try {
-    content = fs.readFileSync(filePath, "utf8");
-  } catch {
-    return undefined;
+  if (providedContent !== undefined) {
+    content = providedContent;
+  } else {
+    try {
+      content = fs.readFileSync(filePath, "utf8");
+    } catch {
+      return undefined;
+    }
   }
 
   let ast: any;
@@ -250,19 +254,23 @@ function analyzeFileEstree(filePath: string): FileAnalysis | undefined {
   return { localImports, localImportSymbols, npmImports, exports, functions, types };
 }
 
-function analyzeFile(filePath: string): FileAnalysis | undefined {
+function analyzeFile(filePath: string, providedContent?: string): FileAnalysis | undefined {
   const ext = path.extname(filePath);
   if (!PARSEABLE_EXTS.has(ext)) return undefined;
 
   if (ext === ".tsx" || ext === ".jsx") {
-    return analyzeFileEstree(filePath);
+    return analyzeFileEstree(filePath, providedContent);
   }
 
   let content: string;
-  try {
-    content = fs.readFileSync(filePath, "utf8");
-  } catch {
-    return undefined;
+  if (providedContent !== undefined) {
+    content = providedContent;
+  } else {
+    try {
+      content = fs.readFileSync(filePath, "utf8");
+    } catch {
+      return undefined;
+    }
   }
 
   const sourceFile = ts.createSourceFile(
@@ -650,6 +658,16 @@ export function parseIgnoreFile(filePath: string): Set<string> {
     return new Set();
   }
 }
+
+/**
+ * Analyze a file's content without reading from the filesystem.
+ * Used for in-memory analysis of extracted archive files.
+ */
+export function analyzeFileContent(fileName: string, content: string): FileAnalysis | undefined {
+  return analyzeFile(fileName, content);
+}
+
+export { PARSEABLE_EXTS };
 
 export function generateFileTree(
   packagesDir: string,

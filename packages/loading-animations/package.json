@@ -4,7 +4,7 @@
   "type": "module",
   "exports": {
     "./svg": "./svg/index.ts",
-    "./cli/*": "./cli/*.js"
+    ".": "./cli/index.js"
   },
   "scripts": {
     "build": "vite build --config vite.config.ts"

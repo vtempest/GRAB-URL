@@ -1,0 +1,44 @@
+▲ Next.js 16.1.6 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://172.18.116.74:3000
+
+✓ Starting...
+[MDX] generated files in 12.230099999999993ms
+[MDX] started dev server
+✓ Ready in 1350ms
+○ Compiling / ...
+ GET / 200 in 4.6s (compile: 4.1s, render: 474ms)
+○ Compiling /docs/[[...slug]] ...
+⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ GET /docs 200 in 18.6s (compile: 16.5s, generate-params: 1186ms, render: 2.1s)
+○ Compiling /api/docs-search ...
+ GET /docs/api-reference/filetree 200 in 455ms (compile: 182ms, generate-params: 142ms, render: 272ms)
+ GET /api/docs-search 200 in 11.5s (compile: 11.5s, render: 29ms)
+⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ GET /docs/api-reference/filetree 200 in 2.4s (compile: 810ms, generate-params: 163ms, render: 1574ms)
+ GET /docs/api-reference/filetree 200 in 1288ms (compile: 51ms, generate-params: 255µs, render: 1238ms)
+ GET /docs/api-reference/filetree 200 in 1375ms (compile: 23ms, generate-params: 36µs, render: 1353ms)
+ GET /docs/api-reference/filetree 200 in 1245ms (compile: 27ms, generate-params: 31µs, render: 1218ms)
+ GET /docs/api-reference/filetree 200 in 1499ms (compile: 19ms, generate-params: 27µs, render: 1480ms)
+ GET /docs/api-reference/filetree 200 in 1588ms (compile: 164ms, generate-params: 144ms, render: 1424ms)
+ GET /docs/api-reference/filetree 200 in 1481ms (compile: 20ms, generate-params: 52µs, render: 1461ms)
+ GET /docs/api-reference/filetree 200 in 1231ms (compile: 48ms, generate-params: 255µs, render: 1183ms)
+ GET /docs/api-reference/filetree 200 in 1589ms (compile: 28ms, generate-params: 60µs, render: 1561ms)
+ GET /docs/api-reference/filetree 200 in 992ms (compile: 21ms, generate-params: 47µs, render: 971ms)
+ GET /docs/api-reference/filetree 200 in 792ms (compile: 34ms, generate-params: 53µs, render: 758ms)
+ GET /docs/api-reference/filetree 200 in 525ms (compile: 34ms, generate-params: 118µs, render: 491ms)
+ GET /docs/api-reference/filetree 200 in 326ms (compile: 179ms, generate-params: 159ms, render: 147ms)
+⚠ Found a change in next.config.ts. Restarting the server to apply the changes...
+[MDX] closing dev server
+▲ Next.js 16.1.6 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://172.18.116.74:3000
+
+✓ Starting...
+[MDX] generated files in 12.935064000000011ms
+[MDX] started dev server
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+✓ Ready in 2.5s
+○ Compiling /docs/[[...slug]] ...
+⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ GET /docs/api-reference/filetree 200 in 6.8s (compile: 5.8s, proxy.ts: 61ms, generate-params: 860ms, render: 932ms)

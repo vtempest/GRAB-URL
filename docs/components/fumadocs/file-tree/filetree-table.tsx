@@ -10,7 +10,7 @@ import type { FileTreeNode } from "@/lib/fumadocs/generate-filetree";
 import styles from "./filetree-table.module.css";
 import { TreeRows } from "./filetree-rows";
 import {
-  getMaxTreeDepth, collectFilePaths, collectFileNodeMap, 
+  getMaxTreeDepth, collectFilePaths, collectFileNodeMap,
   buildSearchRecords, filterTreeByPaths,
   type ImportFilter, type InternalFilter, type ExportFilter
 } from "./filetree-utils";
@@ -55,7 +55,7 @@ export function FileTreeTable({
   const fuse = useMemo(() => new Fuse(searchRecords, {
     includeScore: true,
     shouldSort: true,
-    threshold: 0.34,
+    threshold: 0.1,
     ignoreLocation: true,
     minMatchCharLength: 2,
     keys: [

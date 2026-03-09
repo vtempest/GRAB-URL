@@ -21,10 +21,16 @@ const icons = {
 
 export type BadgeIconName = keyof typeof icons;
 
+export interface BadgeTooltipSectionItem {
+  name: string;
+  signature?: string;
+  icon?: BadgeIconName;
+}
+
 export interface BadgeTooltipSection {
   label: string;
   colorClassName: string;
-  items: string[];
+  items: BadgeTooltipSectionItem[];
 }
 
 export function Badge({
@@ -183,11 +189,18 @@ export function Badge({
                 <div key={section.label} className={styles.sectionGroup}>
                   <div className={styles.sectionTitle}>{section.label}</div>
                   <div className={styles.sectionChips}>
-                    {section.items.map((item) => (
-                      <span key={`${section.label}-${item}`} className={`${styles.sectionChip} ${section.colorClassName}`}>
-                        {item}
-                      </span>
-                    ))}
+                    {section.items.map((item) => {
+                      const ItemIcon = item.icon ? icons[item.icon] : undefined;
+                      return (
+                        <span key={`${section.label}-${item.name}`} className={`${styles.sectionChip} ${section.colorClassName}`}>
+                          {ItemIcon && <ItemIcon size={11} style={{ flexShrink: 0 }} />}
+                          <span className={styles.sectionChipName}>{item.name}</span>
+                          {item.signature && (
+                            <span className={styles.sectionChipSig}>{item.signature}</span>
+                          )}
+                        </span>
+                      );
+                    })}
                   </div>
                 </div>
               ))}

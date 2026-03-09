@@ -196,7 +196,7 @@ Two built-in API routes serve documentation content optimized for LLM consumptio
 
 | Route | Description |
 |-------|-------------|
-| `/llms-full.txt` | All documentation pages concatenated as plain text |
+| `/docs/llms-full.txt` | All documentation pages concatenated as plain text |
 | `/docs/<path>.mdx` | Individual page as raw Markdown (via URL rewrite) |
 
 These are configured in `next.config.ts` and cached indefinitely (`revalidate = false`).
@@ -307,8 +307,8 @@ docs/
 ├── app/
 │   ├── (home)/           # Home page layout
 │   ├── docs/             # Documentation pages (notebook layout)
-│   ├── llms-full.txt/    # LLM full-text route
-│   ├── llms.mdx/         # LLM per-page MDX route
+│   │   ├── llms-full.txt/# LLM full-text route
+│   │   ├── llms.mdx/     # LLM per-page MDX route
 │   ├── actions.ts        # Server actions (remote repo analysis)
 │   ├── layout.config.tsx # Shared layout options
 │   └── provider.tsx      # Root provider (search, theme)
