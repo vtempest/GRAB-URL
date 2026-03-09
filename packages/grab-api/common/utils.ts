@@ -40,11 +40,11 @@ export const wait = (s: number) => new Promise((res) => setTimeout(res, s * 1000
  * @returns An object containing the combined URL and updated baseURL/path if needed.
  */
 export const buildUrl = (baseURL: string, path: string) => {
-    let s = (t: string) => path.startsWith(t);
+    let s = (t: string) => path?.startsWith(t) || false;
     let finalBaseURL = baseURL;
     let finalPath = path;
 
-    if (s("http:") || s("https:")) {
+    if (path?.startsWith("http:") || path?.startsWith("https:")) {
         finalBaseURL = "";
     } else if (!s("/") && !finalBaseURL.endsWith("/")) {
         finalPath = "/" + path;

@@ -46,3 +46,4 @@ docs/dist/
 build.log
 pnpm-lock.yaml
 .turbo
+docs/.next_old

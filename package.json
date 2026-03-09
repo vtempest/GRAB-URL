@@ -18,9 +18,9 @@
   "types": "./dist/grab-api.d.ts",
   "module": "./dist/grab-api.es.js",
   "bin": {
-    "grab-url": "./dist/grab-url-cli.cjs.js",
-    "grab": "./dist/grab-url-cli.cjs.js",
-    "g": "./dist/grab-url-cli.cjs.js"
+    "grab-url": "./dist/grab-url-cli.es.js",
+    "grab": "./dist/grab-url-cli.es.js",
+    "g": "./dist/grab-url-cli.es.js"
   },
   "exports": {
     ".": {
@@ -55,7 +55,6 @@
     "src/loading-animations/cli/loading-animations-emojis.js"
   ],
   "scripts": {
-    "postinstall": "node scripts/dedup-fumadocs-core.mjs",
     "build": "vite build --config vite.config.ts",
     "make": "npm run make:icons && npm run make:docs && npm run build",
     "make:docs": "npx turbo run build --filter=grab-url-docs",

@@ -2,7 +2,7 @@
 
 import path from 'path';
 import { extract } from 'archiver-web';
-import { analyzeFileContent, type FileAnalysis } from '@/lib/fumadocs/generate-filetree';
+import { analyzeFileContent, type FileAnalysis } from '@/lib/fumadocs/code-graph';
 import type { FileInfo } from '@/components/fumadocs/codegraph/dependency-graph-shared';
 
 const PARSEABLE_EXTS = new Set([".ts", ".tsx", ".js", ".jsx", ".mjs"]);

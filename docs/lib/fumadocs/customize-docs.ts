@@ -4,10 +4,9 @@
  */
 export const docsConfig: DocsConfig = {
   title: "GRAB-URL",
-  description: "GRAB URL: 📥 Generate Request to API from Browser",
+  description: "📥 Generate Request to API from Browser",
   github: "https://github.com/vtempest/grab-url",
-  githubPackages:
-    "https://github.com/vtempest/grab-url/tree/master/packages",
+  githubPackages: "https://github.com/vtempest/grab-url/tree/master/packages",
   githubDocs:
     "https://github.com/vtempest/GRAB-URL/tree/master/docs/content/docs",
   favicon: "/favicon.ico",

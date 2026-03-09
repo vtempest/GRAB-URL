@@ -1,7 +1,7 @@
 /**
  * Shared utility functions, logic, and tooltip builders for the dependency graph and its components.
  */
-import type { FileAnalysis } from "@/lib/fumadocs/generate-filetree";
+import type { FileAnalysis } from "@/lib/fumadocs/code-graph";
 
 export interface FileInfo {
   path: string;
@@ -367,11 +367,12 @@ export function buildNodeTooltips(files: FileInfo[], options: GraphDisplayOption
       if (npmMetadata && npmMetadata[pkg]) {
         const meta = npmMetadata[pkg];
         if (!meta._loading && !meta._error && meta.name) {
-          description = `**${meta.name}**\n\n${meta.description || ''}\n`;
-          const latest = meta.version ?? meta['dist-tags']?.latest;
+          description = `**${meta.name}**\n\n${meta.description || ""}\n`;
+          const latest = meta.version ?? meta["dist-tags"]?.latest;
           if (latest) description += `\n**Latest:** \`${latest}\``;
           if (meta.author?.name) description += `\n**Author:** ${meta.author.name}`;
           if (meta.license) description += `\n**License:** ${meta.license}`;
+          if (meta.lastUpdated) description += `\n**Last updated:** ${meta.lastUpdated}`;
         } else if (meta._loading) {
           description = "Loading package metadata...";
         }

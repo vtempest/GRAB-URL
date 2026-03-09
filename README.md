@@ -56,7 +56,7 @@ npx grab-url https://releases.ubuntu.com/24.04.2/ubuntu-24.04.2-live-server-amd6
 
 ### Examples
 
-```ts
+```typescript
 import grab from 'grab-url';
 
 let res = $state({}) as {

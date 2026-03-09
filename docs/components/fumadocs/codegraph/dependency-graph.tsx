@@ -1,7 +1,7 @@
 /**
  * Server component that initializes and passes parsed graph data to the client-side dependency graph.
  */
-import { generateFileTree, parseIgnoreFile, type FileTreeNode } from "@/lib/fumadocs/generate-filetree";
+import { generateFileTree, parseIgnoreFile, type FileTreeNode } from "@/lib/fumadocs/code-graph";
 import path from "path";
 import { DependencyGraphClient } from "./dependency-graph-client";
 import type { FileInfo, GraphDisplayOptions } from "./dependency-graph-shared";
@@ -31,10 +31,17 @@ const DEFAULT_INSTRUCTIONS = (
 
 function collectFiles(nodes: FileTreeNode[], result: FileInfo[] = []): FileInfo[] {
   for (const node of nodes) {
-    if (node.type === "file" && node.analysis) {
+    if (node.type === "file") {
       const pkg = node.path.includes("/") ? node.path.split("/")[0] : "root";
       const id = node.path.replace(/[^a-zA-Z0-9]/g, "_");
-      result.push({ path: node.path, name: node.name, id, pkg, description: node.description, analysis: node.analysis });
+      result.push({
+        path: node.path,
+        name: node.name,
+        id,
+        pkg,
+        description: node.description,
+        analysis: node.analysis,
+      });
     }
     if (node.children) collectFiles(node.children, result);
   }
@@ -43,6 +50,7 @@ function collectFiles(nodes: FileTreeNode[], result: FileInfo[] = []): FileInfo[
 
 export function DependencyGraph({
   paths,
+  descriptions = {},
   ignore = [],
   ignoreFile,
   showLegend = true,
@@ -53,6 +61,7 @@ export function DependencyGraph({
   instructions,
 }: {
   paths: string[];
+  descriptions?: Record<string, string>;
   ignore?: string[];
   ignoreFile?: string;
   showLegend?: boolean;
@@ -72,9 +81,12 @@ export function DependencyGraph({
   const files: FileInfo[] = [];
   for (const d of dirs) {
     const resolvedDir = path.isAbsolute(d) ? d : path.resolve(process.cwd(), d);
-    const tree = generateFileTree(resolvedDir, {}, ignorePatterns, false);
+    console.log("[DependencyGraph] Scanning:", resolvedDir);
+    const tree = generateFileTree(resolvedDir, descriptions, ignorePatterns, false);
+    console.log("[DependencyGraph] Tree nodes:", tree.length);
     collectFiles(tree, files);
   }
+  console.log("[DependencyGraph] Total files collected:", files.length, "| With analysis:", files.filter(f => f.analysis).length);
   const initialOptions: GraphDisplayOptions = {
     showNpmImports,
     showTypes,

@@ -32,7 +32,9 @@ export function DependencyGraphClient({
   const requestedNpmPkgs = useRef(new Set<string>());
 
   useEffect(() => {
-    if (!options.showNpmImports) return;
+    if (!options.showNpmImports) {
+      return;
+    }
 
     const packages = new Set<string>();
     for (const f of files) {
@@ -41,28 +43,58 @@ export function DependencyGraphClient({
       }
     }
 
-    // Workspace packages that should not be fetched from the npm registry
-    const workspaceScopes = ['@grab-url/'];
-    const isWorkspacePkg = (name: string) => workspaceScopes.some(s => name.startsWith(s));
+    // Workspace packages and alias-like paths that should not be fetched from npm
+    const workspaceScopes = ["@grab-url/"];
+    const isWorkspacePkg = (name: string) =>
+      workspaceScopes.some((s) => name.startsWith(s));
+
+    const isLikelyAliasOrPath = (name: string) =>
+      name.startsWith("@/") || name.startsWith("./") || name.startsWith("../");
+
+    const toFetch: string[] = [];
 
     packages.forEach((pkg) => {
-      if (!requestedNpmPkgs.current.has(pkg)) {
-        requestedNpmPkgs.current.add(pkg);
-        if (isWorkspacePkg(pkg)) return;
-        // mark as loading initially
-        setNpmMetadata(prev => ({ ...prev, [pkg]: { _loading: true } }));
-
-        fetch(`https://registry.npmjs.org/${pkg}/latest`)
-        .then(res => res.json())
-        .then(data => {
-          setNpmMetadata(prev => ({ ...prev, [pkg]: data }));
-        })
-        .catch(e => {
-          console.error("Failed to fetch npm data for", pkg, e);
-          setNpmMetadata(prev => ({ ...prev, [pkg]: { _error: true } }));
-        });
-      }
+      if (requestedNpmPkgs.current.has(pkg)) return;
+      requestedNpmPkgs.current.add(pkg);
+      if (isWorkspacePkg(pkg) || isLikelyAliasOrPath(pkg)) return;
+      toFetch.push(pkg);
     });
+
+    if (toFetch.length === 0) return;
+
+    // mark as loading initially
+    setNpmMetadata((prev) => {
+      const next = { ...prev };
+      for (const pkg of toFetch) {
+        next[pkg] = { _loading: true };
+      }
+      return next;
+    });
+
+    fetch("/api/npm-meta", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ packages: toFetch }),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error(`Failed to fetch npm metadata: ${res.status}`);
+        return res.json();
+      })
+      .then((data: Record<string, any>) => {
+        setNpmMetadata((prev) => ({ ...prev, ...data }));
+      })
+      .catch((e) => {
+        console.error("Failed to fetch npm metadata batch", e);
+        setNpmMetadata((prev) => {
+          const next = { ...prev };
+          for (const pkg of toFetch) {
+            next[pkg] = { _error: true };
+          }
+          return next;
+        });
+      });
   }, [files, options.showNpmImports]);
 
   const handleRemoteLoad = () => {
@@ -79,7 +111,11 @@ export function DependencyGraphClient({
     });
   };
 
-  const chart = useMemo(() => buildChart(files, options), [files, options]);
+  const chart = useMemo(() => {
+    const c = buildChart(files, options);
+    console.log("[DependencyGraphClient] files:", files.length, "| chart length:", c.length, "| chart preview:", c.substring(0, 200));
+    return c;
+  }, [files, options]);
   const nodeTooltips = useMemo(() => buildNodeTooltips(files, options, npmMetadata), [files, options, npmMetadata]);
 
   return (

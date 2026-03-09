@@ -1,10 +1,10 @@
 /**
- * Widens Mermaid cluster labels and parses SVG metadata for react-svg-pan-zoom.
+ * Widens Mermaid cluster labels and parses SVG metadata for svg-toolbelt.
  */
 
 const CLUSTER_LABEL_EXTRA_WIDTH = 96;
 
-/** Parsed SVG data needed by react-svg-pan-zoom. */
+/** Parsed SVG data needed by svg-toolbelt. */
 export type ParsedSvg = {
   innerHtml: string;
   width: number;
@@ -39,7 +39,7 @@ export function widenClusterLabels(container: HTMLElement) {
 
 /**
  * Parses a rendered Mermaid SVG string to extract the inner content and
- * dimensions needed by react-svg-pan-zoom.
+ * dimensions needed by svg-toolbelt.
  */
 export function parseMermaidSvg(svgString: string): ParsedSvg {
   const parser = new DOMParser();
