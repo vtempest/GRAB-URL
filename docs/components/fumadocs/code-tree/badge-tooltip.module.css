@@ -196,10 +196,27 @@
   font-size: 0.68rem;
   font-weight: 400;
   opacity: 0.72;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 260px;
+  /* white-space: nowrap; */
+  /* overflow: hidden;
+  text-overflow: ellipsis; */
+  /* max-width: 260px; */
+}
+
+/* Signature syntax colors inside chips */
+.sigKw {
+  color: rgb(147, 197, 253);
+}
+
+.sigTy {
+  color: rgb(190, 230, 150);
+}
+
+.sigParam {
+  color: rgb(207, 186, 240);
+}
+
+.sigPunc {
+  opacity: 0.55;
 }
 
 .sectionType {
@@ -224,4 +241,10 @@
   color: #fde68a;
   background: rgba(234, 179, 8, 0.14);
   border-color: rgba(234, 179, 8, 0.35);
+}
+
+.sectionNpm {
+  color: #bfdbfe;
+  background: rgba(59, 130, 246, 0.14);
+  border-color: rgba(59, 130, 246, 0.35);
 }

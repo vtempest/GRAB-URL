@@ -3,7 +3,7 @@
  * @description Configuration for the documentation layout, including navigation and links.
  */
 import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
-import { Link2 } from 'lucide-react';
+import { BookOpen, Link2 } from 'lucide-react';
 import { docsConfig } from '@/lib/fumadocs/customize-docs';
 
 export const baseOptions: BaseLayoutProps = {
@@ -15,5 +15,14 @@ export const baseOptions: BaseLayoutProps = {
       </span>
     ),
   },
-  links: docsConfig.topLinks ?? [],
+  links: [
+    {
+      type: 'icon',
+      label: 'Docs',
+      icon: <BookOpen />,
+      text: 'Docs',
+      url: '/docs',
+    },
+  ],
+  githubUrl: 'https://github.com/vtempest/grab-url',
 };

@@ -6,7 +6,7 @@ import { FileTreeTable } from "./filetree-table";
 import path from "path";
 
 export function FileTreeView({
-  dir,
+  paths,
   ghBase,
   descriptions = {},
   ignore = [],
@@ -17,8 +17,8 @@ export function FileTreeView({
   defaultExportFilter,
   defaultCollapseDepth,
 }: {
-  /** Absolute or relative (to cwd) path to the directory to scan */
-  dir: string;
+  /** Absolute or relative (to cwd) paths to directories or files to scan */
+  paths: string[];
   /** Base GitHub URL for file links, e.g. "https://github.com/user/repo/tree/master/src" */
   ghBase: string;
   /** Descriptions keyed by relative path from the scanned dir */
@@ -38,8 +38,6 @@ export function FileTreeView({
   /** Default collapse depth level */
   defaultCollapseDepth?: number;
 }) {
-  const resolvedDir = path.isAbsolute(dir) ? dir : path.resolve(process.cwd(), dir);
-
   const ignorePatterns = new Set(ignore);
   if (ignoreFile) {
     const filePath = path.isAbsolute(ignoreFile) ? ignoreFile : path.resolve(process.cwd(), ignoreFile);
@@ -48,7 +46,10 @@ export function FileTreeView({
     }
   }
 
-  const tree = generateFileTree(resolvedDir, descriptions, ignorePatterns, inferDescriptions);
+  const tree = paths.flatMap((p) => {
+    const resolved = path.isAbsolute(p) ? p : path.resolve(process.cwd(), p);
+    return generateFileTree(resolved, descriptions, ignorePatterns, inferDescriptions);
+  });
 
   return (
     <FileTreeTable

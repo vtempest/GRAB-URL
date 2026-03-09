@@ -96,7 +96,7 @@ function escapeMermaidLabel(value: string): string {
 
 export function buildChart(files: FileInfo[], options: GraphDisplayOptions): string {
   const lines: string[] = [
-    "flowchart LR",
+    "flowchart TB",
     '  linkStyle default stroke:#94a3b8,stroke-width:2px,opacity:0.8',
   ];
 
@@ -117,7 +117,7 @@ export function buildChart(files: FileInfo[], options: GraphDisplayOptions): str
     const pkgId = `pkg_${pkg.replace(/[^a-zA-Z0-9_]/g, "_")}`;
     subgraphIds.push(pkgId);
     lines.push(`  subgraph ${pkgId} ["${pkg}"]`);
-    lines.push("    direction TB");
+    lines.push("    direction LR");
     for (const f of pkgFiles) {
       const shortName = pkg === "root"
         ? f.name
@@ -277,7 +277,7 @@ export function buildChart(files: FileInfo[], options: GraphDisplayOptions): str
 
   lines.push("");
   for (const [key, style] of Object.entries(NODE_STYLES)) {
-    const fontSize = key === "npm" ? "34px" : key === "functionNode" || key === "exportedFunctionNode" || key === "typeNode" ? "30px" : "40px";
+    const fontSize = key === "npm" ? "48px" : key === "functionNode" || key === "exportedFunctionNode" || key === "typeNode" ? "44px" : "56px";
     lines.push(
       `  classDef ${key} fill:${style.fill},stroke:${style.stroke},stroke-width:3px,color:${style.color},font-size:${fontSize},font-weight:bold`,
     );
@@ -285,7 +285,7 @@ export function buildChart(files: FileInfo[], options: GraphDisplayOptions): str
 
   for (const sgId of subgraphIds) {
     lines.push(
-      `  style ${sgId} fill:#0f172a,stroke:#0ea5e9,stroke-width:1px,color:#7dd3fc,font-size:32px`,
+      `  style ${sgId} fill:#0f172a,stroke:#0ea5e9,stroke-width:1px,color:#7dd3fc,font-size:44px`,
     );
   }
 
@@ -368,7 +368,7 @@ export function buildNodeTooltips(files: FileInfo[], options: GraphDisplayOption
         const meta = npmMetadata[pkg];
         if (!meta._loading && !meta._error && meta.name) {
           description = `**${meta.name}**\n\n${meta.description || ''}\n`;
-          const latest = meta['dist-tags']?.latest;
+          const latest = meta.version ?? meta['dist-tags']?.latest;
           if (latest) description += `\n**Latest:** \`${latest}\``;
           if (meta.author?.name) description += `\n**Author:** ${meta.author.name}`;
           if (meta.license) description += `\n**License:** ${meta.license}`;

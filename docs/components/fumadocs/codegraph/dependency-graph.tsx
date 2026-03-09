@@ -42,7 +42,7 @@ function collectFiles(nodes: FileTreeNode[], result: FileInfo[] = []): FileInfo[
 }
 
 export function DependencyGraph({
-  dir,
+  paths,
   ignore = [],
   ignoreFile,
   showLegend = true,
@@ -52,7 +52,7 @@ export function DependencyGraph({
   showExportedFunctions = false,
   instructions,
 }: {
-  dir: string | string[];
+  paths: string[];
   ignore?: string[];
   ignoreFile?: string;
   showLegend?: boolean;
@@ -62,7 +62,7 @@ export function DependencyGraph({
   showExportedFunctions?: boolean;
   instructions?: React.ReactNode;
 }) {
-  const dirs = Array.isArray(dir) ? dir : [dir];
+  const dirs = paths;
   const ignorePatterns = new Set(ignore);
   if (ignoreFile) {
     const filePath = path.isAbsolute(ignoreFile) ? ignoreFile : path.resolve(process.cwd(), ignoreFile);

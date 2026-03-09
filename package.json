@@ -66,6 +66,7 @@
     "test:cli": "bun src/grab-url-cli/index.ts https://releases.ubuntu.com/24.04.2/ubuntu-24.04.2-live-server-amd64.iso"
   },
   "devDependencies": {
+    "@grab-url/loading-animations": "workspace:*",
     "@vitest/ui": "^4.0.18",
     "export-svg-typescript": "^0.1.15",
     "lucide-react": "^0.555.0",

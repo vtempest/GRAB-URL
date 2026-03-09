@@ -5,6 +5,8 @@ icon: FolderTree
 
 import { FileTreeView } from '@/components/fumadocs/file-tree/filetree-view';
 import { InlineTOC } from 'fumadocs-ui/components/inline-toc';
+import { docsConfig } from '@/lib/fumadocs/customize-docs';
+import { DependencyGraph } from '@/components/fumadocs/graph/dependency-graph';
 
 export const descriptions = {
   // grab-api
@@ -56,9 +58,9 @@ export const descriptions = {
 
 ## Code Dependency Graph
 
-<DependencyGraph 
-  dir="../packages" 
-  ghBase="https://github.com/vtempest/grab-url/tree/master/packages"
+<DependencyGraph
+  paths={["../packages"]}
+  ghBase={docsConfig.githubPackages}
   descriptions={descriptions}
   ignore={["bun.lock"]}
   showLegend={true}
@@ -70,8 +72,8 @@ export const descriptions = {
 ## Code Type Tree
 
 <FileTreeView
-  dir="../packages"
-  ghBase="https://github.com/vtempest/grab-url/tree/master/packages"
+  paths={["../packages"]}
+  ghBase={docsConfig.githubPackages}
   descriptions={descriptions}
   ignore={["bun.lock"]}
   defaultImportFilter="all"
@@ -80,4 +82,3 @@ export const descriptions = {
   defaultCollapseDepth={4}
 />
 
-import { DependencyGraph } from '@/components/fumadocs/graph/dependency-graph';

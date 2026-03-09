@@ -3,7 +3,7 @@
  */
 import { useState } from "react";
 import { ChevronRight } from "lucide-react";
-import { Badge } from "./badge-tooltip";
+import { Badge, NpmBadge } from "./badge-tooltip";
 import { Markdown } from "../typography/markdown";
 import type { FileTreeNode } from "@/lib/fumadocs/generate-filetree";
 import styles from "./filetree-table.module.css";
@@ -64,14 +64,7 @@ function FileRow({
         {meta && (
           <span className={styles.badgeWrap}>
             {(importFilter === "all" || importFilter === "npm") && meta.npmImports.map((m) => (
-              <Badge
-                key={m}
-                bg="rgba(59,130,246,0.15)"
-                color="rgb(59,130,246)"
-                icon="package"
-                label={m}
-                href={`https://npmgraph.js.org/?q=${m}#select=${m}`}
-              />
+              <NpmBadge key={m} pkg={m} href={`https://npmgraph.js.org/?q=${m}#select=${m}`} />
             ))}
             {(importFilter === "all" || importFilter === "local") && meta.localImports.map((m) => {
               const resolvedPath = resolveLocalImport(node.path, m, knownPaths);
@@ -205,15 +198,7 @@ function FolderRows({
           {node.packageDependencies && (
             <span className={styles.badgeWrap}>
               {(importFilter === "all" || importFilter === "npm") && node.packageDependencies.map((m) => (
-                <Badge
-                  key={m}
-                  bg="rgba(59,130,246,0.15)"
-                  color="rgb(59,130,246)"
-                  icon="package"
-                  label={m}
-                  href={`https://npmgraph.js.org/?q=${m}#select=${m}`}
-                  tooltip="package.json dependency"
-                />
+                <NpmBadge key={m} pkg={m} href={`https://npmgraph.js.org/?q=${m}#select=${m}`} />
               ))}
             </span>
           )}

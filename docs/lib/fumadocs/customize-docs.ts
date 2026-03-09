@@ -1,27 +1,28 @@
-
 /**
  * @file customize-docs.ts
  * @description Documentation configuration object and types.
  */
 export const docsConfig: DocsConfig = {
-  title: "GRAB-URL Docs",
+  title: "GRAB-URL",
   description: "GRAB URL: 📥 Generate Request to API from Browser",
   github: "https://github.com/vtempest/grab-url",
-  githubDocs: "https://github.com/vtempest/GRAB-URL/tree/master/docs/content/docs",
+  githubPackages:
+    "https://github.com/vtempest/grab-url/tree/master/packages",
+  githubDocs:
+    "https://github.com/vtempest/GRAB-URL/tree/master/docs/content/docs",
   favicon: "/favicon.ico",
   topLinks: [
     {
-      text: 'Docs',
-      url: '/docs',
+      text: "Docs",
+      url: "/docs",
     },
     {
-      text: 'GitHub',
-      url: 'https://github.com/vtempest/grab-url',
+      text: "GitHub",
+      url: "https://github.com/vtempest/grab-url",
       external: true,
     },
   ],
 };
-
 
 export interface DocsConfig {
   /** The title of the documentation site */
@@ -32,6 +33,8 @@ export interface DocsConfig {
   github?: string;
   /** Base URL for document editing on GitHub */
   githubDocs?: string;
+  /** Base URL for the packages directory on GitHub */
+  githubPackages?: string;
   /** Path to the favicon */
   favicon?: string;
   /** Path to the OpenAPI specification file */
@@ -43,4 +46,3 @@ export interface DocsConfig {
     external?: boolean;
   }[];
 }
-

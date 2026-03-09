@@ -18,6 +18,14 @@ export const config = {
   turbopack: {
     root: resolve(import.meta.dirname, '..'),
   },
+  async rewrites() {
+    return [
+      {
+        source: '/docs/:path*.mdx',
+        destination: '/docs/llms.mdx/docs/:path*',
+      },
+    ];
+  },
   reactStrictMode: false,
   images: {
     remotePatterns: [

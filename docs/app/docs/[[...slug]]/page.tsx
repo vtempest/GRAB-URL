@@ -14,7 +14,9 @@ import { getMDXComponents } from '@/mdx-components';
 import type { Metadata } from 'next';
 import { AskAIDropdown } from '@/components/fumadocs/ai/ask-ai-dropdown';
 import { LLMCopyButton } from '@/components/fumadocs/ai/llm-copy-button';
+import { Breadcrumb } from '@/components/fumadocs/layout/breadcrumb';
 import { docsConfig } from '@/lib/fumadocs/customize-docs';
+import { getGithubLastEdit } from 'fumadocs-core/content/github';
 
 export default async function Page(props: {
   params: Promise<{ slug?: string[] }>;
@@ -28,8 +30,15 @@ export default async function Page(props: {
 
   const MDX = page.data.body;
 
+  const lastUpdate = await getGithubLastEdit({
+    owner: 'vtempest',
+    repo: 'grab-url',
+    path: `docs/content/docs/${page.path}`,
+  });
+
   return (
-    <DocsPage toc={page.data.toc} full={page.data.full}>
+    <DocsPage toc={page.data.toc} full={page.data.full} lastUpdate={lastUpdate ?? undefined}>
+      <Breadcrumb tree={source.pageTree} />
       <DocsTitle>{page.data.title}</DocsTitle>
       <DocsDescription>{page.data.description}</DocsDescription>
       <DocsBody>

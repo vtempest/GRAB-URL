@@ -41,15 +41,18 @@ export function DependencyGraphClient({
       }
     }
 
+    // Workspace packages that should not be fetched from the npm registry
+    const workspaceScopes = ['@grab-url/'];
+    const isWorkspacePkg = (name: string) => workspaceScopes.some(s => name.startsWith(s));
+
     packages.forEach((pkg) => {
       if (!requestedNpmPkgs.current.has(pkg)) {
         requestedNpmPkgs.current.add(pkg);
+        if (isWorkspacePkg(pkg)) return;
         // mark as loading initially
         setNpmMetadata(prev => ({ ...prev, [pkg]: { _loading: true } }));
-        
-        fetch(`https://registry.npmjs.org/${pkg}`, {
-          headers: { 'Accept': 'application/vnd.npm.install-v1+json' }
-        })
+
+        fetch(`https://registry.npmjs.org/${pkg}/latest`)
         .then(res => res.json())
         .then(data => {
           setNpmMetadata(prev => ({ ...prev, [pkg]: data }));
