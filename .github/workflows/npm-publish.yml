@@ -9,17 +9,27 @@ permissions:
   id-token: write
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18  # Match your test workflow
+      - run: npm install
+      - run: npm test  # Matches your test step
+
   npm-publish:
     runs-on: ubuntu-latest
-
+    needs: test
     steps:
       - uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}  # Needed for push
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20.x"
+          node-version: 18
           registry-url: "https://registry.npmjs.org"
 
       - name: Bump patch version
@@ -32,7 +42,7 @@ jobs:
           git push
 
       - run: npm install
-      - run: npm run build
+      - run: npm run build  # If needed
 
       - run: npm publish --provenance --access public
         env:
