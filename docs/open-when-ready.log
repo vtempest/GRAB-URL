@@ -1,0 +1,20 @@
+▲ Next.js 16.1.6 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://172.18.116.74:3000
+
+✓ Starting...
+[MDX] generated files in 18.836475000000064ms
+[MDX] started dev server
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+✓ Ready in 1590ms
+○ Compiling / ...
+ GET / 200 in 4.5s (compile: 4.0s, render: 500ms)
+○ Compiling /docs/[[...slug]] ...
+⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ GET /docs 200 in 1815ms (compile: 852ms, generate-params: 818ms, render: 963ms)
+ GET /docs 200 in 29.2s (compile: 28.5s, generate-params: 1378ms, render: 704ms)
+[DependencyGraph] Scanning: /mnt/data/Projects/grab-url/packages
+[DependencyGraph] Tree nodes: 6
+[DependencyGraph] Total files collected: 33 | With analysis: 31
+ GET /docs/code-graph 200 in 1133ms (compile: 163ms, proxy.ts: 92ms, generate-params: 100ms, render: 878ms)
+ POST /api/npm-meta 200 in 968ms (compile: 558ms, render: 410ms)

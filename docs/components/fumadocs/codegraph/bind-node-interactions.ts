@@ -18,7 +18,7 @@ export type ActiveTooltip = MermaidTooltipData & { x: number; y: number };
  * fallback for accessibility / screen-readers.
  */
 export function bindNodeTooltips(
-  container: HTMLDivElement,
+  container: HTMLElement | Element,
   nodeTooltips: Record<string, MermaidTooltipData>,
   setTooltip: (value: ActiveTooltip | null | ((prev: ActiveTooltip | null) => ActiveTooltip | null)) => void,
 ) {
@@ -65,7 +65,7 @@ export function bindNodeTooltips(
  * Applies a yellow stroke highlight and bold text to every graph node whose
  * visible text includes the search `query` (case-insensitive).
  */
-export function highlightMatchingNodes(container: HTMLDivElement, query: string) {
+export function highlightMatchingNodes(container: HTMLElement | Element, query: string) {
   const normalizedQuery = query.trim().toLowerCase();
   if (!normalizedQuery) return;
 
@@ -93,7 +93,7 @@ export function highlightMatchingNodes(container: HTMLDivElement, query: string)
  * Intercepts clicks on `<a href="#file-…">` links inside the rendered SVG so
  * they smooth-scroll to the corresponding file-tree row and briefly highlight it.
  */
-export function interceptFiletreeAnchorClicks(container: HTMLDivElement) {
+export function interceptFiletreeAnchorClicks(container: HTMLElement | Element) {
   container.querySelectorAll('a[href^="#file-"]').forEach((a) => {
     a.addEventListener('click', (e) => {
       e.preventDefault();

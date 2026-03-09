@@ -67,6 +67,8 @@ function Mermaid({
       }).catch((err) => {
         console.error("[Mermaid] Render FAILED:", err);
       });
+    }).catch((err) => {
+      console.error("[Mermaid] Failed to import mermaid:", err);
     });
     return () => {
       cancelled = true;
@@ -80,16 +82,13 @@ function Mermaid({
     if (!svgData || !svgContainerRef.current) return;
 
     let tb: any = null;
-    import('svg-toolbelt').then(({ SvgToolbelt }) => {
-      const svgEl = svgContainerRef.current?.querySelector('svg');
-      if (!svgEl) return;
-      tb = new SvgToolbelt(svgEl, {
-        zoom: { min: 0.5, max: 3 },
-        pan: true,
-        controls: false,
-      });
+    import('svg-toolbelt').then(({ SvgZoom }) => {
+      const container = svgContainerRef.current;
+      if (!container) return;
+      tb = new SvgZoom(container);
       toolbeltRef.current = tb;
-      tb.fitToView();
+    }).catch((err) => {
+      console.error("[Mermaid] svg-toolbelt init failed:", err);
     });
 
     return () => {
@@ -103,10 +102,9 @@ function Mermaid({
     (g: SVGGElement | null) => {
       svgWrapperRef.current = g;
       if (!g) return;
-      const container = g as unknown as HTMLElement;
-      bindNodeTooltips(container, nodeTooltips, setTooltip);
-      highlightMatchingNodes(container, highlightQuery);
-      interceptFiletreeAnchorClicks(container);
+      bindNodeTooltips(g, nodeTooltips, setTooltip);
+      highlightMatchingNodes(g, highlightQuery);
+      interceptFiletreeAnchorClicks(g);
     },
     [nodeTooltips, highlightQuery],
   );

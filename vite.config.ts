@@ -83,8 +83,6 @@ export default defineConfig({
         if (id.startsWith("node:") || nodeBuiltins.includes(id)) return true;
         if (externalPkgs.includes(id)) return true;
         if (id === "jszip") return true;
-        // Externalize internal package references
-        if (id.startsWith("@grab-url/")) return true;
         return false;
       },
     },

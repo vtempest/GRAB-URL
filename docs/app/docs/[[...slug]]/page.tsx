@@ -28,7 +28,8 @@ export default async function Page(props: {
     notFound();
   }
 
-  const MDX = page.data.body;
+  const data = page.data as any;
+  const MDX = data.body;
 
   const lastUpdate = await getGithubLastEdit({
     owner: 'vtempest',
@@ -37,7 +38,7 @@ export default async function Page(props: {
   });
 
   return (
-    <DocsPage toc={page.data.toc} full={page.data.full} lastUpdate={lastUpdate ?? undefined}>
+    <DocsPage toc={data.toc} full={data.full} lastUpdate={lastUpdate ?? undefined}>
       <Breadcrumb tree={source.pageTree} />
       <DocsTitle>{page.data.title}</DocsTitle>
       <DocsDescription>{page.data.description}</DocsDescription>

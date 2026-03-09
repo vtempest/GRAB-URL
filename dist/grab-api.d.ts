@@ -158,7 +158,7 @@ export declare interface GrabMockHandler<TParams = any, TResponse = any> {
  * @template TResponse The expected shape of the response data.
  * @template TParams The shape of the request parameters.
  */
-export declare type GrabOptions<TResponse = any, TParams = any> = TParams & {
+export declare type GrabOptions<TResponse = any, TParams = any> = {
     /** include headers and authorization in the request */
     headers?: Record<string, string>;
     /** Pre-initialized object which becomes response JSON, no need for .data */
