@@ -28,47 +28,15 @@ export interface MermaidTooltipData {
   href?: string;
 }
 
-const NODE_STYLES = {
-  entry: {
-    fill: "#14532d",
-    stroke: "#22c55e",
-    color: "#f0fdf4",
-  },
-  core: {
-    fill: "#1d4ed8",
-    stroke: "#60a5fa",
-    color: "#eff6ff",
-  },
-  types: {
-    fill: "#7e22ce",
-    stroke: "#c084fc",
-    color: "#faf5ff",
-  },
-  util: {
-    fill: "#334155",
-    stroke: "#94a3b8",
-    color: "#f8fafc",
-  },
-  npm: {
-    fill: "#7c2d12",
-    stroke: "#fb923c",
-    color: "#fff7ed",
-  },
-  functionNode: {
-    fill: "#14532d",
-    stroke: "#4ade80",
-    color: "#ecfdf5",
-  },
-  exportedFunctionNode: {
-    fill: "#164e63",
-    stroke: "#22d3ee",
-    color: "#ecfeff",
-  },
-  typeNode: {
-    fill: "#581c87",
-    stroke: "#c084fc",
-    color: "#faf5ff",
-  },
+const NODE_COLORS = {
+  entry:    { bg: "#14532d", border: "#22c55e", font: "#f0fdf4" },
+  core:     { bg: "#1d4ed8", border: "#60a5fa", font: "#eff6ff" },
+  types:    { bg: "#7e22ce", border: "#c084fc", font: "#faf5ff" },
+  util:     { bg: "#334155", border: "#94a3b8", font: "#f8fafc" },
+  npm:      { bg: "#7c2d12", border: "#fb923c", font: "#fff7ed" },
+  fn:       { bg: "#14532d", border: "#4ade80", font: "#ecfdf5" },
+  exportFn: { bg: "#164e63", border: "#22d3ee", font: "#ecfeff" },
+  typeNode: { bg: "#581c87", border: "#c084fc", font: "#faf5ff" },
 } as const;
 
 function resolveImport(fromPath: string, importPath: string): string {
@@ -90,16 +58,27 @@ function makeSymbolNodeId(fileId: string, prefix: "private_fn" | "exported_fn" |
   return `${fileId}__${prefix}_${name.replace(/[^a-zA-Z0-9]/g, "_")}`;
 }
 
-function escapeMermaidLabel(value: string): string {
-  return value.replace(/"/g, "&quot;");
+function escapeC4(value: string): string {
+  return value.replace(/"/g, "'");
+}
+
+function classifyFile(f: FileInfo): keyof typeof NODE_COLORS {
+  if (f.name === "index.ts" || f.name === "index.js") return "entry";
+  if (f.name.includes("type")) return "types";
+  if (f.analysis?.exports.some((e) => e.kind === "function" || e.kind === "class")) return "core";
+  return "util";
+}
+
+function fileExtTech(f: FileInfo): string {
+  const ext = f.name.split(".").pop() ?? "";
+  const map: Record<string, string> = { ts: "TypeScript", tsx: "React TSX", js: "JavaScript", jsx: "React JSX", mjs: "ESModule", md: "Markdown", json: "JSON" };
+  return map[ext] ?? ext;
 }
 
 export function buildChart(files: FileInfo[], options: GraphDisplayOptions): string {
-  const lines: string[] = [
-    "flowchart TB",
-    '  linkStyle default stroke:#94a3b8,stroke-width:2px,opacity:0.8',
-  ];
+  const lines: string[] = ["C4Container"];
 
+  // Group files by package
   const pkgs = new Map<string, FileInfo[]>();
   for (const f of files) {
     if (!pkgs.has(f.pkg)) pkgs.set(f.pkg, []);
@@ -112,182 +91,203 @@ export function buildChart(files: FileInfo[], options: GraphDisplayOptions): str
     pathLookup.set(f.path.replace(/\.[^.]+$/, ""), f.id);
   }
 
-  const subgraphIds: string[] = [];
+  // Track all file IDs and their color classification for styling
+  const fileStyles: { id: string; color: keyof typeof NODE_COLORS }[] = [];
+
+  // Emit Container_Boundary per package, nested by subdirectory
   for (const [pkg, pkgFiles] of pkgs) {
     const pkgId = `pkg_${pkg.replace(/[^a-zA-Z0-9_]/g, "_")}`;
-    subgraphIds.push(pkgId);
-    lines.push(`  subgraph ${pkgId} ["${pkg}"]`);
-    lines.push("    direction LR");
+    lines.push(`  Container_Boundary(${pkgId}, "${pkg}") {`);
+
+    // Separate files into subdirectories vs package root
+    const subDirs = new Map<string, FileInfo[]>();
+    const rootFiles: FileInfo[] = [];
     for (const f of pkgFiles) {
-      const shortName = pkg === "root"
-        ? f.name
-        : (f.path.startsWith(`${pkg}/`) ? f.path.slice(pkg.length + 1) : f.name);
-      let cls: keyof typeof NODE_STYLES = "util";
-      if (f.name === "index.ts" || f.name === "index.js") cls = "entry";
-      else if (f.name.includes("type")) cls = "types";
-      else if (f.analysis && f.analysis.exports.some((e) => e.kind === "function" || e.kind === "class")) cls = "core";
-
-      lines.push(`    ${f.id}["${shortName}"]:::${cls}`);
-    }
-    lines.push("  end");
-  }
-
-  const fileEdges = new Map<string, {
-    from: string;
-    to: string;
-    valueNames: Set<string>;
-    typeNames: Set<string>;
-  }>();
-
-  const getFileEdge = (from: string, to: string) => {
-    const key = `${from}=>${to}`;
-    let edge = fileEdges.get(key);
-    if (!edge) {
-      edge = {
-        from,
-        to,
-        valueNames: new Set<string>(),
-        typeNames: new Set<string>(),
-      };
-      fileEdges.set(key, edge);
-    }
-    return edge;
-  };
-
-  const edges = new Set<string>();
-  for (const f of files) {
-    if (!f.analysis) continue;
-    for (const imp of f.analysis.localImports) {
-      const resolved = resolveImport(f.path, imp);
-      const targetId = pathLookup.get(resolved);
-      if (targetId && targetId !== f.id) {
-        getFileEdge(f.id, targetId);
+      const relPath = pkg === "root" ? f.name : (f.path.startsWith(`${pkg}/`) ? f.path.slice(pkg.length + 1) : f.name);
+      const parts = relPath.split("/");
+      if (parts.length > 1) {
+        const subDir = parts[0];
+        if (!subDirs.has(subDir)) subDirs.set(subDir, []);
+        subDirs.get(subDir)!.push(f);
+      } else {
+        rootFiles.push(f);
       }
     }
+
+    // Nested subdirectory boundaries
+    for (const [subDir, subFiles] of subDirs) {
+      const subId = `${pkgId}_${subDir.replace(/[^a-zA-Z0-9_]/g, "_")}`;
+      lines.push(`    Container_Boundary(${subId}, "${subDir}/") {`);
+      for (const f of subFiles) {
+        const shortName = f.path.startsWith(`${pkg}/`) ? f.path.slice(pkg.length + 1) : f.name;
+        const tech = fileExtTech(f);
+        const descr = f.description ? escapeC4(f.description) : shortName;
+        const cls = classifyFile(f);
+        fileStyles.push({ id: f.id, color: cls });
+        lines.push(`      Component(${f.id}, "${escapeC4(shortName)}", "${tech}", $descr="${descr}")`);
+      }
+      lines.push(`    }`);
+    }
+
+    // Root-level files in the package
+    for (const f of rootFiles) {
+      const tech = fileExtTech(f);
+      const descr = f.description ? escapeC4(f.description) : f.name;
+      const cls = classifyFile(f);
+      fileStyles.push({ id: f.id, color: cls });
+      lines.push(`    Component(${f.id}, "${escapeC4(f.name)}", "${tech}", $descr="${descr}")`);
+    }
+
+    lines.push(`  }`);
   }
+
+  // Symbol nodes (private functions, exported functions, types) as top-level components
+  const symbolStyles: { id: string; color: keyof typeof NODE_COLORS }[] = [];
 
   if (options.showPrivateFunctions || options.showExportedFunctions || options.showTypes) {
     for (const f of files) {
       if (!f.analysis) continue;
 
       if (options.showPrivateFunctions) {
-        const privateFunctionNames = uniqueNames(
-          f.analysis.functions.map((item) => item.name),
-        );
-
-        for (const fnName of privateFunctionNames) {
+        for (const fnName of uniqueNames(f.analysis.functions.map((i) => i.name))) {
           const nodeId = makeSymbolNodeId(f.id, "private_fn", fnName);
-          lines.push(`  ${nodeId}["${fnName}"]:::functionNode`);
-          lines.push(`  ${f.id} -.-> ${nodeId}`);
-          lines.push(`  click ${nodeId} "#file-${f.path.replace(/[^a-zA-Z0-9]/g, "-")}"`);
+          lines.push(`  Component(${nodeId}, "${escapeC4(fnName)}", "Function", $descr="Private fn in ${escapeC4(f.name)}")`);
+          symbolStyles.push({ id: nodeId, color: "fn" });
+        }
+      }
+
+      if (options.showExportedFunctions) {
+        for (const fnName of uniqueNames(f.analysis.exports.filter((i) => i.kind === "function" || i.kind === "class").map((i) => i.name))) {
+          const nodeId = makeSymbolNodeId(f.id, "exported_fn", fnName);
+          lines.push(`  Component(${nodeId}, "${escapeC4(fnName)}", "Export", $descr="Exported from ${escapeC4(f.name)}")`);
+          symbolStyles.push({ id: nodeId, color: "exportFn" });
         }
       }
 
       if (options.showTypes) {
         const typeNames = uniqueNames([
-          ...f.analysis.types.map((item) => item.name),
-          ...f.analysis.exports.filter((item) => item.kind === "type").map((item) => item.name),
+          ...f.analysis.types.map((i) => i.name),
+          ...f.analysis.exports.filter((i) => i.kind === "type").map((i) => i.name),
         ]);
-
         for (const typeName of typeNames) {
           const nodeId = makeSymbolNodeId(f.id, "type", typeName);
-          lines.push(`  ${nodeId}["${typeName}"]:::typeNode`);
-          lines.push(`  ${f.id} -.-> ${nodeId}`);
-          lines.push(`  click ${nodeId} "#file-${f.path.replace(/[^a-zA-Z0-9]/g, "-")}"`);
+          lines.push(`  Component(${nodeId}, "${escapeC4(typeName)}", "Type", $descr="Type in ${escapeC4(f.name)}")`);
+          symbolStyles.push({ id: nodeId, color: "typeNode" });
         }
       }
     }
+  }
 
+  // NPM external systems
+  if (options.showNpmImports) {
+    const npmNodes = new Map<string, string>();
+    for (const f of files) {
+      for (const pkg of [...new Set(f.analysis?.npmImports ?? [])]) {
+        if (!npmNodes.has(pkg)) {
+          const nodeId = `npm_${pkg.replace(/[^a-zA-Z0-9]/g, "_")}`;
+          npmNodes.set(pkg, nodeId);
+          lines.push(`  System_Ext(${nodeId}, "${escapeC4(pkg)}", "npm package")`);
+        }
+      }
+    }
+  }
+
+  lines.push("");
+
+  // Relationships: file-to-file imports
+  const edges = new Set<string>();
+
+  const fileEdges = new Map<string, { from: string; to: string; valueNames: Set<string>; typeNames: Set<string> }>();
+  const getFileEdge = (from: string, to: string) => {
+    const key = `${from}=>${to}`;
+    let edge = fileEdges.get(key);
+    if (!edge) { edge = { from, to, valueNames: new Set(), typeNames: new Set() }; fileEdges.set(key, edge); }
+    return edge;
+  };
+
+  for (const f of files) {
+    if (!f.analysis) continue;
+    for (const imp of f.analysis.localImports) {
+      const resolved = resolveImport(f.path, imp);
+      const targetId = pathLookup.get(resolved);
+      if (targetId && targetId !== f.id) getFileEdge(f.id, targetId);
+    }
+  }
+
+  // Collect symbol import details
+  if (options.showExportedFunctions || options.showTypes) {
     for (const f of files) {
       if (!f.analysis) continue;
       for (const imported of f.analysis.localImportSymbols ?? []) {
         const resolved = resolveImport(f.path, imported.source);
-        const targetFile = files.find((candidate) => candidate.path === resolved || candidate.path.replace(/\.[^.]+$/, "") === resolved);
+        const targetFile = files.find((c) => c.path === resolved || c.path.replace(/\.[^.]+$/, "") === resolved);
         if (!targetFile || targetFile.id === f.id) continue;
-
         const fileEdge = getFileEdge(f.id, targetFile.id);
-
-        if (options.showExportedFunctions) {
-          for (const valueName of imported.valueNames) {
-            fileEdge.valueNames.add(valueName);
-          }
-        }
-
-        if (options.showTypes) {
-          for (const typeName of imported.typeNames) {
-            fileEdge.typeNames.add(typeName);
-          }
-        }
+        if (options.showExportedFunctions) for (const v of imported.valueNames) fileEdge.valueNames.add(v);
+        if (options.showTypes) for (const t of imported.typeNames) fileEdge.typeNames.add(t);
       }
     }
   }
 
+  // Emit Rel() for file edges
   for (const edge of fileEdges.values()) {
-    const valueLabel = options.showExportedFunctions
-      ? uniqueNames([...edge.valueNames]).slice(0, 5).join(", ")
-      : "";
-    const typeLabel = options.showTypes
-      ? uniqueNames([...edge.typeNames]).slice(0, 3).map((name) => `type ${name}`).join(", ")
-      : "";
-
-    if (valueLabel) {
-      lines.push(`  ${edge.from} -->|"${escapeMermaidLabel(valueLabel)}"| ${edge.to}`);
-    } else {
-      const plainEdge = `${edge.from} --> ${edge.to}`;
-      if (!edges.has(plainEdge)) {
-        edges.add(plainEdge);
-        lines.push(`  ${plainEdge}`);
-      }
+    const valueParts = options.showExportedFunctions ? uniqueNames([...edge.valueNames]).slice(0, 5) : [];
+    const typeParts = options.showTypes ? uniqueNames([...edge.typeNames]).slice(0, 3).map((n) => `type ${n}`) : [];
+    const label = [...valueParts, ...typeParts].join(", ") || "imports";
+    const key = `${edge.from}->${edge.to}`;
+    if (!edges.has(key)) {
+      edges.add(key);
+      lines.push(`  Rel(${edge.from}, ${edge.to}, "${escapeC4(label)}")`);
     }
+  }
 
-    if (typeLabel) {
-      const dashedEdge = `${edge.from} -. "${escapeMermaidLabel(typeLabel)}" .-> ${edge.to}`;
-      if (!edges.has(dashedEdge)) {
-        edges.add(dashedEdge);
-        lines.push(`  ${dashedEdge}`);
+  // Symbol relationships
+  if (options.showPrivateFunctions || options.showExportedFunctions || options.showTypes) {
+    for (const f of files) {
+      if (!f.analysis) continue;
+      if (options.showPrivateFunctions) {
+        for (const fnName of uniqueNames(f.analysis.functions.map((i) => i.name))) {
+          lines.push(`  Rel(${f.id}, ${makeSymbolNodeId(f.id, "private_fn", fnName)}, "defines")`);
+        }
+      }
+      if (options.showTypes) {
+        const typeNames = uniqueNames([
+          ...f.analysis.types.map((i) => i.name),
+          ...f.analysis.exports.filter((i) => i.kind === "type").map((i) => i.name),
+        ]);
+        for (const typeName of typeNames) {
+          lines.push(`  Rel(${f.id}, ${makeSymbolNodeId(f.id, "type", typeName)}, "declares")`);
+        }
       }
     }
   }
 
+  // NPM import relationships
   if (options.showNpmImports) {
     const npmNodes = new Map<string, string>();
     for (const f of files) {
-      const npmImports = [...new Set(f.analysis?.npmImports ?? [])];
-      for (const pkg of npmImports) {
-        if (!npmNodes.has(pkg)) {
-          const nodeId = `npm_${pkg.replace(/[^a-zA-Z0-9]/g, "_")}`;
-          npmNodes.set(pkg, nodeId);
-          lines.push(`  ${nodeId}["${pkg}"]:::npm`);
-          lines.push(`  click ${nodeId} "https://npmgraph.js.org/?q=${pkg}"`);
-        }
+      for (const pkg of [...new Set(f.analysis?.npmImports ?? [])]) {
+        if (!npmNodes.has(pkg)) npmNodes.set(pkg, `npm_${pkg.replace(/[^a-zA-Z0-9]/g, "_")}`);
         const targetId = npmNodes.get(pkg)!;
-        const edge = `${f.id} -.-> ${targetId}`;
-        if (!edges.has(edge)) {
-          edges.add(edge);
-          lines.push(`  ${edge}`);
+        const key = `${f.id}->${targetId}`;
+        if (!edges.has(key)) {
+          edges.add(key);
+          lines.push(`  Rel(${f.id}, ${targetId}, "uses")`);
         }
       }
     }
   }
 
-  for (const f of files) {
-    const anchor = `#file-${f.path.replace(/[^a-zA-Z0-9]/g, "-")}`;
-    lines.push(`  click ${f.id} "${anchor}"`);
-  }
-
   lines.push("");
-  for (const [key, style] of Object.entries(NODE_STYLES)) {
-    const fontSize = key === "npm" ? "48px" : key === "functionNode" || key === "exportedFunctionNode" || key === "typeNode" ? "44px" : "56px";
-    lines.push(
-      `  classDef ${key} fill:${style.fill},stroke:${style.stroke},stroke-width:3px,color:${style.color},font-size:${fontSize},font-weight:bold`,
-    );
+
+  // Per-element styling
+  for (const { id, color } of [...fileStyles, ...symbolStyles]) {
+    const c = NODE_COLORS[color];
+    lines.push(`  UpdateElementStyle(${id}, $bgColor="${c.bg}", $fontColor="${c.font}", $borderColor="${c.border}")`);
   }
 
-  for (const sgId of subgraphIds) {
-    lines.push(
-      `  style ${sgId} fill:#0f172a,stroke:#0ea5e9,stroke-width:1px,color:#7dd3fc,font-size:44px`,
-    );
-  }
+  // Layout
+  lines.push(`  UpdateLayoutConfig($c4ShapeInRow="4", $c4BoundaryInRow="2")`);
 
   return lines.join("\n");
 }

@@ -1,4 +1,10 @@
-# Fumadocs Template
+<p align="center">
+    <img width="300px" src="https://i.imgur.com/jg49HQ8.png" />
+</p>
+
+
+
+# Code Graph - Fumadocs Template
 
 A feature-rich documentation template built on [Fumadocs](https://fumadocs.vercel.app/) with Next.js 16, offering interactive code analysis, dependency graphs, AI integrations, OpenAPI docs, and full-text search out of the box.
 

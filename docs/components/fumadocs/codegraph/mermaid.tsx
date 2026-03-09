@@ -12,6 +12,7 @@ import type { MermaidTooltipData } from './dependency-graph-shared';
 import { widenClusterLabels, parseMermaidSvg, type ParsedSvg } from './pan-zoom-controller';
 import { type ActiveTooltip, bindNodeTooltips, highlightMatchingNodes, interceptFiletreeAnchorClicks } from './bind-node-interactions';
 import { MermaidTooltipOverlay } from './mermaid-tooltip-overlay';
+import 'svg-toolbelt/dist/svg-toolbelt.css';
 
 export { Mermaid as MermaidClient };
 
@@ -77,22 +78,31 @@ function Mermaid({
     };
   }, [chart]);
 
-  // Initialize svg-toolbelt once SVG is in the DOM
+  // Initialize svg-toolbelt once SVG is in the DOM (pan, zoom, controls)
   useEffect(() => {
     if (!svgData || !svgContainerRef.current) return;
 
-    let tb: any = null;
     import('svg-toolbelt').then(({ SvgZoom }) => {
       const container = svgContainerRef.current;
       if (!container) return;
-      tb = new SvgZoom(container);
+      const tb = new SvgZoom(container, {
+        minScale: 0.2,
+        maxScale: 6,
+        zoomStep: 0.15,
+        showControls: true,
+        controlsPosition: 'top-right',
+        enableTouch: true,
+        enableKeyboard: true,
+        showZoomLevelIndicator: true,
+      });
+      tb.init();
       toolbeltRef.current = tb;
     }).catch((err) => {
       console.error("[Mermaid] svg-toolbelt init failed:", err);
     });
 
     return () => {
-      if (tb?.destroy) tb.destroy();
+      toolbeltRef.current?.destroy();
       toolbeltRef.current = null;
     };
   }, [svgData]);

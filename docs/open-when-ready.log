@@ -18,3 +18,13 @@
 [DependencyGraph] Total files collected: 33 | With analysis: 31
  GET /docs/code-graph 200 in 1133ms (compile: 163ms, proxy.ts: 92ms, generate-params: 100ms, render: 878ms)
  POST /api/npm-meta 200 in 968ms (compile: 558ms, render: 410ms)
+[DependencyGraph] Scanning: /mnt/data/Projects/grab-url/packages
+[DependencyGraph] Tree nodes: 6
+[DependencyGraph] Total files collected: 33 | With analysis: 31
+[DependencyGraphClient] files: 33 | chart length: 9684 | chart preview: flowchart TB
+  linkStyle default stroke:#94a3b8,stroke-width:2px,opacity:0.8
+  subgraph pkg_archiver_web ["archiver-web"]
+    direction LR
+    archiver_web_src_bin_compress_ts["src/bin-compress.ts"]::
+ GET /docs/code-graph 200 in 767ms (compile: 136ms, proxy.ts: 4ms, generate-params: 106ms, render: 627ms)
+✓ Compiled in 1071ms
