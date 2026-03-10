@@ -91,13 +91,18 @@ export function buildChart(files: FileInfo[], options: GraphDisplayOptions): str
     pathLookup.set(f.path.replace(/\.[^.]+$/, ""), f.id);
   }
 
+  // Track boundary IDs for styling
+  const pkgBoundaryIds: string[] = [];
+  const dirBoundaryIds: string[] = [];
+
   // Track all file IDs and their color classification for styling
   const fileStyles: { id: string; color: keyof typeof NODE_COLORS }[] = [];
 
   // Emit Container_Boundary per package, nested by subdirectory
   for (const [pkg, pkgFiles] of pkgs) {
     const pkgId = `pkg_${pkg.replace(/[^a-zA-Z0-9_]/g, "_")}`;
-    lines.push(`  Container_Boundary(${pkgId}, "${pkg}") {`);
+    pkgBoundaryIds.push(pkgId);
+    lines.push(`  Container_Boundary(${pkgId}, "${pkg} ➕") {`);
 
     // Separate files into subdirectories vs package root
     const subDirs = new Map<string, FileInfo[]>();
@@ -117,14 +122,14 @@ export function buildChart(files: FileInfo[], options: GraphDisplayOptions): str
     // Nested subdirectory boundaries
     for (const [subDir, subFiles] of subDirs) {
       const subId = `${pkgId}_${subDir.replace(/[^a-zA-Z0-9_]/g, "_")}`;
-      lines.push(`    Container_Boundary(${subId}, "${subDir}/") {`);
+      dirBoundaryIds.push(subId);
+      lines.push(`    Container_Boundary(${subId}, "${subDir}/ ➕") {`);
       for (const f of subFiles) {
         const shortName = f.path.startsWith(`${pkg}/`) ? f.path.slice(pkg.length + 1) : f.name;
         const tech = fileExtTech(f);
-        const descr = f.description ? escapeC4(f.description) : shortName;
         const cls = classifyFile(f);
         fileStyles.push({ id: f.id, color: cls });
-        lines.push(`      Component(${f.id}, "${escapeC4(shortName)}", "${tech}", $descr="${descr}")`);
+        lines.push(`      Component(${f.id}, "${escapeC4(f.name)}", "${tech}")`);
       }
       lines.push(`    }`);
     }
@@ -132,10 +137,9 @@ export function buildChart(files: FileInfo[], options: GraphDisplayOptions): str
     // Root-level files in the package
     for (const f of rootFiles) {
       const tech = fileExtTech(f);
-      const descr = f.description ? escapeC4(f.description) : f.name;
       const cls = classifyFile(f);
       fileStyles.push({ id: f.id, color: cls });
-      lines.push(`    Component(${f.id}, "${escapeC4(f.name)}", "${tech}", $descr="${descr}")`);
+      lines.push(`    Component(${f.id}, "${escapeC4(f.name)}", "${tech}")`);
     }
 
     lines.push(`  }`);
@@ -151,7 +155,7 @@ export function buildChart(files: FileInfo[], options: GraphDisplayOptions): str
       if (options.showPrivateFunctions) {
         for (const fnName of uniqueNames(f.analysis.functions.map((i) => i.name))) {
           const nodeId = makeSymbolNodeId(f.id, "private_fn", fnName);
-          lines.push(`  Component(${nodeId}, "${escapeC4(fnName)}", "Function", $descr="Private fn in ${escapeC4(f.name)}")`);
+          lines.push(`  Component(${nodeId}, "${escapeC4(fnName)}", "Function")`);
           symbolStyles.push({ id: nodeId, color: "fn" });
         }
       }
@@ -159,7 +163,7 @@ export function buildChart(files: FileInfo[], options: GraphDisplayOptions): str
       if (options.showExportedFunctions) {
         for (const fnName of uniqueNames(f.analysis.exports.filter((i) => i.kind === "function" || i.kind === "class").map((i) => i.name))) {
           const nodeId = makeSymbolNodeId(f.id, "exported_fn", fnName);
-          lines.push(`  Component(${nodeId}, "${escapeC4(fnName)}", "Export", $descr="Exported from ${escapeC4(f.name)}")`);
+          lines.push(`  Component(${nodeId}, "${escapeC4(fnName)}", "Export")`);
           symbolStyles.push({ id: nodeId, color: "exportFn" });
         }
       }
@@ -171,7 +175,7 @@ export function buildChart(files: FileInfo[], options: GraphDisplayOptions): str
         ]);
         for (const typeName of typeNames) {
           const nodeId = makeSymbolNodeId(f.id, "type", typeName);
-          lines.push(`  Component(${nodeId}, "${escapeC4(typeName)}", "Type", $descr="Type in ${escapeC4(f.name)}")`);
+          lines.push(`  Component(${nodeId}, "${escapeC4(typeName)}", "Type")`);
           symbolStyles.push({ id: nodeId, color: "typeNode" });
         }
       }
@@ -187,6 +191,7 @@ export function buildChart(files: FileInfo[], options: GraphDisplayOptions): str
           const nodeId = `npm_${pkg.replace(/[^a-zA-Z0-9]/g, "_")}`;
           npmNodes.set(pkg, nodeId);
           lines.push(`  System_Ext(${nodeId}, "${escapeC4(pkg)}", "npm package")`);
+          symbolStyles.push({ id: nodeId, color: "npm" });
         }
       }
     }
@@ -280,10 +285,28 @@ export function buildChart(files: FileInfo[], options: GraphDisplayOptions): str
 
   lines.push("");
 
+  // Interactions (collapse toggle for boundaries)
+  for (const id of pkgBoundaryIds) {
+    lines.push(`  click ${id} call toggleCollapse("${id}") "Toggle folder"`);
+  }
+  for (const id of dirBoundaryIds) {
+    lines.push(`  click ${id} call toggleCollapse("${id}") "Toggle folder"`);
+  }
+
+  lines.push("");
+
   // Per-element styling
   for (const { id, color } of [...fileStyles, ...symbolStyles]) {
     const c = NODE_COLORS[color];
     lines.push(`  UpdateElementStyle(${id}, $bgColor="${c.bg}", $fontColor="${c.font}", $borderColor="${c.border}")`);
+  }
+
+  // Per-boundary styling
+  for (const id of pkgBoundaryIds) {
+    lines.push(`  UpdateBoundaryStyle(${id}, $bgColor="#0f172a", $fontColor="#38bdf8", $borderColor="#0284c7")`);
+  }
+  for (const id of dirBoundaryIds) {
+    lines.push(`  UpdateBoundaryStyle(${id}, $bgColor="#1e293b", $fontColor="#a78bfa", $borderColor="#7c3aed")`);
   }
 
   // Layout
@@ -387,4 +410,69 @@ export function buildNodeTooltips(files: FileInfo[], options: GraphDisplayOption
   }
 
   return tooltips;
+}
+
+export function getGraphHierarchy(files: FileInfo[], options: GraphDisplayOptions): Record<string, string[]> {
+  const hierarchy: Record<string, string[]> = {};
+  
+  const pkgs = new Map<string, FileInfo[]>();
+  for (const f of files) {
+    if (!pkgs.has(f.pkg)) pkgs.set(f.pkg, []);
+    pkgs.get(f.pkg)!.push(f);
+  }
+
+  for (const [pkg, pkgFiles] of pkgs) {
+    const pkgId = `pkg_${pkg.replace(/[^a-zA-Z0-9_]/g, "_")}`;
+    if (!hierarchy[pkgId]) hierarchy[pkgId] = [];
+
+    const subDirs = new Map<string, FileInfo[]>();
+    for (const f of pkgFiles) {
+      const relPath = pkg === "root" ? f.name : (f.path.startsWith(`${pkg}/`) ? f.path.slice(pkg.length + 1) : f.name);
+      const parts = relPath.split("/");
+      if (parts.length > 1) {
+        const subDir = parts[0];
+        if (!subDirs.has(subDir)) subDirs.set(subDir, []);
+        subDirs.get(subDir)!.push(f);
+      } else {
+        hierarchy[pkgId].push(f.id);
+      }
+    }
+
+    for (const [subDir, subFiles] of subDirs) {
+      const subId = `${pkgId}_${subDir.replace(/[^a-zA-Z0-9_]/g, "_")}`;
+      hierarchy[pkgId].push(subId);
+      if (!hierarchy[subId]) hierarchy[subId] = [];
+      for (const f of subFiles) {
+        hierarchy[subId].push(f.id);
+      }
+    }
+  }
+
+  // Symbol nodes
+  if (options.showPrivateFunctions || options.showExportedFunctions || options.showTypes) {
+    for (const f of files) {
+      if (!f.analysis) continue;
+      if (!hierarchy[f.id]) hierarchy[f.id] = [];
+      if (options.showPrivateFunctions) {
+        for (const fnName of uniqueNames(f.analysis.functions.map((i) => i.name))) {
+           hierarchy[f.id].push(makeSymbolNodeId(f.id, "private_fn", fnName));
+        }
+      }
+      if (options.showExportedFunctions) {
+        for (const fnName of uniqueNames(f.analysis.exports.filter((i) => i.kind === "function" || i.kind === "class").map((i) => i.name))) {
+           hierarchy[f.id].push(makeSymbolNodeId(f.id, "exported_fn", fnName));
+        }
+      }
+      if (options.showTypes) {
+        const typeNames = uniqueNames([
+          ...f.analysis.types.map((i) => i.name),
+          ...f.analysis.exports.filter((i) => i.kind === "type").map((i) => i.name),
+        ]);
+        for (const typeName of typeNames) {
+           hierarchy[f.id].push(makeSymbolNodeId(f.id, "type", typeName));
+        }
+      }
+    }
+  }
+  return hierarchy;
 }

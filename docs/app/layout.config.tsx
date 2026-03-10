@@ -17,7 +17,6 @@ export const baseOptions: BaseLayoutProps = {
   },
   links: [
     {
-      type: 'icon',
       label: 'Docs',
       icon: <BookOpen />,
       text: 'Docs',

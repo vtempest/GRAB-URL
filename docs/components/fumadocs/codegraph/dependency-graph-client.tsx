@@ -6,7 +6,7 @@
 import { useMemo, useState, useTransition, useRef, useEffect, type ReactNode } from "react";
 import { Boxes, FunctionSquare, Package, Search, Share2, Settings, Cloud, Loader2, X, Download, HelpCircle } from "lucide-react";
 import { MermaidClient } from "./mermaid";
-import { buildChart, buildNodeTooltips, type FileInfo, type GraphDisplayOptions } from "./dependency-graph-shared";
+import { buildChart, buildNodeTooltips, getGraphHierarchy, type FileInfo, type GraphDisplayOptions } from "./dependency-graph-shared";
 import { analyzeRemoteRepository } from "@/app/actions";
 
 export function DependencyGraphClient({
@@ -117,6 +117,60 @@ export function DependencyGraphClient({
     return c;
   }, [files, options]);
   const nodeTooltips = useMemo(() => buildNodeTooltips(files, options, npmMetadata), [files, options, npmMetadata]);
+  const hierarchy = useMemo(() => getGraphHierarchy(files, options), [files, options]);
+
+  useEffect(() => {
+    (window as any).__c4Hierarchy = hierarchy;
+    
+    (window as any).toggleCollapse = (nodeId: string) => {
+      // Find the node to toggle its icon
+      const node = document.querySelector(`[id*="-${nodeId}-"]`);
+      if (node) {
+        // Toggle the +/- icon text
+        node.querySelectorAll('tspan, span, div, text').forEach((el) => {
+          if (el.textContent?.endsWith(' ➕')) {
+             el.textContent = el.textContent.replace(' ➕', ' ➖');
+          } else if (el.textContent?.endsWith(' ➖')) {
+             el.textContent = el.textContent.replace(' ➖', ' ➕');
+          }
+        });
+      }
+
+      const h = (window as any).__c4Hierarchy;
+      if (!h || !h[nodeId]) return;
+
+      const directChildren = h[nodeId] || [];
+      if (directChildren.length === 0) return;
+
+      // Determine collapse state from the first child
+      let isCollapsed = false;
+      for (const cId of directChildren) {
+        const cEl = document.querySelector(`[id*="-${cId}-"]`) as HTMLElement;
+        if (cEl) {
+          isCollapsed = cEl.style.display !== 'none';
+          break;
+        }
+      }
+
+      const display = isCollapsed ? 'none' : '';
+      
+      const toggleDescendants = (id: string) => {
+        const children = h[id] || [];
+        for (const cId of children) {
+          const el = document.querySelector(`[id*="-${cId}-"]`) as HTMLElement;
+          if (el) el.style.display = display;
+          
+          // Also hide/show edges connected to this child in mermaid
+          // Mermaid C4 flowchart edges don't nicely match by class/id, so we just let them disconnect.
+          // Recursively toggle
+          toggleDescendants(cId);
+        }
+      };
+
+      toggleDescendants(nodeId);
+    };
+  }, [hierarchy]);
+
 
   return (
     <div className="space-y-3">
