@@ -5,7 +5,7 @@ export const revalidate = false;
 
 export async function GET(
   _req: Request,
-  { params }: RouteContext<"/docs/llms.mdx/docs/[[...slug]]">,
+  { params }: { params: Promise<{ slug?: string[] }> },
 ) {
   const { slug } = await params;
   const cleanSlug = slug?.map((s, i) => i === slug.length - 1 ? s.replace(/\.mdx$/, '') : s);
