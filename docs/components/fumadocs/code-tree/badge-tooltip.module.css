@@ -15,6 +15,27 @@
   line-height: 1;
 }
 
+.mobileInfoButton {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  line-height: 1;
+  opacity: 0.65;
+  flex-shrink: 0;
+}
+
+@media (hover: none) {
+  .mobileInfoButton {
+    display: inline-flex;
+  }
+}
+
 .tooltip {
   padding: 0.6rem 0.85rem;
   border-radius: 0.5rem;
