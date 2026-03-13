@@ -115,6 +115,24 @@ function Mermaid({
       bindNodeTooltips(g, nodeTooltips, setTooltip);
       highlightMatchingNodes(g, highlightQuery);
       interceptFiletreeAnchorClicks(g);
+
+      // Add manual click listeners for cluster collapse
+      g.querySelectorAll('.cluster').forEach((cluster) => {
+        const match = cluster.id.match(/-(pkg_[^-]+)-/);
+        if (match && match[1]) {
+          const nodeId = match[1];
+          const label = cluster.querySelector('.cluster-label');
+          if (label) {
+            label.setAttribute('style', 'cursor: pointer');
+            label.addEventListener('click', (e) => {
+              e.stopPropagation();
+              if ((window as any).toggleCollapse) {
+                (window as any).toggleCollapse(nodeId);
+              }
+            });
+          }
+        }
+      });
     },
     [nodeTooltips, highlightQuery],
   );

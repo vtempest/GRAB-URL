@@ -1,4 +1,12 @@
 #!/usr/bin/env node
+
+/**
+ * @fileoverview CLI tool that spawns a dev server command, monitors its log
+ * output for a "ready" signal, and automatically opens the local URL in the
+ * browser. If an error is detected first, it opens an AI assistant with the
+ * error context for troubleshooting.
+ */
+
 import fsPromises from "fs/promises";
 import fs from "fs";
 import path from "path";
@@ -20,18 +28,12 @@ const logPath = fs.existsSync(nextDir)
   ? path.join(".next", "port.log")
   : "open-when-ready.log";
 
-console.log(`📁 Log: ${logPath} | Poll: ${pollDelay}ms`);
 
 /**
- * Opens browser when dev server is ready.
- * 
- * ### Features
- * - **Automatic**: Detects server start
- * - **Versatile**: Supports multiple browsers
- * 
- * ```js
- * console.log("Ready!");
- * ```
+ * Scans log output for error lines and extracts surrounding context
+ * as a URL-encoded string suitable for an AI search query.
+ * @param {string} log - Raw log output from the dev server
+ * @returns {string} URL-encoded error context, or empty string if no error found
  */
 function getErrorContext(log) {
   const lines = log.split(/\n/);
@@ -53,31 +55,31 @@ function getErrorContext(log) {
   return "";
 }
 
+/**
+ * Parses log output to find the local dev server URL (e.g. http://localhost:3000).
+ * @param {string} log - Raw log output from the dev server
+ * @returns {string|null} The localhost URL, or null if not found
+ */
 function extractUrl(log) {
   // Better regex for Local: line
   const localMatch = log.match(/Local:\s+(http:\/\/localhost:\d+)/i);
-  if (localMatch) {
-    console.log("✅ EXTRACTED URL:", localMatch[1]);
-    return localMatch[1];
-  }
+  if (localMatch) return localMatch[1];
 
   // Fallback port
   const portMatch = log.match(/localhost:(\d+)/);
-  if (portMatch) {
-    const url = `http://localhost:${portMatch[1]}`;
-    console.log("✅ FALLBACK URL:", url);
-    return url;
-  }
+  if (portMatch) return `http://localhost:${portMatch[1]}`;
 
-  console.log("❌ NO URL FOUND");
   return null;
 }
 
+/**
+ * Main entry point. Spawns the dev server command, pipes its output to a log
+ * file, and polls the log for ready/error signals to open the browser or AI helper.
+ */
 async function run() {
   try {
     await fsPromises.rm(logPath, { force: true });
   } catch {}
-  console.log("🚀 Starting", cmdArgs.join(" "));
 
   const proc = spawn(cmdArgs.join(" "), [], {
     stdio: ["ignore", "pipe", "pipe", "ipc"],
@@ -107,14 +109,9 @@ async function run() {
       if (logChanged && stats.size > 100) {
         stableCount = 0;
         lastLogSize = stats.size;
-        console.log(
-          `📊 ${stats.size}B CHANGED | LOG:\n${currentLog.slice(0, 500)}...`,
-        );
       } else if (stats.size > 100) {
         stableCount++;
-        console.log(`📊 ${stats.size}B STABLE (${stableCount}/5)`);
         if (stableCount >= 5) {
-          console.log("🛑 Log stable 5 polls - stopping");
           clearInterval(poll);
           return;
         }
@@ -123,7 +120,6 @@ async function run() {
       // Error first
       const errorRegex = /⨯|[Ss]yntax[Ee]rror|error|failed|exception/i;
       if (errorRegex.test(currentLog) && !noAi && !errorOpened) {
-        console.log("🎯 ERROR!");
         const err = getErrorContext(currentLog);
         const customPrompt = "Explain what the error is, how to fix it, then give a shell script with the best recommended solution.";
         const prompt = encodeURIComponent(customPrompt + " ");
@@ -138,33 +134,21 @@ async function run() {
       if (isReadyNow && !lastReadySeen && !opened) {
         opened = true;
         lastReadySeen = true;
-        console.log("🎉 READY DETECTED!");
         const url = extractUrl(currentLog);
         if (url && !noOpen) {
-          console.log("🌐 Testing", url);
           try {
             await waitOn(url, { timeout: 10000, http: true });
-            console.log("✅ HTTP READY!");
-          } catch (e) {
-            console.log(
-              "⚠ HTTP not ready, but opening:",
-              e.message.slice(0, 50),
-            );
-          }
-          console.log("🚀 OPENING BROWSER:", url);
+          } catch {}
           opener(url);
         }
         clearInterval(poll);
         return;
       }
       lastReadySeen = isReadyNow;
-    } catch (e) {
-      console.log("Poll error:", e.message);
-    }
+    } catch {}
   }, pollDelay);
 
   process.on("SIGINT", () => {
-    console.log("\n👋 Exiting (dev server alive)");
     clearInterval(poll);
     process.exit(0);
   });
