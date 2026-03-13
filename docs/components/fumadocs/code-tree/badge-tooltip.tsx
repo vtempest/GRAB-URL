@@ -4,7 +4,7 @@
  * Reusable badge component with an interactive tooltip for displaying rich metadata.
  */
 import { useRef, useState, useCallback, useEffect } from "react";
-import { Package, FunctionSquare, Braces, FileOutput, FileInput, Box, Blocks } from "lucide-react";
+import { Package, FunctionSquare, Braces, FileOutput, FileInput, Box, Blocks, Info } from "lucide-react";
 import type { TypeProperty } from "@/lib/fumadocs/code-graph";
 import styles from "./badge-tooltip.module.css";
 import { Markdown } from "../typography/markdown";
@@ -201,6 +201,14 @@ export function Badge({
         <Icon size={12} />
       </button>
       <span onClick={href ? openSource : undefined}>{label}</span>
+      <button
+        type="button"
+        onClick={togglePin}
+        aria-label={`${pinned ? "Hide" : "Show"} info for ${label}`}
+        className={styles.mobileInfoButton}
+      >
+        <Info size={11} />
+      </button>
       {pos && (
         <div
           ref={tooltipRef}

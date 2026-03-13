@@ -2,7 +2,7 @@
   "name": "grab-url",
   "description": "Generate Request to API from Browser",
   "type": "module",
-  "version": "1.6.4",
+  "version": "1.6.7",
   "packageManager": "bun@1.3.10",
   "author": "vtempest",
   "license": "rights.institute/prosper",
@@ -63,6 +63,11 @@
     "test:ui": "vitest --ui",
     "test": "vitest",
     "test:cli": "bun src/grab-url-cli/index.ts https://releases.ubuntu.com/24.04.2/ubuntu-24.04.2-live-server-amd64.iso"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "cli-table3": "^0.6.3",
+    "cli-progress": "^3.12.0"
   },
   "devDependencies": {
     "@grab-url/loading-animations": "workspace:*",
