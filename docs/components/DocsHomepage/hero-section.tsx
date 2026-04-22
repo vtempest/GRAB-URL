@@ -25,8 +25,8 @@ export function HeroSection() {
       <div className="absolute inset-0 grid-glow" />
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/50 to-background" />
 
-      <div className="container mx-auto px-4  relative">
-        <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
+      <div className="container mx-auto px-4 py-12 md:py-20 relative">
+        <div className="flex flex-col items-center text-center max-w-4xl mx-auto w-full">
           {/* <div className="mb-8 relative" style={{ animation: "float 6s ease-in-out infinite" }}>
             <Image
               src="https://i.imgur.com/RH80JGZ.png"
@@ -41,10 +41,10 @@ export function HeroSection() {
             v1.0 — Zero Dependencies, 4KB
           </Badge>
 
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-balance mb-4">
+          <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-balance mb-4 break-words">
             Why <span className="line-through text-muted-foreground">fetch</span> when you can just
           </h1>
-          <h2 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-6">
+          <h2 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-6 break-words">
             <span className="shimmer-text">GRAB</span>
             <span className="text-primary">?</span>
           </h2>
