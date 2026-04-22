@@ -12,6 +12,7 @@ export default function Layout({ children }: { children: ReactNode }) {
     <html
       lang="en"
       suppressHydrationWarning
+      className="overflow-x-hidden"
     >
       <body className="flex flex-col min-h-screen overflow-x-hidden">
         <Provider>{children}</Provider>

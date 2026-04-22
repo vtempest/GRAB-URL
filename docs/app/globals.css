@@ -44,8 +44,7 @@ div[class*="bg-sidebar"],
 div[class*="sidebar"],
 [data-collapsible="offcanvas"],
 [data-state="collapsed"],
-[data-slot="sidebar-container"],
-[data-slot="sidebar-gap"] {
+[data-slot="sidebar-container"] {
   background-color: rgb(255, 255, 255) !important;
   backdrop-filter: blur(20px) !important;
   -webkit-backdrop-filter: blur(20px) !important;
@@ -53,6 +52,15 @@ div[class*="sidebar"],
   box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.15),
     inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+}
+
+/* sidebar-gap is a layout spacer — must not have border or background */
+[data-slot="sidebar-gap"] {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 .dark .bg-sidebar,
@@ -63,8 +71,7 @@ div[class*="sidebar"],
 .dark div[class*="sidebar"],
 .dark [data-collapsible="offcanvas"],
 .dark [data-state="collapsed"],
-.dark [data-slot="sidebar-container"],
-.dark [data-slot="sidebar-gap"] {
+.dark [data-slot="sidebar-container"] {
   background-color: rgb(30, 41, 59) !important;
   backdrop-filter: blur(24px) !important;
   -webkit-backdrop-filter: blur(24px) !important;
