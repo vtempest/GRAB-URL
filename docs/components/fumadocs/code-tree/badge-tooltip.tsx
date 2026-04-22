@@ -102,7 +102,10 @@ export function Badge({
   const calcPos = useCallback(() => {
     if (!wrapperRef.current) return null;
     const rect = wrapperRef.current.getBoundingClientRect();
-    return { top: rect.top - 8, left: rect.left + rect.width / 2 };
+    const tooltipWidth = Math.min(600, window.innerWidth - 32);
+    const idealLeft = rect.left + rect.width / 2;
+    const clampedLeft = Math.min(Math.max(idealLeft, tooltipWidth / 2 + 8), window.innerWidth - tooltipWidth / 2 - 8);
+    return { top: rect.top - 8, left: clampedLeft };
   }, []);
 
   const showTooltip = useCallback(() => {
