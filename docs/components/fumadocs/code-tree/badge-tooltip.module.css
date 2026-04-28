@@ -43,7 +43,7 @@
   font-weight: 400;
   line-height: 1.5;
   white-space: normal;
-  max-width: 600px;
+  max-width: min(600px, calc(100vw - 32px));
   max-height: min(70vh, calc(100dvh - 32px));
   overflow-y: auto;
   overscroll-behavior: contain;
