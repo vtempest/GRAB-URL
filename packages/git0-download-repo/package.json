@@ -5,6 +5,7 @@
     "author": "vtempest",
     "scripts": {
         "build": "bun build src/cli.ts --outdir dist --target node --format esm --sourcemap",
+        "test": "bun test",
         "docs": "cd docs-config && bun run build:docs",
         "demo": "bun src/cli.ts react template",
         "publish:npm": "npm version patch && npm publish --access public"

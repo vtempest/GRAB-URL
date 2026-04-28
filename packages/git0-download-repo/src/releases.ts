@@ -74,6 +74,14 @@ function hasKnownPlatformKeyword(name: string): boolean {
  */
 function classifyAsset(asset: ReleaseAsset, platformAssets: PlatformAssets): void {
   const name = asset.name.toLowerCase();
+
+  // Explicit universal label wins regardless of any other keyword matches
+  // (e.g. 'app-universal.tar.gz' should not be mis-filed under linux).
+  if (name.includes('universal')) {
+    platformAssets.universal.push({ ...asset, detectedArch: 'universal', platform: 'universal' });
+    return;
+  }
+
   let categorized = false;
 
   for (const [platform, keywords] of Object.entries(PLATFORM_KEYWORDS)) {
@@ -87,11 +95,7 @@ function classifyAsset(asset: ReleaseAsset, platformAssets: PlatformAssets): voi
     }
   }
 
-  if (!categorized && (
-    name.includes('universal') ||
-    name.includes('all') ||
-    !hasKnownPlatformKeyword(name)
-  )) {
+  if (!categorized) {
     platformAssets.universal.push({ ...asset, detectedArch: 'universal', platform: 'universal' });
   }
 }
