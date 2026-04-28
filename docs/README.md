@@ -266,44 +266,6 @@ All standard fumadocs-ui components plus extras are available in MDX files:
 | `DependencyGraph` | Custom | Interactive code dependency graph |
 | `FileTreeView` | Custom | Interactive file tree with analysis |
 | `TypeTable` | Custom | Property/type documentation tables |
-
-#### Type Table
-
-Display typed property tables with collapsible details:
-
-```mdx
-import { TypeTable } from '@/components/fumadocs/file-tree/type-table';
-
-<TypeTable type={{
-  name: {
-    type: "string",
-    description: "The display name",
-    required: true,
-  },
-  options: {
-    type: "Options",
-    typeDescription: "{ timeout: number; retries: number }",
-    default: "{}",
-  },
-}} />
-```
-
----
-
-### 11. Page Tree Code Titles
-
-A custom loader plugin (`source.tsx`) that automatically wraps page titles ending with `()` or matching `<Component />` in `<code>` tags for proper formatting in the sidebar navigation.
-
----
-
-### 12. Notebook-Style Layout
-
-Uses `fumadocs-ui/layouts/notebook` for the docs section, providing a clean reading experience with:
-
-- Sidebar navigation with page tree
-- Table of contents per page
-- Full-width page support via `full: true` frontmatter
-
 ---
 
 ## Project Structure

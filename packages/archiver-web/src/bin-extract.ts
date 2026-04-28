@@ -1,7 +1,7 @@
 import { parseArgs } from "util";
 import * as fs from "fs";
 import * as path from "path";
-import { extract } from "./index.js";
+import { extract } from "./index";
 
 async function readStreamToBuffer(stream: NodeJS.ReadStream): Promise<Buffer> {
   const chunks: Buffer[] = [];
@@ -28,7 +28,9 @@ async function main() {
     console.error("Usage: extract [archive-file] [options]");
     console.error("If [archive-file] is omitted, reads from stdin.");
     console.error("Options:");
-    console.error("  -o, --out <dir>         Output directory. If absent, outputs to stdout (only works if 1 file).");
+    console.error(
+      "  -o, --out <dir>         Output directory. If absent, outputs to stdout (only works if 1 file).",
+    );
     console.error("  -d, --folder <dir>      Folder to extract from archive.");
     process.exit(0);
   }
@@ -39,7 +41,9 @@ async function main() {
     archiveBuffer = fs.readFileSync(path.resolve(positionals[0]));
   } else {
     if (process.stdin.isTTY) {
-      console.error("Error: Must provide an archive file or pipe input via stdin.");
+      console.error(
+        "Error: Must provide an archive file or pipe input via stdin.",
+      );
       process.exit(1);
     }
     archiveBuffer = await readStreamToBuffer(process.stdin);
@@ -75,14 +79,21 @@ async function main() {
   } else {
     if (files.length === 1) {
       let buf: Buffer;
-      if (files[0].content.match(/^[A-Za-z0-9+/=]*$/) && files[0].content.length > 50) {
+      if (
+        files[0].content.match(/^[A-Za-z0-9+/=]*$/) &&
+        files[0].content.length > 50
+      ) {
         buf = Buffer.from(files[0].content, "base64");
       } else {
         buf = Buffer.from(files[0].content, "utf8");
       }
       process.stdout.write(buf);
     } else {
-      console.error("Archive contains " + files.length + " files. Please specify -o/--out directory to extract them.");
+      console.error(
+        "Archive contains " +
+          files.length +
+          " files. Please specify -o/--out directory to extract them.",
+      );
       process.exit(1);
     }
   }

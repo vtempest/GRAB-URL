@@ -1,7 +1,7 @@
 import { parseArgs } from "util";
 import * as fs from "fs";
 import * as path from "path";
-import { compress } from "./index.js";
+import { compress } from "./index";
 
 async function readStreamToBuffer(stream: NodeJS.ReadStream): Promise<Buffer> {
   const chunks: Buffer[] = [];
@@ -28,7 +28,9 @@ async function main() {
     console.error("Usage: compress [files...] [options]");
     console.error("If [files...] are omitted, reads from stdin.");
     console.error("Options:");
-    console.error("  -o, --out <file>        Output file. If absent and not TTY, outputs to stdout.");
+    console.error(
+      "  -o, --out <file>        Output file. If absent and not TTY, outputs to stdout.",
+    );
     console.error("  -l, --level <1-9>       Compression level (default: 6).");
     process.exit(0);
   }
@@ -39,7 +41,9 @@ async function main() {
     for (const filePath of positionals) {
       const stat = fs.statSync(filePath);
       if (stat.isDirectory()) {
-        console.error("Directory archiving not supported yet (" + filePath + ")");
+        console.error(
+          "Directory archiving not supported yet (" + filePath + ")",
+        );
         process.exit(1);
       }
       const buf = fs.readFileSync(filePath);
@@ -50,7 +54,9 @@ async function main() {
     }
   } else {
     if (process.stdin.isTTY) {
-      console.error("Error: Must provide files to archive or pipe input via stdin.");
+      console.error(
+        "Error: Must provide files to archive or pipe input via stdin.",
+      );
       process.exit(1);
     }
     const stdinBuffer = await readStreamToBuffer(process.stdin);
