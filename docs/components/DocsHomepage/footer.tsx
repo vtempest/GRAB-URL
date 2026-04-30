@@ -11,12 +11,10 @@ export function Footer() {
     <footer className="py-20 md:py-32">
       <div className="container mx-auto px-4">
         <div className="text-center max-w-3xl mx-auto">
-          <h2 className="text-3xl md:text-5xl font-bold mb-6 text-balance">
+          {/* <h2 className="text-3xl md:text-5xl font-bold mb-6 text-balance">
             Ready to <span className="text-primary">GRAB</span> your data?
           </h2>
-          <p className="text-xl text-muted-foreground mb-8">
-            Debugging fetch requests is a bitch. Make the switch!
-          </p>
+         
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
             <Link href="/docs">
@@ -37,7 +35,7 @@ export function Footer() {
                 Join Discord
               </Button>
             </Link>
-          </div>
+          </div> */}
 
           <div className="border-t border-border pt-8">
             <p className="text-muted-foreground text-sm">🌟 Star this repo so it will grow and get updates!</p>

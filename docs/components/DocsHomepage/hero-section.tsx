@@ -55,6 +55,9 @@ export function HeroSection() {
             {"}"}
           </p>
 
+          <p className="text-xl text-muted-foreground mb-8">
+            Debugging fetch requests is a bitch. Make the switch!
+          </p>
 
           <p className="text-base md:text-lg text-muted-foreground max-w-2xl mb-6 text-pretty">
             Functionally Brilliant, Elegantly Simple. One function, no dependencies, minimalist syntax with more

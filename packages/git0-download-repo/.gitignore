@@ -1,6 +1,0 @@
-node_modules/
-.vscode/
-.DS_Store
-.idea/
-bun.lock
-/.docusaurus
