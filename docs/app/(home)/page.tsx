@@ -17,7 +17,7 @@ const inter = Inter({
 
 export default function Home() {
   return (
-    <main className={`${inter.className} min-h-screen bg-background`}>
+    <main className={`${inter.className} min-h-screen bg-background overflow-x-hidden`}>
       <HeroSection />
       <FeaturesGrid />
       <CodeExample />
