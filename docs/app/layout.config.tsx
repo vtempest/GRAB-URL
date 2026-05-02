@@ -10,18 +10,13 @@ export const baseOptions: BaseLayoutProps = {
   nav: {
     title: (
       <span className="inline-flex items-center gap-2">
-        { docsConfig.favicon ? <img src={docsConfig.favicon} alt="Logo" /> : <Link2 />}
+        {docsConfig.favicon ? <img src={docsConfig.favicon} alt="Logo" /> : <Link2 />}
         {docsConfig.title}
       </span>
     ),
   },
   links: [
-    {
-      label: 'Docs',
-      icon: <BookOpen />,
-      text: 'Docs',
-      url: '/docs',
-    },
+
   ],
   githubUrl: 'https://github.com/vtempest/grab-url',
 };

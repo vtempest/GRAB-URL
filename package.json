@@ -86,7 +86,7 @@
     "fumadocs-mdx"
   ],
   "overrides": {
-    "fumadocs-core": "16.6.10"
+    "fumadocs-core": "16.8.5"
   },
   "keywords": [
     "api",
