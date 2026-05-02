@@ -3,7 +3,7 @@
  * @description Configuration for the documentation layout, including navigation and links.
  */
 import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
-import { Link2 } from 'lucide-react';
+import { Link2, BookOpen } from 'lucide-react';
 import { docsConfig } from '@/lib/fumadocs/customize-docs';
 
 export const baseOptions: BaseLayoutProps = {
