@@ -1,0 +1,69 @@
+{
+  "name": "quantum-sphere-loading-icon",
+  "version": "1.0.2",
+  "description": "Parabolic spherical orbital loading component for React and Svelte, inspired by quantum superposition of atomic orbitals.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "svelte": "./src/svelte/QuantumWaveOrbital.svelte",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./react": {
+      "types": "./dist/react/QuantumWaveOrbital.d.ts",
+      "import": "./src/react/index.ts",
+      "require": "./src/react/index.ts"
+    },
+    "./svelte": {
+      "types": "./src/types/QuantumSphere.d.ts",
+      "svelte": "./src/svelte/QuantumWaveOrbital.svelte"
+    },
+    "./css": "./src/react/QuantumWaveOrbital.css",
+    "./types": "./src/types/QuantumSphere.d.ts"
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "ship": "npx standard-version --release-as patch; npm publish",
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "publish": "npm publish"
+  },
+  "keywords": [
+    "react",
+    "svelte",
+    "loader",
+    "spinner",
+    "quantum",
+    "orbital",
+    "ui",
+    "component"
+  ],
+  "author": "vtempest",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vtempest/quantum-sphere-loading-animation"
+  },
+  "bugs": {
+    "url": "https://github.com/vtempest/quantum-sphere-loading-animation/issues"
+  },
+  "homepage": "https://github.com/vtempest/quantum-sphere-loading-animation#readme",
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0",
+    "svelte": ">=5.0.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0"
+  }
+}

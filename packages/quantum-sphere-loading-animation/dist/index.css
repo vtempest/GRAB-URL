@@ -1,0 +1,24 @@
+/* src/react/QuantumWaveOrbital.css */
+.orbital-sphere {
+  perspective: 1000px;
+}
+@keyframes orbitalSpin {
+  from {
+    transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+  }
+  to {
+    transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg);
+  }
+}
+@keyframes orbitalLineSpin {
+  from {
+    transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+  }
+  to {
+    transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg);
+  }
+}
+.orbital-line {
+  animation: orbitalLineSpin infinite linear;
+}
+/*# sourceMappingURL=index.css.map */

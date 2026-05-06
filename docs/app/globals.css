@@ -54,6 +54,15 @@ div[class*="sidebar"],
     inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
 }
 
+/* Ensure sidebar stays sticky on scroll */
+aside[data-slot="sidebar"],
+[data-slot="sidebar"] {
+  position: sticky !important;
+  top: 0 !important;
+  height: 100vh !important;
+  overflow-y: auto !important;
+}
+
 /* sidebar-gap is a layout spacer — must not have border or background */
 [data-slot="sidebar-gap"] {
   background: none !important;
