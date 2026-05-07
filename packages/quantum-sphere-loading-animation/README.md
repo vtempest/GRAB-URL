@@ -1,13 +1,12 @@
-<p align="center">
-    <img width="200px"  src="https://i.imgur.com/wySaMJl.png" />
-<h3 align="center">
-  <a href="https://v0-quantum-sphere-demo.vercel.app">🎯 Demo</a>
-</h3>
-</p>
+https://i.imgur.com/wySaMJl.png
 
-# Quantum Orbital Loading Animation
+
+
+# Quantum Sphere Loading
 
 https://github.com/user-attachments/assets/903f2483-6fac-4592-be09-5fdc17196a84
+
+## [DEMO](https://v0-quantum-sphere-demo.vercel.app)
 
 A parabolic spherical orbital loading component, inspired by [quantum superposition of atomic orbitals](https://www.thoughtco.com/definition-of-molecular-orbital-605367) and the wave function collapse concept. Particles occupy multiple quantum states until interacting (hovering), creating a mesmerizing, high-performance UI element.
 
@@ -34,12 +33,12 @@ bun i quantum-sphere-loading-icon
 
 ```tsx
 import React from 'react';
-import QuantumOrbital from 'quantum-sphere-loading-icon';
+import QuantumWaveOrbital from 'quantum-sphere-loading-icon';
 
 function App() {
   return (
     <div style={{ height: '500px', width: '100%' }}>
-      <QuantumOrbital 
+      <QuantumWaveOrbital 
         autoRandomize={true} 
         onSphereClick={() => console.log('Sphere clicked')} 
         className="my-custom-class"
@@ -53,11 +52,11 @@ function App() {
 
 ```svelte
 <script>
-  import QuantumOrbital from 'quantum-sphere-loading-icon/svelte';
+  import QuantumWaveOrbital from 'quantum-sphere-loading-icon/svelte';
 </script>
 
 <div class="container">
-  <QuantumOrbital 
+  <QuantumWaveOrbital 
     autoRandomize={true}
     onSphereClick={() => console.log('Sphere clicked')}
   />
@@ -87,7 +86,7 @@ const myConfig = {
   // ... see types for full list
 };
 
-<QuantumOrbital config={myConfig} />
+<QuantumWaveOrbital config={myConfig} />
 ```
 
 ### Props / API
@@ -101,7 +100,7 @@ const myConfig = {
 
 ### OrbitalSphereConfig Interface
 
-See `src/QuantumOrbital.d.ts` (or your IDE's autocomplete) for the full list of configuration options, including:
+See `src/QuantumSphere.d.ts` (or your IDE's autocomplete) for the full list of configuration options, including:
 
 - `minLines` / `maxLines`
 - `minSphereSize` / `maxSphereSize`
