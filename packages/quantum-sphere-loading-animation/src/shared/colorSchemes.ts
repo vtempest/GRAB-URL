@@ -1,12 +1,13 @@
 /**
  * @module colorSchemes
- * Color scheme palette definitions for the QuantumOrbital component.
+ * Color scheme palette definitions shared by the React and Svelte
+ * QuantumOrbital implementations.
  *
- * Each scheme is a function that maps an orbital line index to an HSL hue value,
- * allowing many different visual styles (Triadic, Neon, Galaxy, etc.) to be
- * generated from the same base hue. Schemes that need stochastic behavior pull
- * from injected `random` / `randomRange` helpers so that the component's seeded
- * RNG remains the single source of randomness.
+ * Each scheme is a function mapping an orbital line index to an HSL hue,
+ * letting the same generator emit many distinct visual styles (Triadic,
+ * Neon, Galaxy, etc.) from one base hue. Stochastic schemes draw from the
+ * injected `random` / `randomRange` helpers so the component's seeded RNG
+ * remains the single source of randomness.
  *
  * @author [vtempest](https://github.com/vtempest)
  */
@@ -22,17 +23,11 @@ import type { ColorScheme, RandomFunction, RandomRangeFunction } from "../types/
  */
 export type ColorSchemeFunction = (index: number, total: number, baseHue: number) => number
 
-/**
- * Map of every available {@link ColorScheme} name to its hue-resolution function.
- */
+/** Map of every available {@link ColorScheme} name to its hue-resolution function. */
 export type ColorSchemeMap = Record<ColorScheme, ColorSchemeFunction>
 
 /**
  * Build the full set of color scheme functions, bound to the supplied seeded RNG.
- *
- * Returning a fresh map per call lets the component memoize the schemes against
- * its own random helpers — when the helpers change the schemes regenerate too,
- * keeping deterministic behavior intact.
  *
  * @param random - Seeded random helper returning a value in [0, 1).
  * @param randomRange - Seeded helper returning a float in [min, max).

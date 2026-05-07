@@ -1,214 +1,43 @@
 <script lang="ts">
+  /**
+   * @module QuantumOrbital
+   * Svelte implementation of the QuantumOrbital animated loader.
+   *
+   * Inspired by quantum superposition of atomic orbitals and the
+   * [wave function collapse](https://en.wikipedia.org/wiki/Wave_function_collapse).
+   * The sphere periodically re-randomizes (color scheme, line count, glow,
+   * rotation) and reacts to mouse hover with per-line color/glow flair.
+   *
+   * @author [vtempest](https://github.com/vtempest)
+   */
   import { onMount, onDestroy } from "svelte";
   import type {
-    OrbitalSphereConfig,
-    OrbitalLine,
-    SphereData,
     HoverEffects,
-    LineStyle,
+    OrbitalLine,
     OrbitalSphereProps,
-    RandomFunction,
-    RandomRangeFunction,
-    RandomIntFunction,
-    ColorScheme,
-  } from "../types/QuantumOrbital.d.ts";
-
-  /**
-     * Parabolic spherical orbital, inspired by quantum superposition of atomic orbitals and the 
-     * [wave function collapse](https://en.wikipedia.org/wiki/Wave_function_collapse).
-     * @author [vtempest](https://github.com/vtempest)
-      Quantum superposition principle allows particles to occupy multiple quantum states
-       simultaneously until measured: in this case, hovering over with mouse changes electron orbit.
-
-     */
+    SphereData,
+  } from "../types/QuantumOrbital";
+  import { DEFAULT_ORBITAL_SPHERE_CONFIG } from "../shared/defaults";
+  import { createRandom } from "../shared/random";
+  import { generateSphereConfig as buildSphereConfig } from "../shared/generateSphereConfig";
+  import { getLineStyle } from "../shared/getLineStyle";
 
   let {
-    config = {
-      minLines: 6,
-      maxLines: 12,
-      minSphereSize: 120,
-      maxSphereSize: 180,
-      minLineWidth: 0.8,
-      maxLineWidth: 1.6,
-      minGlowIntensity: 6,
-      maxGlowIntensity: 12,
-      minRotationSpeed: 2,
-      maxRotationSpeed: 15,
-      minSaturation: 70,
-      maxSaturation: 90,
-      minLightness: 50,
-      maxLightness: 70,
-      autoRandomizeMin: 5000,
-      autoRandomizeMax: 12000,
-      opacity: 0.75,
-    },
+    config = DEFAULT_ORBITAL_SPHERE_CONFIG,
     autoRandomize = true,
     className = "",
     onSphereClick = null,
   } = $props() as OrbitalSphereProps;
 
-  // Simple random number generator with seed
-  let seed: number = Date.now() % 2147483647;
-  const random = (): number => {
-    seed = (seed * 16807) % 2147483647;
-    return (seed - 1) / 2147483646;
-  };
+  // Seeded RNG instance, stable for the component's lifetime.
+  const rng = createRandom();
+  const { randomRange } = rng;
 
-  const randomRange = (min: number, max: number): number =>
-    min + random() * (max - min);
-  const randomInt = (min: number, max: number): number =>
-    Math.floor(randomRange(min, max + 1));
+  /** Build a fresh sphere config bound to this component's RNG. */
+  const generateSphereConfig = (cfg = config): SphereData =>
+    buildSphereConfig(cfg, rng);
 
-  // Enhanced color scheme definitions
-  const colorSchemes = {
-    Single: (index: number, total: number, baseHue: number) => baseHue,
-    Dual: (index: number, total: number, baseHue: number) =>
-      index % 2 === 0 ? baseHue : (baseHue + 180) % 360,
-    // Rainbow: (index: number, total: number) => (index / total) * 360,
-    // Random: () => random() * 360,
-    Complementary: (index: number, total: number, baseHue: number) =>
-      index % 2 === 0 ? baseHue : (baseHue + 180) % 360,
-    Triadic: (index: number, total: number, baseHue: number) =>
-      baseHue + (index % 3) * 120,
-    Analogous: (index: number, total: number, baseHue: number) =>
-      (baseHue + index * 30) % 360,
-    Split: (index: number, total: number, baseHue: number) => {
-      const angles = [0, 150, 210];
-      return (baseHue + angles[index % 3]) % 360;
-    },
-    Tetradic: (index: number, total: number, baseHue: number) =>
-      baseHue + (index % 4) * 90,
-    Monochromatic: (index: number, total: number, baseHue: number) => baseHue,
-    Warm: (index: number, total: number) =>
-      randomRange(0, 60) + (index % 2) * 300, // Reds, oranges, yellows
-    Cool: (index: number, total: number) => randomRange(180, 270), // Blues, greens, purples
-    Neon: (index: number, total: number) => {
-      const neonHues = [300, 60, 120, 180, 240, 0]; // Magenta, lime, cyan, etc.
-      return neonHues[index % neonHues.length];
-    },
-    Sunset: (index: number, total: number) => {
-      const sunsetHues = [15, 30, 45, 330, 345]; // Oranges, reds, pinks
-      return sunsetHues[index % sunsetHues.length];
-    },
-    Ocean: (index: number, total: number) => {
-      const oceanHues = [180, 200, 220, 240, 160]; // Blues and teals
-      return oceanHues[index % oceanHues.length];
-    },
-    Forest: (index: number, total: number) => {
-      const forestHues = [120, 140, 90, 100, 80]; // Greens
-      return forestHues[index % forestHues.length];
-    },
-    Galaxy: (index: number, total: number) => {
-      const galaxyHues = [240, 280, 300, 260, 220]; // Purples and deep blues
-      return galaxyHues[index % galaxyHues.length];
-    },
-    Fire: (index: number, total: number) => {
-      const fireHues = [0, 15, 30, 45, 60]; // Reds, oranges, yellows
-      return fireHues[index % fireHues.length];
-    },
-    Ice: (index: number, total: number) => {
-      const iceHues = [180, 190, 200, 210, 220]; // Light blues and cyans
-      return iceHues[index % iceHues.length];
-    },
-    Cyberpunk: (index: number, total: number) => {
-      const cyberpunkHues = [300, 180, 60, 320, 200]; // Magenta, cyan, lime
-      return cyberpunkHues[index % cyberpunkHues.length];
-    },
-    Pastel: (index: number, total: number) => random() * 360, // Will use reduced saturation
-    Vintage: (index: number, total: number) => {
-      const vintageHues = [30, 45, 60, 200, 220]; // Warm browns and muted blues
-      return vintageHues[index % vintageHues.length];
-    },
-    Gradient: (index: number, total: number, baseHue: number) =>
-      (baseHue + (index / total) * 60) % 360, // Smooth gradient over 60 degrees
-    Electric: (index: number, total: number) => {
-      const electricHues = [60, 120, 180, 240, 300]; // Bright saturated colors
-      return electricHues[index % electricHues.length];
-    },
-  };
-
-  const colorSchemeNames = Object.keys(colorSchemes) as ColorScheme[];
-
-  /**
-   * Parabolic spherical orbital, inspired by quantum superposition and the
-   * [wave function collapse](https://en.wikipedia.org/wiki/Wave_function_collapse).
-   * @author [vtempest (2025)](https://github.com/vtempest)
-   */
-  function generateSphereConfig(cfg: OrbitalSphereConfig = config): SphereData {
-    const lineCount = randomInt(cfg.minLines, cfg.maxLines);
-    const sphereSize = randomInt(cfg.minSphereSize, cfg.maxSphereSize);
-    const lineWidth = randomRange(cfg.minLineWidth, cfg.maxLineWidth);
-    const glowIntensity = randomRange(
-      cfg.minGlowIntensity,
-      cfg.maxGlowIntensity,
-    );
-    const rotationSpeed = randomRange(
-      cfg.minRotationSpeed,
-      cfg.maxRotationSpeed,
-    );
-
-    // Select random color scheme
-    const colorSchemeName =
-      colorSchemeNames[randomInt(0, colorSchemeNames.length - 1)];
-    const colorSchemeFunc = colorSchemes[colorSchemeName];
-
-    // Base color configuration
-    let saturation = randomInt(cfg.minSaturation, cfg.maxSaturation);
-    let lightness = randomInt(cfg.minLightness, cfg.maxLightness);
-
-    // Adjust saturation and lightness for specific schemes
-    if (colorSchemeName === "Pastel") {
-      saturation = randomInt(30, 50); // Lower saturation for pastels
-      lightness = randomInt(70, 85); // Higher lightness for pastels
-    } else if (colorSchemeName === "Neon" || colorSchemeName === "Electric") {
-      saturation = randomInt(85, 100); // Maximum saturation for neon/electric
-      lightness = randomInt(50, 70);
-    } else if (colorSchemeName === "Vintage") {
-      saturation = randomInt(40, 60); // Muted saturation for vintage
-      lightness = randomInt(40, 60);
-    } else if (colorSchemeName === "Monochromatic") {
-      // Vary lightness for monochromatic schemes
-      lightness = randomInt(30, 80);
-    }
-
-    const baseHue = random() * 360;
-
-    // Generate line data with enhanced color schemes
-    const lines: OrbitalLine[] = [];
-    for (let i = 0; i < lineCount; i++) {
-      let hue = colorSchemeFunc(i, lineCount, baseHue);
-
-      // Special handling for monochromatic - vary lightness instead of hue
-      let lineLightness = lightness;
-      if (colorSchemeName === "Monochromatic") {
-        lineLightness = randomInt(30, 80);
-      }
-
-      lines.push({
-        id: i,
-        angleX: random() * 360,
-        angleY: random() * 360,
-        angleZ: random() * 360,
-        hue,
-        speed: randomRange(0.5, 1.5),
-        customLightness:
-          colorSchemeName === "Monochromatic" ? lineLightness : undefined,
-      });
-    }
-
-    return {
-      lines,
-      sphereSize,
-      lineWidth,
-      glowIntensity,
-      rotationSpeed,
-      saturation,
-      lightness,
-      colorScheme: colorSchemeName,
-    };
-  }
-
-  // State variables
+  // Reactive state
   let sphereData = $state<SphereData>(generateSphereConfig(config));
   let hueShift = $state<number>(0);
   let hoveredLineId = $state<number | null>(null);
@@ -217,14 +46,21 @@
   let timeoutId: number | null = null;
   let hueTimeoutId: number | null = null;
 
+  /** Replace the current sphere with a freshly randomized one. */
   const randomizeSphere = (): void => {
     sphereData = generateSphereConfig(config);
   };
 
+  /** Bump the global hue shift by a random amount in [10, 50) degrees. */
   const shiftHue = (): void => {
     hueShift = (hueShift + randomRange(10, 50)) % 360;
   };
 
+  /**
+   * Document-level pointer tracker. Determines whether the cursor is over the
+   * sphere and, if so, which orbital line is under it (via `data-line-id`).
+   * Picks a fresh batch of {@link HoverEffects} on hover transitions.
+   */
   const handleMouseMove = (event: MouseEvent): void => {
     if (!sphereRef) return;
 
@@ -240,7 +76,6 @@
       return;
     }
 
-    // Find which line element is being hovered
     const elementFromPoint = document.elementFromPoint(
       event.clientX,
       event.clientY,
@@ -251,7 +86,6 @@
       );
       if (lineId !== hoveredLineId) {
         hoveredLineId = lineId;
-        // Generate random hover effects
         hoverEffects = {
           hueShift: randomRange(-90, 90),
           saturationBoost: randomRange(10, 30),
@@ -266,51 +100,25 @@
     }
   };
 
-  const handleSphereClick = (event: MouseEvent): void => {
+  /** Forwards a click on the sphere container to the user-supplied callback. */
+  const handleSphereClick = (_event: MouseEvent): void => {
     if (onSphereClick) {
       onSphereClick();
     }
   };
 
-  // Derived function to calculate line styles
-  const getLineStyle = (line: OrbitalLine): LineStyle => {
-    const isHovered = hoveredLineId === line.id;
-    let finalHue = (line.hue + hueShift) % 360;
-    let finalSaturation = sphereData.saturation;
-    let finalLightness = line.customLightness || sphereData.lightness;
-    let finalGlow = sphereData.glowIntensity;
-    let finalSpeed = sphereData.rotationSpeed * line.speed;
-    let finalScale = 1;
-
-    if (isHovered) {
-      finalHue = (finalHue + hoverEffects.hueShift) % 360;
-      finalSaturation = Math.min(
-        100,
-        finalSaturation + hoverEffects.saturationBoost,
-      );
-      finalLightness = Math.max(
-        0,
-        Math.min(100, finalLightness + hoverEffects.lightnessShift),
-      );
-      finalGlow *= hoverEffects.glowMultiplier;
-      finalSpeed *= hoverEffects.speedMultiplier;
-      finalScale = hoverEffects.scaleMultiplier;
-    }
-
-    const color = `hsla(${finalHue}, ${finalSaturation}%, ${finalLightness}%, ${config.opacity})`;
-
-    return {
-      transform: `rotateX(${line.angleX}deg) rotateY(${line.angleY}deg) rotateZ(${line.angleZ}deg) scale(${finalScale})`,
-      borderColor: color,
-      borderWidth: `${sphereData.lineWidth}px`,
-      boxShadow: `0 0 ${finalGlow}px ${color}`,
-      animationDuration: `${finalSpeed}s`,
-      zIndex: isHovered ? 10 : 1,
-    };
-  };
+  /** Resolve the inline style for one orbital line via the shared helper. */
+  const styleForLine = (line: OrbitalLine) =>
+    getLineStyle(
+      line,
+      sphereData,
+      hueShift,
+      hoveredLineId,
+      hoverEffects,
+      config.opacity,
+    );
 
   onMount(() => {
-    // Add global mouse event listener
     document.addEventListener("mousemove", handleMouseMove);
 
     if (autoRandomize) {
@@ -350,13 +158,6 @@
 <div
   class="relative w-full h-full flex justify-center items-center p-2.5 overflow-hidden {className}"
 >
-  <!-- Color scheme indicator (optional debug info) -->
-  <div
-    class="absolute top-2 left-2 text-xs opacity-50 pointer-events-none z-20"
-  >
-    <!-- {sphereData.colorScheme} -->
-  </div>
-
   <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
   <div class="relative z-10" onclick={handleSphereClick} bind:this={sphereRef}>
     <div
@@ -369,7 +170,7 @@
       "
     >
       {#each sphereData.lines as line (line.id)}
-        {@const lineStyle = getLineStyle(line)}
+        {@const lineStyle = styleForLine(line)}
         <div
           class="absolute inset-0 rounded-full border-solid transition-all duration-200 ease-in-out orbital-line"
           data-line-id={line.id}

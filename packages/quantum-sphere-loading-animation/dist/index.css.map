@@ -1,11 +1,1 @@
-{
-  "version": 3,
-  "sources": [
-    "../src/react/QuantumOrbital.css"
-  ],
-  "sourcesContent": [
-    ".orbital-sphere {\n  perspective: 1000px;\n}\n\n@keyframes orbitalSpin {\n  from {\n    transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg);\n  }\n  to {\n    transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg);\n  }\n}\n\n@keyframes orbitalLineSpin {\n  from {\n    transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg);\n  }\n  to {\n    transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg);\n  }\n}\n\n.orbital-line {\n  animation: orbitalLineSpin infinite linear;\n}\n"
-  ],
-  "mappings": ";AAAA,CAAC;AACC,eAAa;AACf;AAEA,WAAW;AACT;AACE,eAAW,QAAQ,MAAM,QAAQ,MAAM,QAAQ;AACjD;AACA;AACE,eAAW,QAAQ,QAAQ,QAAQ,QAAQ,QAAQ;AACrD;AACF;AAEA,WAAW;AACT;AACE,eAAW,QAAQ,MAAM,QAAQ,MAAM,QAAQ;AACjD;AACA;AACE,eAAW,QAAQ,QAAQ,QAAQ,QAAQ,QAAQ;AACrD;AACF;AAEA,CAAC;AACC,aAAW,gBAAgB,SAAS;AACtC;",
-  "names": []
-}
+{"version":3,"sources":["../src/react/QuantumOrbital.css"],"sourcesContent":[".orbital-sphere {\n  perspective: 1000px;\n}\n\n@keyframes orbitalSpin {\n  from {\n    transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg);\n  }\n  to {\n    transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg);\n  }\n}\n\n@keyframes orbitalLineSpin {\n  from {\n    transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg);\n  }\n  to {\n    transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg);\n  }\n}\n\n.orbital-line {\n  animation: orbitalLineSpin infinite linear;\n}\n"],"mappings":";AAAA,CAAC;AACC,eAAa;AACf;AAEA,WAAW;AACT;AACE,eAAW,QAAQ,MAAM,QAAQ,MAAM,QAAQ;AACjD;AACA;AACE,eAAW,QAAQ,QAAQ,QAAQ,QAAQ,QAAQ;AACrD;AACF;AAEA,WAAW;AACT;AACE,eAAW,QAAQ,MAAM,QAAQ,MAAM,QAAQ;AACjD;AACA;AACE,eAAW,QAAQ,QAAQ,QAAQ,QAAQ,QAAQ;AACrD;AACF;AAEA,CAAC;AACC,aAAW,gBAAgB,SAAS;AACtC;","names":[]}

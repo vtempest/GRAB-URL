@@ -1,4 +1,4 @@
-import * as react_jsx_runtime from "react/jsx-runtime";
+import * as react_jsx_runtime from 'react/jsx-runtime';
 
 /**
  * @module QuantumOrbital
@@ -264,31 +264,13 @@ interface OrbitalSphereState {
 }
 
 /**
- * Parabolic spherical orbital, inspired by quantum superposition of atomic orbitals and the
- * [wave function collapse](https://en.wikipedia.org/wiki/Wave_function_collapse).
- * Quantum superposition principle allows particles to occupy multiple quantum states
- * simultaneously until measured: in this case, hovering over with mouse changes electron orbit.
- * @author [vtempest](https://github.com/vtempest)
+ * Animated quantum-orbital loader component.
+ *
+ * @param config - Range/min-max bounds for line count, sphere size, colors, etc.
+ * @param autoRandomize - When true, the sphere periodically re-randomizes and shifts hue.
+ * @param className - Extra CSS classes appended to the outer wrapper.
+ * @param onSphereClick - Click callback fired when the sphere container is clicked.
  */
-declare function QuantumOrbital({
-  config,
-  autoRandomize,
-  className,
-  onSphereClick,
-}: OrbitalSphereProps): react_jsx_runtime.JSX.Element;
+declare function QuantumOrbital({ config, autoRandomize, className, onSphereClick, }: OrbitalSphereProps): react_jsx_runtime.JSX.Element;
 
-export {
-  type ColorScheme,
-  type HoverEffects,
-  type LineStyle,
-  type OrbitalLine,
-  type OrbitalSphereConfig,
-  type OrbitalSphereProps,
-  type OrbitalSphereState,
-  QuantumOrbital,
-  type RandomFunction,
-  type RandomIntFunction,
-  type RandomRangeFunction,
-  type SphereData,
-  QuantumOrbital as default,
-};
+export { type ColorScheme, type HoverEffects, type LineStyle, type OrbitalLine, type OrbitalSphereConfig, type OrbitalSphereProps, type OrbitalSphereState, QuantumOrbital, type RandomFunction, type RandomIntFunction, type RandomRangeFunction, type SphereData, QuantumOrbital as default };

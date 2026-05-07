@@ -1,2 +1,2 @@
-export { default as QuantumOrbital } from "./QuantumOrbital";
+export { default as QuantumOrbital } from "./QuantumOrbital.svelte";
 export type * from "../types/QuantumOrbital";

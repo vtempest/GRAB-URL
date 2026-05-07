@@ -1,10 +1,26 @@
 "use client"
 
+/**
+ * @module QuantumOrbital
+ * React implementation of the QuantumOrbital animated loader.
+ *
+ * Inspired by quantum superposition of atomic orbitals and the
+ * [wave function collapse](https://en.wikipedia.org/wiki/Wave_function_collapse).
+ * The sphere periodically re-randomizes (color scheme, line count, glow,
+ * rotation) and reacts to mouse hover with per-line color/glow flair.
+ *
+ * Renders a stack of CSS-rotated bordered divs sharing the same parent
+ * 3D-transform space, so the spinning is pure CSS while the randomization
+ * lives in React state.
+ *
+ * @author [vtempest](https://github.com/vtempest)
+ */
 import type React from "react"
-import { useState, useEffect, useRef, useCallback } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
+import { DEFAULT_ORBITAL_SPHERE_CONFIG } from "../shared/defaults"
+import { getLineStyle } from "../shared/getLineStyle"
 import type {
   HoverEffects,
-  LineStyle,
   OrbitalLine,
   OrbitalSphereProps,
   SphereData,
@@ -15,32 +31,15 @@ import { useSphereConfig } from "./useSphereConfig"
 import "./QuantumOrbital.css"
 
 /**
- * Parabolic spherical orbital, inspired by quantum superposition of atomic orbitals and the
- * [wave function collapse](https://en.wikipedia.org/wiki/Wave_function_collapse).
- * Quantum superposition principle allows particles to occupy multiple quantum states
- * simultaneously until measured: in this case, hovering over with mouse changes electron orbit.
- * @author [vtempest](https://github.com/vtempest)
+ * Animated quantum-orbital loader component.
+ *
+ * @param config - Range/min-max bounds for line count, sphere size, colors, etc.
+ * @param autoRandomize - When true, the sphere periodically re-randomizes and shifts hue.
+ * @param className - Extra CSS classes appended to the outer wrapper.
+ * @param onSphereClick - Click callback fired when the sphere container is clicked.
  */
 export default function QuantumOrbital({
-  config = {
-    minLines: 6,
-    maxLines: 12,
-    minSphereSize: 120,
-    maxSphereSize: 180,
-    minLineWidth: 0.8,
-    maxLineWidth: 1.6,
-    minGlowIntensity: 6,
-    maxGlowIntensity: 12,
-    minRotationSpeed: 2,
-    maxRotationSpeed: 15,
-    minSaturation: 70,
-    maxSaturation: 90,
-    minLightness: 50,
-    maxLightness: 70,
-    autoRandomizeMin: 5000,
-    autoRandomizeMax: 12000,
-    opacity: 0.75,
-  },
+  config = DEFAULT_ORBITAL_SPHERE_CONFIG,
   autoRandomize = true,
   className = "",
   onSphereClick = null,
@@ -61,7 +60,7 @@ export default function QuantumOrbital({
    * Document-level pointer tracker. Determines whether the cursor is currently
    * over the sphere and, if so, which orbital line element is under it (via
    * `data-line-id`). Picks a fresh batch of {@link HoverEffects} on hover
-   * transitions so the highlighted line gets a unique flair each time.
+   * transitions so the highlighted line gets unique flair each time.
    */
   const handleMouseMove = useCallback(
     (event: MouseEvent): void => {
@@ -100,10 +99,7 @@ export default function QuantumOrbital({
     [hoveredLineId, randomRange],
   )
 
-  /**
-   * Forwards a click on the sphere container to the user-supplied
-   * `onSphereClick` callback (no-op when none is provided).
-   */
+  /** Forwards a click on the sphere container to the user-supplied callback. */
   const handleSphereClick = useCallback(
     (_event: React.MouseEvent<HTMLDivElement>): void => {
       if (onSphereClick) {
@@ -113,41 +109,10 @@ export default function QuantumOrbital({
     [onSphereClick],
   )
 
-  /**
-   * Compute the inline style for a single orbital line, blending the sphere's
-   * base appearance, the global hue shift, and any active hover effects into a
-   * final HSLA color, transform, glow, and animation duration.
-   */
-  const getLineStyle = useCallback(
-    (line: OrbitalLine): LineStyle => {
-      const isHovered = hoveredLineId === line.id
-      let finalHue = (line.hue + hueShift) % 360
-      let finalSaturation = sphereData.saturation
-      let finalLightness = line.customLightness || sphereData.lightness
-      let finalGlow = sphereData.glowIntensity
-      let finalSpeed = sphereData.rotationSpeed * line.speed
-      let finalScale = 1
-
-      if (isHovered) {
-        finalHue = (finalHue + hoverEffects.hueShift) % 360
-        finalSaturation = Math.min(100, finalSaturation + hoverEffects.saturationBoost)
-        finalLightness = Math.max(0, Math.min(100, finalLightness + hoverEffects.lightnessShift))
-        finalGlow *= hoverEffects.glowMultiplier
-        finalSpeed *= hoverEffects.speedMultiplier
-        finalScale = hoverEffects.scaleMultiplier
-      }
-
-      const color = `hsla(${finalHue}, ${finalSaturation}%, ${finalLightness}%, ${config.opacity})`
-
-      return {
-        transform: `rotateX(${line.angleX}deg) rotateY(${line.angleY}deg) rotateZ(${line.angleZ}deg) scale(${finalScale})`,
-        borderColor: color,
-        borderWidth: `${sphereData.lineWidth}px`,
-        boxShadow: `0 0 ${finalGlow}px ${color}`,
-        animationDuration: `${finalSpeed}s`,
-        zIndex: isHovered ? 10 : 1,
-      }
-    },
+  /** Resolve the inline style for one orbital line via the shared helper. */
+  const styleForLine = useCallback(
+    (line: OrbitalLine) =>
+      getLineStyle(line, sphereData, hueShift, hoveredLineId, hoverEffects, config.opacity),
     [hoveredLineId, hueShift, sphereData, hoverEffects, config.opacity],
   )
 
@@ -196,7 +161,7 @@ export default function QuantumOrbital({
           }}
         >
           {sphereData.lines.map((line) => {
-            const lineStyle = getLineStyle(line)
+            const lineStyle = styleForLine(line)
             return (
               <div
                 key={line.id}
