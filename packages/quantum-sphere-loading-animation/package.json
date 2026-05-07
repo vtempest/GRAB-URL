@@ -6,7 +6,7 @@
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
-  "svelte": "./src/svelte/QuantumWaveOrbital.svelte",
+  "svelte": "./src/svelte/QuantumOrbital.svelte",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -14,16 +14,16 @@
       "require": "./dist/index.js"
     },
     "./react": {
-      "types": "./dist/react/QuantumWaveOrbital.d.ts",
+      "types": "./dist/react/QuantumOrbital.d.ts",
       "import": "./src/react/index.ts",
       "require": "./src/react/index.ts"
     },
     "./svelte": {
-      "types": "./src/types/QuantumSphere.d.ts",
-      "svelte": "./src/svelte/QuantumWaveOrbital.svelte"
+      "types": "./src/types/QuantumOrbital.d.ts",
+      "svelte": "./src/svelte/QuantumOrbital.svelte"
     },
-    "./css": "./src/react/QuantumWaveOrbital.css",
-    "./types": "./src/types/QuantumSphere.d.ts"
+    "./css": "./src/react/QuantumOrbital.css",
+    "./types": "./src/types/QuantumOrbital.d.ts"
   },
   "files": [
     "dist",

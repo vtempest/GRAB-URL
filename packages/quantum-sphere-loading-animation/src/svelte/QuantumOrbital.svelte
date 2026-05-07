@@ -1,19 +1,19 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
-  import type { 
-    OrbitalSphereConfig, 
-    OrbitalLine, 
-    SphereData, 
-    HoverEffects, 
+  import { onMount, onDestroy } from "svelte";
+  import type {
+    OrbitalSphereConfig,
+    OrbitalLine,
+    SphereData,
+    HoverEffects,
     LineStyle,
     OrbitalSphereProps,
     RandomFunction,
     RandomRangeFunction,
     RandomIntFunction,
-    ColorScheme
-  } from './QuantumSphere.d.ts';
+    ColorScheme,
+  } from "../types/QuantumOrbital.d.ts";
 
-    /**
+  /**
      * Parabolic spherical orbital, inspired by quantum superposition of atomic orbitals and the 
      * [wave function collapse](https://en.wikipedia.org/wiki/Wave_function_collapse).
      * @author [vtempest](https://github.com/vtempest)
@@ -21,8 +21,7 @@
        simultaneously until measured: in this case, hovering over with mouse changes electron orbit.
 
      */
-  
-  
+
   let {
     config = {
       minLines: 6,
@@ -41,11 +40,11 @@
       maxLightness: 70,
       autoRandomizeMin: 5000,
       autoRandomizeMax: 12000,
-      opacity: 0.75
+      opacity: 0.75,
     },
     autoRandomize = true,
     className = "",
-    onSphereClick = null
+    onSphereClick = null,
   } = $props() as OrbitalSphereProps;
 
   // Simple random number generator with seed
@@ -55,33 +54,34 @@
     return (seed - 1) / 2147483646;
   };
 
-  const randomRange = (min: number, max: number): number => min + random() * (max - min);
-  const randomInt = (min: number, max: number): number => Math.floor(randomRange(min, max + 1));
+  const randomRange = (min: number, max: number): number =>
+    min + random() * (max - min);
+  const randomInt = (min: number, max: number): number =>
+    Math.floor(randomRange(min, max + 1));
 
   // Enhanced color scheme definitions
   const colorSchemes = {
     Single: (index: number, total: number, baseHue: number) => baseHue,
-    Dual: (index: number, total: number, baseHue: number) => 
+    Dual: (index: number, total: number, baseHue: number) =>
       index % 2 === 0 ? baseHue : (baseHue + 180) % 360,
     // Rainbow: (index: number, total: number) => (index / total) * 360,
     // Random: () => random() * 360,
-    Complementary: (index: number, total: number, baseHue: number) => 
+    Complementary: (index: number, total: number, baseHue: number) =>
       index % 2 === 0 ? baseHue : (baseHue + 180) % 360,
-    Triadic: (index: number, total: number, baseHue: number) => 
+    Triadic: (index: number, total: number, baseHue: number) =>
       baseHue + (index % 3) * 120,
-    Analogous: (index: number, total: number, baseHue: number) => 
-      (baseHue + (index * 30)) % 360,
+    Analogous: (index: number, total: number, baseHue: number) =>
+      (baseHue + index * 30) % 360,
     Split: (index: number, total: number, baseHue: number) => {
       const angles = [0, 150, 210];
       return (baseHue + angles[index % 3]) % 360;
     },
-    Tetradic: (index: number, total: number, baseHue: number) => 
+    Tetradic: (index: number, total: number, baseHue: number) =>
       baseHue + (index % 4) * 90,
     Monochromatic: (index: number, total: number, baseHue: number) => baseHue,
-    Warm: (index: number, total: number) => 
+    Warm: (index: number, total: number) =>
       randomRange(0, 60) + (index % 2) * 300, // Reds, oranges, yellows
-    Cool: (index: number, total: number) => 
-      randomRange(180, 270), // Blues, greens, purples
+    Cool: (index: number, total: number) => randomRange(180, 270), // Blues, greens, purples
     Neon: (index: number, total: number) => {
       const neonHues = [300, 60, 120, 180, 240, 0]; // Magenta, lime, cyan, etc.
       return neonHues[index % neonHues.length];
@@ -119,47 +119,54 @@
       const vintageHues = [30, 45, 60, 200, 220]; // Warm browns and muted blues
       return vintageHues[index % vintageHues.length];
     },
-    Gradient: (index: number, total: number, baseHue: number) => 
+    Gradient: (index: number, total: number, baseHue: number) =>
       (baseHue + (index / total) * 60) % 360, // Smooth gradient over 60 degrees
     Electric: (index: number, total: number) => {
       const electricHues = [60, 120, 180, 240, 300]; // Bright saturated colors
       return electricHues[index % electricHues.length];
-    }
+    },
   };
 
   const colorSchemeNames = Object.keys(colorSchemes) as ColorScheme[];
 
-   /**
-     * Parabolic spherical orbital, inspired by quantum superposition and the 
-     * [wave function collapse](https://en.wikipedia.org/wiki/Wave_function_collapse).
-     * @author [vtempest (2025)](https://github.com/vtempest)
-     */
+  /**
+   * Parabolic spherical orbital, inspired by quantum superposition and the
+   * [wave function collapse](https://en.wikipedia.org/wiki/Wave_function_collapse).
+   * @author [vtempest (2025)](https://github.com/vtempest)
+   */
   function generateSphereConfig(cfg: OrbitalSphereConfig = config): SphereData {
     const lineCount = randomInt(cfg.minLines, cfg.maxLines);
     const sphereSize = randomInt(cfg.minSphereSize, cfg.maxSphereSize);
     const lineWidth = randomRange(cfg.minLineWidth, cfg.maxLineWidth);
-    const glowIntensity = randomRange(cfg.minGlowIntensity, cfg.maxGlowIntensity);
-    const rotationSpeed = randomRange(cfg.minRotationSpeed, cfg.maxRotationSpeed);
-    
+    const glowIntensity = randomRange(
+      cfg.minGlowIntensity,
+      cfg.maxGlowIntensity,
+    );
+    const rotationSpeed = randomRange(
+      cfg.minRotationSpeed,
+      cfg.maxRotationSpeed,
+    );
+
     // Select random color scheme
-    const colorSchemeName = colorSchemeNames[randomInt(0, colorSchemeNames.length - 1)];
+    const colorSchemeName =
+      colorSchemeNames[randomInt(0, colorSchemeNames.length - 1)];
     const colorSchemeFunc = colorSchemes[colorSchemeName];
-    
+
     // Base color configuration
     let saturation = randomInt(cfg.minSaturation, cfg.maxSaturation);
     let lightness = randomInt(cfg.minLightness, cfg.maxLightness);
-    
+
     // Adjust saturation and lightness for specific schemes
-    if (colorSchemeName === 'Pastel') {
+    if (colorSchemeName === "Pastel") {
       saturation = randomInt(30, 50); // Lower saturation for pastels
       lightness = randomInt(70, 85); // Higher lightness for pastels
-    } else if (colorSchemeName === 'Neon' || colorSchemeName === 'Electric') {
+    } else if (colorSchemeName === "Neon" || colorSchemeName === "Electric") {
       saturation = randomInt(85, 100); // Maximum saturation for neon/electric
       lightness = randomInt(50, 70);
-    } else if (colorSchemeName === 'Vintage') {
+    } else if (colorSchemeName === "Vintage") {
       saturation = randomInt(40, 60); // Muted saturation for vintage
       lightness = randomInt(40, 60);
-    } else if (colorSchemeName === 'Monochromatic') {
+    } else if (colorSchemeName === "Monochromatic") {
       // Vary lightness for monochromatic schemes
       lightness = randomInt(30, 80);
     }
@@ -170,10 +177,10 @@
     const lines: OrbitalLine[] = [];
     for (let i = 0; i < lineCount; i++) {
       let hue = colorSchemeFunc(i, lineCount, baseHue);
-      
+
       // Special handling for monochromatic - vary lightness instead of hue
       let lineLightness = lightness;
-      if (colorSchemeName === 'Monochromatic') {
+      if (colorSchemeName === "Monochromatic") {
         lineLightness = randomInt(30, 80);
       }
 
@@ -184,7 +191,8 @@
         angleZ: random() * 360,
         hue,
         speed: randomRange(0.5, 1.5),
-        customLightness: colorSchemeName === 'Monochromatic' ? lineLightness : undefined
+        customLightness:
+          colorSchemeName === "Monochromatic" ? lineLightness : undefined,
       });
     }
 
@@ -196,7 +204,7 @@
       rotationSpeed,
       saturation,
       lightness,
-      colorScheme: colorSchemeName
+      colorScheme: colorSchemeName,
     };
   }
 
@@ -221,12 +229,11 @@
     if (!sphereRef) return;
 
     const sphereRect = sphereRef.getBoundingClientRect();
-    const isOverSphere = (
+    const isOverSphere =
       event.clientX >= sphereRect.left &&
       event.clientX <= sphereRect.right &&
       event.clientY >= sphereRect.top &&
-      event.clientY <= sphereRect.bottom
-    );
+      event.clientY <= sphereRect.bottom;
 
     if (!isOverSphere) {
       hoveredLineId = null;
@@ -234,9 +241,14 @@
     }
 
     // Find which line element is being hovered
-    const elementFromPoint = document.elementFromPoint(event.clientX, event.clientY);
+    const elementFromPoint = document.elementFromPoint(
+      event.clientX,
+      event.clientY,
+    );
     if (elementFromPoint && (elementFromPoint as HTMLElement).dataset.lineId) {
-      const lineId = parseInt((elementFromPoint as HTMLElement).dataset.lineId!);
+      const lineId = parseInt(
+        (elementFromPoint as HTMLElement).dataset.lineId!,
+      );
       if (lineId !== hoveredLineId) {
         hoveredLineId = lineId;
         // Generate random hover effects
@@ -246,7 +258,7 @@
           lightnessShift: randomRange(-20, 20),
           glowMultiplier: randomRange(1.5, 3),
           speedMultiplier: randomRange(0.3, 2.5),
-          scaleMultiplier: randomRange(1.1, 1.4)
+          scaleMultiplier: randomRange(1.1, 1.4),
         };
       }
     } else {
@@ -272,33 +284,42 @@
 
     if (isHovered) {
       finalHue = (finalHue + hoverEffects.hueShift) % 360;
-      finalSaturation = Math.min(100, finalSaturation + hoverEffects.saturationBoost);
-      finalLightness = Math.max(0, Math.min(100, finalLightness + hoverEffects.lightnessShift));
+      finalSaturation = Math.min(
+        100,
+        finalSaturation + hoverEffects.saturationBoost,
+      );
+      finalLightness = Math.max(
+        0,
+        Math.min(100, finalLightness + hoverEffects.lightnessShift),
+      );
       finalGlow *= hoverEffects.glowMultiplier;
       finalSpeed *= hoverEffects.speedMultiplier;
       finalScale = hoverEffects.scaleMultiplier;
     }
 
     const color = `hsla(${finalHue}, ${finalSaturation}%, ${finalLightness}%, ${config.opacity})`;
-    
+
     return {
       transform: `rotateX(${line.angleX}deg) rotateY(${line.angleY}deg) rotateZ(${line.angleZ}deg) scale(${finalScale})`,
       borderColor: color,
       borderWidth: `${sphereData.lineWidth}px`,
       boxShadow: `0 0 ${finalGlow}px ${color}`,
       animationDuration: `${finalSpeed}s`,
-      zIndex: isHovered ? 10 : 1
+      zIndex: isHovered ? 10 : 1,
     };
   };
 
   onMount(() => {
     // Add global mouse event listener
-    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener("mousemove", handleMouseMove);
 
     if (autoRandomize) {
       const scheduleNext = () => {
         randomizeSphere();
-        const delay = randomRange(config.autoRandomizeMin, config.autoRandomizeMax);
+        const delay = randomRange(
+          config.autoRandomizeMin,
+          config.autoRandomizeMax,
+        );
         timeoutId = window.setTimeout(scheduleNext, delay);
       };
 
@@ -313,28 +334,32 @@
     }
 
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener("mousemove", handleMouseMove);
       if (timeoutId) clearTimeout(timeoutId);
       if (hueTimeoutId) clearTimeout(hueTimeoutId);
     };
   });
 
   onDestroy(() => {
-    document.removeEventListener('mousemove', handleMouseMove);
+    document.removeEventListener("mousemove", handleMouseMove);
     if (timeoutId) clearTimeout(timeoutId);
     if (hueTimeoutId) clearTimeout(hueTimeoutId);
   });
 </script>
 
-<div class="relative w-full h-full flex justify-center items-center p-2.5 overflow-hidden {className}">
+<div
+  class="relative w-full h-full flex justify-center items-center p-2.5 overflow-hidden {className}"
+>
   <!-- Color scheme indicator (optional debug info) -->
-  <div class="absolute top-2 left-2 text-xs opacity-50 pointer-events-none z-20">
+  <div
+    class="absolute top-2 left-2 text-xs opacity-50 pointer-events-none z-20"
+  >
     <!-- {sphereData.colorScheme} -->
   </div>
-  
+
   <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
   <div class="relative z-10" onclick={handleSphereClick} bind:this={sphereRef}>
-    <div 
+    <div
       class="relative cursor-pointer orbital-sphere"
       style="
         transform-style: preserve-3d;
@@ -366,22 +391,22 @@
   .orbital-sphere {
     perspective: 1000px;
   }
-  
+
   @keyframes orbitalSpin {
-    from { 
-      transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); 
+    from {
+      transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg);
     }
-    to { 
-      transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg); 
+    to {
+      transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg);
     }
   }
-  
+
   @keyframes orbitalLineSpin {
-    from { 
-      transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); 
+    from {
+      transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg);
     }
-    to { 
-      transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg); 
+    to {
+      transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg);
     }
   }
 

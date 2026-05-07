@@ -1,12 +1,15 @@
-# Quantum Sphere Loading
+<p align="center">
+    <img width="200px"  src="https://i.imgur.com/wySaMJl.png" />
+<h3 align="center">
+  <a href="https://v0-quantum-sphere-demo.vercel.app">🎯 Demo</a>
+</h3>
+</p>
 
-
+# Quantum Orbital Loading Animation
 
 https://github.com/user-attachments/assets/903f2483-6fac-4592-be09-5fdc17196a84
 
-## [DEMO](https://v0-quantum-sphere-demo.vercel.app)
-
-A parabolic spherical orbital loading component, inspired by quantum superposition of atomic orbitals and the wave function collapse concept. Particles occupy multiple quantum states until interacting (hovering), creating a mesmerizing, high-performance UI element.
+A parabolic spherical orbital loading component, inspired by [quantum superposition of atomic orbitals](https://www.thoughtco.com/definition-of-molecular-orbital-605367) and the wave function collapse concept. Particles occupy multiple quantum states until interacting (hovering), creating a mesmerizing, high-performance UI element.
 
 Available for both **React** and **Svelte 5**.
 
@@ -25,19 +28,18 @@ bun i quantum-sphere-loading-icon
 
 ```
 
-
 ## Usage
 
 ### React
 
 ```tsx
 import React from 'react';
-import QuantumWaveOrbital from 'quantum-sphere-loading-icon';
+import QuantumOrbital from 'quantum-sphere-loading-icon';
 
 function App() {
   return (
     <div style={{ height: '500px', width: '100%' }}>
-      <QuantumWaveOrbital 
+      <QuantumOrbital 
         autoRandomize={true} 
         onSphereClick={() => console.log('Sphere clicked')} 
         className="my-custom-class"
@@ -51,11 +53,11 @@ function App() {
 
 ```svelte
 <script>
-  import QuantumWaveOrbital from 'quantum-sphere-loading-icon/svelte';
+  import QuantumOrbital from 'quantum-sphere-loading-icon/svelte';
 </script>
 
 <div class="container">
-  <QuantumWaveOrbital 
+  <QuantumOrbital 
     autoRandomize={true}
     onSphereClick={() => console.log('Sphere clicked')}
   />
@@ -85,21 +87,22 @@ const myConfig = {
   // ... see types for full list
 };
 
-<QuantumWaveOrbital config={myConfig} />
+<QuantumOrbital config={myConfig} />
 ```
 
 ### Props / API
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `config` | `OrbitalSphereConfig` | (Default Preset) | detailed configuration object |
-| `autoRandomize` | `boolean` | `true` | Periodically changes the sphere's configuration (colors, lines, size) |
-| `className` | `string` | `""` | Additional CSS classes for the container |
-| `onSphereClick` | `() => void` | `null` | Callback when the sphere is clicked |
+| Prop              | Type                    | Default          | Description                                                           |
+| ----------------- | ----------------------- | ---------------- | --------------------------------------------------------------------- |
+| `config`        | `OrbitalSphereConfig` | (Default Preset) | detailed configuration object                                         |
+| `autoRandomize` | `boolean`             | `true`         | Periodically changes the sphere's configuration (colors, lines, size) |
+| `className`     | `string`              | `""`           | Additional CSS classes for the container                              |
+| `onSphereClick` | `() => void`          | `null`         | Callback when the sphere is clicked                                   |
 
 ### OrbitalSphereConfig Interface
 
-See `src/QuantumSphere.d.ts` (or your IDE's autocomplete) for the full list of configuration options, including:
+See `src/QuantumOrbital.d.ts` (or your IDE's autocomplete) for the full list of configuration options, including:
+
 - `minLines` / `maxLines`
 - `minSphereSize` / `maxSphereSize`
 - `minGlowIntensity` / `maxGlowIntensity`

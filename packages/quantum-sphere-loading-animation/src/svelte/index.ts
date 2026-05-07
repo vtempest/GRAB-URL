@@ -1,2 +1,2 @@
-export { default as QuantumWaveOrbital } from './QuantumWaveOrbital.svelte';
-export type * from './QuantumSphere.d';
+export { default as QuantumOrbital } from "./QuantumOrbital";
+export type * from "../types/QuantumOrbital";

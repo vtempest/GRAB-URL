@@ -1,8 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import QuantumWaveOrbital from "@/components/QuantumWaveOrbital"
-import type { ColorScheme } from "@/types/QuantumSphere.d"
+import QuantumOrbital from "@/components/QuantumOrbital"
+import type { ColorScheme } from "@/types/QuantumOrbital.d"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -94,7 +94,7 @@ export default function Home() {
         <div className="flex flex-1 items-start justify-center p-8">
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: sphereCount }).map((_, index) => (
-              <QuantumWaveOrbital
+              <QuantumOrbital
                 key={`${key}-${index}`}
                 config={config}
                 autoRandomize={!selectedScheme}

@@ -10,9 +10,9 @@ import type {
   LineStyle,
   OrbitalSphereProps,
   ColorScheme,
-} from "@/types/QuantumSphere.d"
+} from "@/types/QuantumOrbital.d"
 
-import "./QuantumWaveOrbital.css"
+import "./QuantumOrbital.css"
 
 /**
  * Parabolic spherical orbital, inspired by quantum superposition of atomic orbitals and the
@@ -21,7 +21,7 @@ import "./QuantumWaveOrbital.css"
  * simultaneously until measured: in this case, hovering over with mouse changes electron orbit.
  * @author [vtempest](https://github.com/vtempest)
  */
-export default function QuantumWaveOrbital({
+export default function QuantumOrbital({
   config = {
     minLines: 6,
     maxLines: 12,
