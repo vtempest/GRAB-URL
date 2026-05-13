@@ -49,7 +49,7 @@ export function LLMCopyButton({
       className={cn(
         buttonVariants({
           size: 'sm',
-          className: 'gap-2 [&_svg]:size-3.5 [&_svg]:text-fd-muted-foreground',
+          className: 'gap-2 [&_svg]:size-3.5',
         }),
       )}
       onClick={onClick}

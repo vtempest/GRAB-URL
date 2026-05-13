@@ -1,6 +1,23 @@
-https://i.imgur.com/wySaMJl.png
-
-
+<p align="center">
+    <img width="350px" src="https://i.imgur.com/wySaMJl.png" />
+<h3 align="center">
+   <a href="https://grab.js.org">📑 Docs</a>
+  <a href="https://grab.js.org/docs/examples">🎯 Examples</a>
+</h3>
+<p align="center">
+  <a href="https://discord.gg/SJdBqBz3tV"><img src="https://img.shields.io/discord/1110227955554209923.svg?label=Chat&logo=Discord&colorB=7289da&style=flat"
+          alt="Join Discord" /></a>
+  <a href="https://github.com/vtempest/GRAB-URL/discussions"><img alt="GitHub Stars" src="https://img.shields.io/github/stars/vtempest/GRAB-URL" /></a>
+  <a href="https://github.com/vtempest/GRAB-URL/discussions"><img alt="GitHub Discussions"
+      src="https://img.shields.io/github/discussions/vtempest/GRAB-URL" /></a>
+  <br />
+  <a href="https://github.com/vtempest/GRAB-URL/pulse"><img src="https://img.shields.io/github/commit-activity/m/vtempest/GRAB-URL" alt="Activity" /></a>
+  <a href="https://github.com/vtempest/GRAB-URL/commits/master/"><img src="https://img.shields.io/github/last-commit/vtempest/GRAB-URL.svg" alt="GitHub last commit" /></a>
+  <br />
+  <img src="https://img.shields.io/badge/Claude-D97757?logo=claude&logoColor=fff" alt="Claude AI">
+  <a href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome" /></a>
+  <a href="https://codespaces.new/vtempest/GRAB-URL"><img src="https://github.com/codespaces/badge.svg" width="150" height="20" alt="GitHub Codespaces" /></a>
+</p>
 
 # Quantum Sphere Loading
 
@@ -32,15 +49,15 @@ bun i quantum-sphere-loading-icon
 ### React
 
 ```tsx
-import React from 'react';
-import QuantumWaveOrbital from 'quantum-sphere-loading-icon';
+import React from "react";
+import QuantumWaveOrbital from "quantum-sphere-loading-icon";
 
 function App() {
   return (
-    <div style={{ height: '500px', width: '100%' }}>
-      <QuantumWaveOrbital 
-        autoRandomize={true} 
-        onSphereClick={() => console.log('Sphere clicked')} 
+    <div style={{ height: "500px", width: "100%" }}>
+      <QuantumWaveOrbital
+        autoRandomize={true}
+        onSphereClick={() => console.log("Sphere clicked")}
         className="my-custom-class"
       />
     </div>
@@ -56,7 +73,7 @@ function App() {
 </script>
 
 <div class="container">
-  <QuantumWaveOrbital 
+  <QuantumWaveOrbital
     autoRandomize={true}
     onSphereClick={() => console.log('Sphere clicked')}
   />
@@ -86,17 +103,17 @@ const myConfig = {
   // ... see types for full list
 };
 
-<QuantumWaveOrbital config={myConfig} />
+<QuantumWaveOrbital config={myConfig} />;
 ```
 
 ### Props / API
 
-| Prop              | Type                    | Default          | Description                                                           |
-| ----------------- | ----------------------- | ---------------- | --------------------------------------------------------------------- |
+| Prop            | Type                  | Default          | Description                                                           |
+| --------------- | --------------------- | ---------------- | --------------------------------------------------------------------- |
 | `config`        | `OrbitalSphereConfig` | (Default Preset) | detailed configuration object                                         |
-| `autoRandomize` | `boolean`             | `true`         | Periodically changes the sphere's configuration (colors, lines, size) |
-| `className`     | `string`              | `""`           | Additional CSS classes for the container                              |
-| `onSphereClick` | `() => void`          | `null`         | Callback when the sphere is clicked                                   |
+| `autoRandomize` | `boolean`             | `true`           | Periodically changes the sphere's configuration (colors, lines, size) |
+| `className`     | `string`              | `""`             | Additional CSS classes for the container                              |
+| `onSphereClick` | `() => void`          | `null`           | Callback when the sphere is clicked                                   |
 
 ### OrbitalSphereConfig Interface
 
