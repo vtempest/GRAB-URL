@@ -1,5 +1,8 @@
 import { createMDX } from 'fumadocs-mdx/next';
 import { resolve } from 'path';
+import { initOpenNextCloudflareForDev } from '@opennextjs/cloudflare';
+
+initOpenNextCloudflareForDev();
 
 const withMDX = createMDX({
   // mdxOptions: {
@@ -12,12 +15,10 @@ const withMDX = createMDX({
 type MDXNextConfig = NonNullable<Parameters<typeof withMDX>[0]>;
 
 export const config = {
+  serverExternalPackages: ['typescript', 'fumadocs-typescript'],
   // output: 'export',
   // distDir: './dist',
-  serverExternalPackages: [],
-  turbopack: {
-    root: resolve(import.meta.dirname, '..'),
-  },
+  outputFileTracingRoot: resolve(import.meta.dirname, '..'),
   async rewrites() {
     return [
       {

@@ -14,7 +14,7 @@ import { openapiPlugin } from 'fumadocs-openapi/server'
 
 export const source = loader({
   baseUrl: '/docs',
-  plugins: [pageTreeCodeTitles(), lucideIconsPlugin(), openapiPlugin()],
+  plugins: [pageTreeCodeTitles(), lucideIconsPlugin(), openapiPlugin() as any],
   source: docs.toFumadocsSource(),
 })
 

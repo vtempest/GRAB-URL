@@ -8,7 +8,7 @@ import Link from 'next/link';
 
 export function Breadcrumb({ tree }: { tree: Root }) {
   const pathname = usePathname();
-  const items = useBreadcrumb(pathname, tree);
+  const items = useBreadcrumb(pathname ?? "", tree);
 
   if (items.length === 0) return null;
 
