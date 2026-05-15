@@ -39,7 +39,6 @@ export type GrabOptions<TResponse = any, TParams = any> = {
   cacheForTime?: number;
   /** default=30 The timeout for the request in seconds */
   timeout?: number;
-  /** default='/api/' base url prefix, override with SERVER_API_URL env */
   baseURL?: string;
   /** default=true Cancel previous requests to same path */
   cancelOngoingIfNew?: boolean;
