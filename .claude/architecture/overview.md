@@ -1,61 +1,73 @@
 # Architecture Overview
 
-A monorepo in layout, a **single published package** in practice. `packages/*`
-are source modules; one Vite build at the repo root compiles them into the
-`grab-url` package's `dist/`, and the root `package.json` exposes them as
-subpath exports.
+One npm package (`grab-url`) built from several source folders under
+`packages/`, plus a documentation site and an agent skill. There is no
+per-package build: the root `vite.config.ts` compiles every entry into one
+`dist/`, and `package.json`'s `exports` map is the public surface.
 
-## What ships
+## The packages
 
-`grab-url`, version-pinned at the repo root, with these public entries:
-
-| Import | Built from | What it is |
+| Folder | Published as | What it is |
 | --- | --- | --- |
-| `grab-url` | `packages/grab-api/src/index.ts` | The HTTP client: caching, retries, rate limiting, request dedupe, mock support |
-| `grab-url/slim` | `packages/grab-api/src/index.slim.ts` | The same client with the heavy dependencies externalized |
-| `grab-url/animations` | `packages/loading-animations/src/svg/index.ts` | Tree-shakable SVG spinners |
-| `grab-url/icons/quantum-sphere` | `packages/quantum-sphere-loading-animation/src/icons.ts` | The React orbital loader |
-| `grab-url/log` | `packages/log-json/src/log-json.ts` | JSON logger |
-| `grab-url/cli` | `packages/grab-url-cli/src/index.ts` | The CLI, also installed as the `grab-url`, `grab` and `g` bins |
+| `grab-api` | the `grab-url` main entry | The `grab()` function. Zero runtime dependencies — that is the product claim. |
+| `grab-url-cli` | `grab-url` / `grab` / `g` bins | The download CLI: HTTP, SFTP, torrents/magnets (aria2c), 700+ media sites (yt-dlp), page archiving. |
+| `archiver-web` | `archiver-web`, `grab-url/…` bins | ZIP extract/create on JSZip. Frontend-only, no WASM. Powers auto-unzip. |
+| `api2client` | `api2client` | Generates a typed client from an OpenAPI spec with Hey API, wired to send through `grab` instead of axios. |
+| `log-json` | `grab-url/log` | `log()` — the colored JSON structure printer and request history. |
+| `loading-animations` | `grab-url/animations` | Tree-shakable SVG spinners plus CLI terminal spinner frames. |
+| `quantum-sphere-loading-animation` | `grab-url/icons/quantum-sphere` | The 3D orbital loader, React and Svelte. |
+| `native-app-wrapper` | `native-app-wrapper` | Tauri scaffold packaging a site or a bundled CLI as a desktop/mobile app, driven by one JSON profile. Ships grab-url's downloader with yt-dlp as a sidecar. **Excluded from the workspace globs** (`"!packages/native-app-wrapper"`) — it installs and builds on its own. |
 
-Plus three more build entries that back the archive tooling: `archiver-web`,
-`bin-extract`, `bin-compress`.
+## Inside `grab-api`
 
-## Source packages
+```
+src/index.ts              the grab() entry and the instance factory
+src/index.slim.ts         the same, with the heavy processors externalized
+src/core/
+  core.ts                 the request lifecycle
+  request-prep.ts         params, headers, baseURL, body encoding
+  request-executor.ts     the fetch call (…-slim.ts is the trimmed variant)
+  flow-control.ts         dedupe, cancel, rate limit, timeout, retry
+  cache-pagination.ts     the frontend cache and infinite-scroll paging
+  regrab-events.ts        refetch on refocus / network change / stale
+  content-processors.ts   auto-JSON, auto-unzip, DOM parsing
+src/response/
+  response-handler.ts     shaping { data, error, isLoading } onto the response object
+  infinite-scroll.ts      merging the next page, scroll position recovery
+src/devtools/devtools.ts  the Ctrl+Alt+I overlay
+src/common/{types,utils}.ts
+```
 
-| Package | npm name | Published? |
-| --- | --- | --- |
-| `grab-api` | `@grab-url/grab-api` | **No** — bundled into `grab-url` |
-| `grab-url-cli` | `@grab-url/cli` | **No** — bundled |
-| `log-json` | `@grab-url/log` | **No** — bundled |
-| `api2client` | `api2client` | Yes |
-| `archiver-web` | `archiver-web` | Yes |
-| `loading-animations` | `loading-animations` | Yes |
-| `quantum-sphere-loading-animation` | `quantum-sphere-loading-icon` | Yes |
-| `native-app-wrapper` | `native-app-wrapper` | No — **and excluded from the workspace globs** |
+A request runs: `request-prep` → `flow-control` (may short-circuit on dedupe,
+rate limit or cache) → `request-executor` → `content-processors` →
+`response-handler`. The response object is pre-initialized and mutated, which is
+why `.isLoading` can be bound by any framework without a hook.
 
-So there are two kinds of directory under `packages/`: internals that only exist
-to be bundled, and packages that publish in their own right *and* get bundled
-into a `grab-url` entry. Know which one you are in before you reason about how a
-consumer receives your change.
+**Slim vs full.** `index.slim.ts` is a second entry that externalizes
+`archiver-web` and `linkedom`, for consumers who do not want unzip and DOM
+parsing pulled in. A change in `content-processors.ts` usually needs a matching
+thought about whether the slim build still resolves.
 
-## Other top-level directories
+## Inside `grab-url-cli`
 
-| Directory | What it is |
-| --- | --- |
-| `test/` | **All the tests.** Vitest, run through the root `vite.config.ts`. |
-| `grab-help-docs/` | The Fumadocs documentation site, deployed to GitHub Pages. A workspace. |
-| `skills/use-grab-request/` | The agent skill — the source of truth for the docs page about it |
-| `examples/` | Runnable examples: basic request, cookbook, reactive React/Svelte/Vue, api2client |
-| `scripts/` | `install-yt-dlp.mjs` (postinstall), `sync-skill-docs.mjs` |
-| `docs/` | A GitHub Pages Jekyll stub — `_config.yml` plus an `index.html` redirect. No documentation; see [documentation.md](documentation.md), which also explains why it is what breaks the Vercel deploy. |
-| `dist/` | Build output. Generated; never hand-edited, never a source of truth. |
+```
+src/index.ts              arg parsing → dispatch
+src/cli-args.ts           the flag surface
+src/transfer/
+  media-domains.ts        which URLs get routed to yt-dlp (700+ domains)
+  ytdlp-transfer.ts       yt-dlp, ytdlp-binary.ts installs/locates it
+  aria2-transfer.ts       torrents and magnet links
+  single-file-transfer.ts / multi-file-transfer.ts
+  resume-state.ts         resumable transfers
+src/page/                 --page: archive an article into ./<Page Title>/
+src/background.ts         detach and keep going
+src/keyboard-controls.ts  Ctrl+C offering resume/background rather than dying
+src/display/, download-spinners.ts, cancel-state.ts
+```
 
-## Optional peers, loaded at runtime
+`--page` loads **`extract-webpage`** (the qwksearch extractor) through a runtime
+`import()`. It is an optional peer dependency and must never enter the bundle —
+it drags in jsdom/linkedom. `extract-webpage-loader.ts` exists to keep that
+boundary; do not turn it into a static import.
 
-`grab-url` declares `react`, `react-dom` and **`extract-webpage`** as optional
-peer dependencies. `extract-webpage` is the qwksearch content extractor behind
-`grab-url --page`; it is loaded through a runtime `import()` and drags in
-jsdom/linkedom, so it is externalized and **must never enter the CLI bundle**.
-The same applies to React for the quantum-sphere entry — see
-[build.md](build.md).
+yt-dlp is installed by `scripts/install-yt-dlp.mjs`, which runs on `postinstall`.

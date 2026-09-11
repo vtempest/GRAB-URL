@@ -1,82 +1,80 @@
 # CLAUDE.md — GRAB-URL
 
 Orientation for Claude agents working in this repository. Read this first; the
-detailed notes live in [`.claude/architecture/`](.claude/architecture/) and are
-linked from each section below.
+detailed notes live in [`.claude/architecture/`](.claude/architecture/).
 
-`grab-url` ("Generate Request to API from Browser") is one npm package with
-several subpath entries — an HTTP client with caching, retries, rate limiting
-and request dedupe; a download/archive CLI; loading animations; and a JSON
-logger. The repo is a monorepo in layout only: **`packages/*` are source
-modules, and one Vite build at the root bundles them all into a single
-published `dist/`.**
+**GRAB — Generate Request to API from Browser.** One `grab()` function with no
+runtime dependencies that replaces a request library: auto-JSON, auto-unzip, DOM
+parsing, dedupe, retry, timeout, rate limiting, caching, infinite scroll, mocks
+and a devtools overlay. Around it: a media-downloading CLI, an OpenAPI client
+generator, loading animations, and a Tauri wrapper.
 
 ## Ground rules
 
-1. **npm, not bun or pnpm.** `packageManager` pins `npm@11.19.1` and CI runs
-   `npm install` / `npm ci` against `package-lock.json`. A `pnpm-workspace.yaml`
-   exists for pnpm compatibility, but there is no pnpm lockfile — do not switch
-   package managers or commit a second lockfile.
-2. **There is no root `src/`.** All source lives under `packages/*/src`, and the
-   published entry points are built from there. See
+1. **npm, not bun or yarn.** `packageManager` pins `npm@11.19.1` and CI runs
+   `npm install`. The Pages workflow uses `npm ci` deliberately — a floating
+   resolve picks an incompatible fumadocs pair. Commit `package-lock.json`.
+2. **The published package has one build, from the repo root.** `packages/*` are
+   source folders, not independently published packages — `vite.config.ts` at the
+   root compiles all of them into one `dist/`. See
    [`architecture/build.md`](.claude/architecture/build.md).
-3. **Most `packages/*` are private internals**, not separately published
-   packages. `@grab-url/grab-api`, `@grab-url/cli` and `@grab-url/log` are
-   compiled *into* `grab-url`. See
-   [`architecture/monorepo.md`](.claude/architecture/monorepo.md).
-4. **Changing `vite.config.ts` is changing the product.** Externals, aliases,
-   the `"use client"` restoration and the CLI shebang banner each exist because
-   something broke without them. Read the comments before touching it.
-5. **Tests live in the root `test/` folder**, run by Vitest through the same
-   `vite.config.ts`. Coverage counts `packages/**/src/**`.
-6. **`postinstall` downloads yt-dlp** (`scripts/install-yt-dlp.mjs`). An install
-   that "hangs" is usually that.
-7. **Never commit secrets** or build output. `dist/` is generated.
+3. **Zero runtime dependencies in `grab-api`.** That is the product claim. Adding
+   an import to `packages/grab-api/src/` that is not a Node builtin breaks it.
+4. **Documentation goes in the user guide**, `grab-help-docs/content/docs`.
+   The root `docs/` folder holds no documentation — it is a vestigial Jekyll stub
+   from before GitHub Pages switched to deploying via Actions, and PR #47 removes
+   it. Put nothing there, and do not recreate it. See
+   [`architecture/documentation.md`](.claude/architecture/documentation.md).
+5. **The skill is generated.** `grab-help-docs/content/docs/claude-skill.mdx` is
+   written from `skills/use-grab-request/SKILL.md` — edit the skill, then run
+   `npm run make:skill`.
+6. **Never commit secrets**, credentials, API keys, or `dist/` changes that did
+   not come from a build.
 
 ## Where things live
 
 | You want to change… | Go to |
 | --- | --- |
-| The HTTP client, caching, retries, dedupe | `packages/grab-api` |
-| The `grab` / `grab-url` CLI | `packages/grab-url-cli` |
-| Archive extract/create | `packages/archiver-web` |
-| SVG + terminal loading spinners | `packages/loading-animations` |
-| The React/Svelte orbital loader | `packages/quantum-sphere-loading-animation` |
-| JSON logging | `packages/log-json` |
-| The Hey API client adapter | `packages/api2client` |
-| Documentation | `grab-help-docs` |
-| The agent skill | `skills/use-grab-request` |
-| Build entries, externals, bundling | `vite.config.ts` |
+| The `grab()` request function | `packages/grab-api/src/` |
+| The `grab-url` download CLI | `packages/grab-url-cli/src/` |
+| ZIP extract/create | `packages/archiver-web/src/` |
+| The OpenAPI → client generator | `packages/api2client/` |
+| `log()` and the JSON printer | `packages/log-json/src/` |
+| SVG / CLI spinners | `packages/loading-animations/src/` |
+| The 3D orbital loader | `packages/quantum-sphere-loading-animation/` |
+| The Tauri desktop/mobile wrapper | `packages/native-app-wrapper/` (not in the workspace globs) |
+| Build entries, externals, bundling | `vite.config.ts` at the root |
+| Documentation | `grab-help-docs/content/docs/` |
+| The agent skill | `skills/use-grab-request/SKILL.md` |
 
 Full map: [`architecture/overview.md`](.claude/architecture/overview.md).
 
 ## Commands
 
 ```bash
-npm install                    # not bun, not pnpm
-npm run build                  # vite build — produces every dist entry
-npm run make                   # icons → skill docs → help docs → build
-npm run test                   # vitest
-npm run test:coverage
-npm run test:cli               # a real end-to-end CLI download
+npm install                 # never bun/yarn
+npm run build               # vite build — the whole dist/
+npm run make                # icons → skill → docs → build (the full refresh)
+npm test                    # vitest
+npm run test:coverage       # as CI runs it
+npm run test:cli            # a real download, end to end
 ```
 
 ## Before you open a PR
 
-- Run `npm run test:coverage` — that is what CI runs.
-- Run `npm run build` if you touched anything under `packages/*/src` or
-  `vite.config.ts`, and check the entry you changed actually appears in `dist/`.
-- If you changed the CLI's public behaviour, update
-  `skills/use-grab-request/SKILL.md` and run `npm run make:skill` — the docs
-  page is generated from the skill.
-- Target `master`. Keep the PR focused; no drive-by refactors.
+- `npm run test:coverage`, and `npm run build` if you touched anything bundled.
+- If you changed the skill, run `npm run make:skill` and commit the regenerated
+  docs page; `--check` fails when it is stale.
+- Commit style is **gitmoji + conventional commits**:
+  `✨ feat(cli): archive a page into a folder with --page`. See
+  [`architecture/conventions.md`](.claude/architecture/conventions.md).
+- Target `master`. Keep the PR focused.
 
 ## Detailed notes
 
 | Note | Covers |
 | --- | --- |
-| [overview.md](.claude/architecture/overview.md) | What ships, every entry point, every source package |
-| [build.md](.claude/architecture/build.md) | The one Vite build: entries, externals, aliases, and the hacks that must not be removed |
-| [monorepo.md](.claude/architecture/monorepo.md) | Workspaces, npm vs pnpm, which packages actually publish, tests |
-| [documentation.md](.claude/architecture/documentation.md) | `grab-help-docs`, the generated skill page, the Pages deploy |
-| [conventions.md](.claude/architecture/conventions.md) | Code style, commits, PRs, CI, publishing, security |
+| [overview.md](.claude/architecture/overview.md) | What each package does and how a request flows through `grab()` |
+| [build.md](.claude/architecture/build.md) | The single root build, entries, externals, and the traps in it |
+| [documentation.md](.claude/architecture/documentation.md) | The Fumadocs site, the two deployments, the vestigial root `docs/`, and the broken Vercel setting |
+| [conventions.md](.claude/architecture/conventions.md) | Code style, commits, PRs, CI, publishing |

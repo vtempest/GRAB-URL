@@ -1,81 +1,87 @@
 # The Build
 
-One `vite build` at the repo root produces every published entry. `vite.config.ts`
-is therefore the most consequential file in the repo: it is the packaging, the
-module boundaries and the runtime contract all at once.
-
-Its comments record real production failures. Read them before editing, and do
-not remove any of the following.
-
-## Aliases: how `packages/*` resolve
-
-```ts
-"@grab-url/log"      → packages/log-json/src/log-json.ts
-"@grab-url/grab-api" → packages/grab-api/src/index.ts
-"grab-url"           → packages/grab-api/src/index.ts
-```
-
-That last one matters: the Hey API client imports the **published package
-name**, and inside the monorepo it has to resolve to the same source. Without
-it you get two copies of the client in one bundle.
-
-## Externals — three separate reasons
-
-| Externalized | Why |
-| --- | --- |
-| Node builtins (`node:*` and a long explicit list) | The library runs in browsers too |
-| `chalk`, `cli-table3`, `cli-progress`, `cli-spinners` | CLI-only deps, kept out of library bundles |
-| **`extract-webpage`** | The optional peer behind `grab-url --page`. It is loaded via runtime `import()` and pulls in jsdom/linkedom. **Bundling it would drag a DOM implementation into the CLI.** |
-| **`react`, `react-dom`, `react/jsx-runtime`, `react/jsx-dev-runtime`** | A second React copy makes every hook in `QuantumOrbital` throw *"Invalid hook call"*. No other entry imports React, so this costs nothing elsewhere. |
-| `jszip` | Heavy; the archive tooling's caller provides it |
-| `archiver-web`, `linkedom` — **slim entry only** | The point of `grab-url/slim`: the same client without the heavy deps. Externalized only when the importer is `index.slim`. |
-
-## The two output hacks
-
-Both exist because the obvious approach silently fails.
-
-**1. `"use client"` on the quantum-sphere bundles.** Rollup drops the source
-file's module-level directive when bundling, and a `banner` does not survive
-either — terser re-parses the chunk afterwards and discards a directive it reads
-as dead code in an ES module. Writing it in `generateBundle`, which runs *after*
-minification, is the one point where it sticks. Without it, a React Server
-Component importing the sphere fails on the first hook.
-
-**2. The shebang banner.** `rollupOptions.output.banner` adds
-`#!/usr/bin/env node` to `grab-url-cli` and any `bin-*` chunk. The bins in
-`package.json` point at these files directly; without the shebang they are not
-executable.
-
-Also note `inlineDynamicImports: false` — the runtime `import()` of
-`extract-webpage` depends on dynamic imports staying dynamic.
-
-## Output shape
-
-- Formats: **ES and CJS**, named `<entry>.<format>.js`.
-- Target `es2022`, minified with **terser**, sourcemaps on.
-- Types via `vite-plugin-dts` over `packages/**/*.ts(x)`, excluding the
-  quantum-sphere Svelte, demo and dist directories.
-
-## After changing the build
+Everything published comes from **one** Vite build at the repo root. There is no
+per-package build step, and `packages/*/package.json` files are mostly metadata —
+editing one does not change what ships.
 
 ```bash
-npm run build
-ls dist/          # the entry you touched must be there, in both formats
+npm run build      # vite build --config vite.config.ts → dist/
+npm run make       # icons → skill docs → docs site → build
 ```
 
-A missing or renamed `dist` file is a broken `exports` map, which consumers hit
-at import time and no test here will catch.
+`npm run make` is the full refresh:
 
-## `npm run make`
+1. `make:icons` — regenerates `packages/loading-animations/src/svg/index.ts` from
+   the SVG files with `export-svg-typescript`.
+2. `make:skill` — regenerates `grab-help-docs/content/docs/claude-skill.mdx` from
+   `skills/use-grab-request/SKILL.md`.
+3. `make:docs` — `turbo run build --filter=grab-help-docs`.
+4. `build` — the library bundle.
 
-The full pipeline, in order:
+## Entries
 
+Each key becomes `dist/<name>.{es,cjs}.js` plus a `.d.ts`, and is wired into
+`package.json`'s `exports`:
+
+| Entry | From | Exposed as |
+| --- | --- | --- |
+| `grab-api` | `packages/grab-api/src/index.ts` | `grab-url` |
+| `grab-api-slim` | `…/index.slim.ts` | `grab-url/slim` |
+| `animations` | `packages/loading-animations/src/svg/index.ts` | `grab-url/animations` |
+| `quantum-sphere` | `packages/quantum-sphere-loading-animation/src/icons.ts` | `grab-url/icons/quantum-sphere` |
+| `log` | `packages/log-json/src/log-json.ts` | `grab-url/log` |
+| `grab-url-cli` | `packages/grab-url-cli/src/index.ts` | `grab-url/cli`, and the `grab-url`/`grab`/`g` bins |
+| `archiver-web`, `bin-extract`, `bin-compress` | `packages/archiver-web/src/` | `archiver-web` and its bins |
+
+**Adding an entry means editing three places**: `build.lib.entry` in
+`vite.config.ts`, `exports` in `package.json`, and `files` if it needs new source
+shipped.
+
+## Externals — each one is load-bearing
+
+`rollupOptions.external` is a function, not a list, and every branch is there for
+a reason:
+
+- **Node builtins** (`node:*` and the `nodeBuiltins` list) — the CLI is a Node
+  program; bundling these breaks it.
+- **`extract-webpage`** — the optional peer behind `--page`, loaded by runtime
+  `import()`. Bundling it pulls jsdom/linkedom into the CLI.
+- **`react`, `react-dom`, the JSX runtimes** — a second React copy makes every
+  hook in `QuantumOrbital` throw *Invalid hook call*. Only the sphere imports
+  React, so this is a no-op for the other entries.
+- **`jszip`** — always external.
+- **`archiver-web` and `linkedom`, but only when the importer is `index.slim`** —
+  this is what makes the slim build slim. The `importer?.includes("index.slim")`
+  check is the whole mechanism.
+
+## Two traps that have already cost a release
+
+**The `"use client"` directive on the quantum-sphere bundles.** Rollup drops the
+source file's module-level directive when bundling, and a `banner` does not
+survive either — terser re-parses the chunk and discards a directive it reads as
+dead code in an ES module. The `useClientDirective` plugin writes it in
+`generateBundle`, after minification, which is the one point where it sticks.
+Without it, a React Server Component importing the sphere fails on the first
+hook. Do not "simplify" that plugin into a banner.
+
+**Shebangs.** `rollupOptions.output.banner` adds `#!/usr/bin/env node` to
+`grab-url-cli` and the `bin-*` chunks by name. A renamed entry silently loses its
+shebang and the bin stops being executable.
+
+## Aliases
+
+`resolve.alias` maps `@grab-url/log`, `@grab-url/grab-api` **and the published
+name `grab-url`** to the in-repo source, so the generated Hey API client — which
+imports `grab-url` by package name — resolves to the same source inside the
+monorepo as it does for a consumer.
+
+## Tests
+
+Vitest is configured inside `vite.config.ts` (`test.coverage`), with tests in
+`test/*.test.ts` and coverage over `packages/**/src/**`.
+
+```bash
+npm test                 # watch
+npm run test:coverage    # what CI runs
+npm run test:cli         # a real end-to-end download
 ```
-make:icons  → export-svg-typescript over packages/loading-animations/src/svg
-make:skill  → scripts/sync-skill-docs.mjs   (skill → docs page)
-make:docs   → turbo build --filter=grab-help-docs
-build       → vite build
-```
-
-Use it when you changed icons, the skill or the docs — `npm run build` alone
-skips all three.
