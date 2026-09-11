@@ -79,7 +79,9 @@ export {
   runYtDlpTransfer,
   YTDLP_PROGRESS_TEMPLATE,
 } from "./transfer/ytdlp-transfer.js";
+export { runYtDlpDownload } from "./transfer/ytdlp-transfer.js";
 export type {
+  YtDlpMetadata,
   YtDlpOptions,
   YtDlpProgress,
 } from "./transfer/ytdlp-transfer.js";
@@ -120,18 +122,6 @@ export {
   buildContentDocument,
   buildTranscriptDocument,
 } from "./page/archive-html.js";
-export {
-  findYtDlp,
-  ytDlpInstallHint,
-  parseYtDlpSize,
-  parseYtDlpEta,
-  parseYtDlpProgress,
-  buildYtDlpArgs,
-  describeYtDlpExit,
-  probeYtDlp,
-  runYtDlpDownload,
-} from "./transfer/ytdlp-transfer.js";
-export type { YtDlpMetadata, YtDlpOptions, YtDlpProgress } from "./transfer/ytdlp-transfer.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
