@@ -1,10 +1,9 @@
-# GitHub Pages builds this folder with Jekyll (Settings -> Pages -> "Deploy from
-# a branch", folder /docs), which is why this folder still exists after the
-# documentation app moved to ../grab-help-docs.
+# Leftover from when GitHub Pages built this folder with Jekyll (Settings ->
+# Pages -> "Deploy from a branch", folder /docs). That is no longer how the site
+# is published: Pages now deploys the static export from
+# .github/workflows/pages.yml, and nothing reads this file.
 #
-# The real documentation site at https://grab.js.org is the Next.js + Fumadocs
-# app in `grab-help-docs/`, built with `next build`. All that lives here is the
-# index.html redirect below, so Jekyll has nothing it can choke on — no `.mdx`
-# sources with JSX expressions, no README with `{{ ... }}` in a code sample.
+# The documentation site is the Next.js + Fumadocs app in `grab-help-docs/`.
+# See README.md in this folder before deleting it.
 exclude:
   - node_modules

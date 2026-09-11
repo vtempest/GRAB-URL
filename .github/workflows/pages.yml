@@ -1,8 +1,8 @@
 # Builds the Fumadocs docs site and publishes it to GitHub Pages.
 #
-# Requires Settings -> Pages -> Source: "GitHub Actions". While the source is still
-# "Deploy from a branch", GitHub keeps running its own Jekyll workflow over /docs and
-# this one never deploys -- docs/_config.yml keeps that build green in the meantime.
+# Settings -> Pages -> Source is "GitHub Actions", so this workflow is what publishes
+# the site. The /docs folder it used to build from with Jekyll is no longer read by
+# Pages at all; see docs/README.md for what is still keeping that folder around.
 #
 # The site is a full Next.js app, so it is exported statically here: see
 # grab-help-docs/scripts/build-static-pages.mjs for the server-only pieces that are pruned and
