@@ -4,47 +4,64 @@ All documentation lives in the user guide, **`grab-help-docs/content/docs`** —
 Next.js + Fumadocs app. Nothing else in this repo is documentation prose, with
 the package `README.md`s and the agent skill as the two deliberate exceptions.
 
-## `docs/` at the root is vestigial
+## `docs/` at the root is gone
 
-It holds three files and no documentation: a Jekyll `_config.yml`, an
+It held three files and no documentation: a Jekyll `_config.yml`, an
 `index.html` redirect to grab.js.org, and a `README.md` describing itself.
 
-They are left over from when GitHub Pages deployed from a branch folder — `/docs`
-being the only folder name Pages accepts besides the repository root. **Pages no
-longer works that way.** Settings → Pages → Source is "GitHub Actions", and
-`.github/workflows/pages.yml` publishes the static export built from
-`grab-help-docs/out`. Nothing reads `docs/` at all.
+They were left over from when GitHub Pages deployed from a branch folder —
+`/docs` being the only folder name Pages accepts besides the repository root.
+**Pages no longer works that way.** Settings → Pages → Source is "GitHub
+Actions", and `.github/workflows/pages.yml` publishes the static export built
+from `grab-help-docs/out`. Nothing read `docs/` at all, so PR #47 deleted the
+folder (commit `c894e60`).
 
-Verify that claim rather than trusting this paragraph, or the folder's own
-README: the `Deploy docs to Pages` workflow ends in `actions/deploy-pages@v5`,
-which **only succeeds when Source is "GitHub Actions"**, and it is green on
-`master`. If it is passing, the folder is inert.
+Verify that claim rather than trusting this paragraph: the `Deploy docs to
+Pages` workflow ends in `actions/deploy-pages@v5`, which **only succeeds when
+Source is "GitHub Actions"**, and it is green on `master`.
 
-The folder's `README.md` and `_config.yml` still assert that Pages builds them
-with Jekyll. That is stale, and it is load-bearing stale: it is the stated reason
-the folder exists. PR #47 corrects those files and then deletes the folder.
+So: put no documentation here, and do not recreate the folder.
 
-So: put no documentation here, and do not recreate it once it is gone.
-
-## The Vercel deploy is broken, and `docs/` is why
+## The Vercel deploy is broken, and `docs/` is still why
 
 Every deployment of the `grab-url` Vercel project is failing, production
-included, and has been since the docs app was renamed `docs/` → `grab-help-docs/`.
+included, and has been since the docs app was renamed `docs/` →
+`grab-help-docs/`.
 
-The project's **Root Directory is still `docs`**. Turbo resolves no package from
-there (`docs/` matches neither `packages/*` nor `grab-help-docs` in the workspace
-globs), so it reports `No tasks were executed as part of this run`, never writes
-a `.next`, and Vercel fails with:
+The project's **Root Directory is still `docs`**. While the folder existed,
+turbo resolved no package from there (`docs/` matched neither `packages/*` nor
+`grab-help-docs` in the workspace globs), so it reported `No tasks were
+executed as part of this run`, never wrote a `.next`, and Vercel failed with:
 
 ```
 The file "/vercel/path0/docs/.next/routes-manifest.json" couldn't be found.
 ```
 
-**This is a dashboard setting, not a diff — no commit can fix it.** Set Root
-Directory to `grab-help-docs`, clear the `npm install --prefix=..` Install
-Command override, and leave Build Command unset; `grab-help-docs/vercel.json`
-supplies all three. Deleting `docs/` does not fix it either — it only changes the
-error to a missing-root-directory one.
+Now that the folder is deleted the build fails one step earlier, immediately
+after the clone:
+
+```
+The specified Root Directory "docs" does not exist. Please update your Project Settings.
+```
+
+Same cause, louder error. **This is a dashboard setting, not a diff — no commit
+can fix it**, and deleting `docs/` did not fix it either. In Vercel → the
+`grab-url` project → Settings → Build and Deployment:
+
+1. Set **Root Directory** to `grab-help-docs` (it is `docs`).
+2. Leave **Include source files outside of the Root Directory in the Build
+   Step** enabled — the install and the turbo build both reach up to the repo
+   root.
+3. Clear the **Install Command** override (`npm install --prefix=..`), and
+   leave **Build Command** and **Output Directory** unset.
+
+`grab-help-docs/vercel.json` supplies all three itself:
+
+| Setting | Value |
+| --- | --- |
+| `installCommand` | `npm install --prefix=..` |
+| `buildCommand` | `npx turbo run build --filter=grab-help-docs` |
+| `outputDirectory` | `.next` |
 
 Until that setting changes, a red Vercel check on a PR here says nothing about
 that PR.
@@ -78,7 +95,7 @@ the next `npm run make`.
 
 | Target | Built by | Notes |
 | --- | --- | --- |
-| **https://grab.js.org** (Vercel) | `grab-help-docs/vercel.json` → `turbo run build --filter=grab-help-docs` | The full app — middleware, a Server Action and a POST route handler all work. **Currently failing**: Root Directory is still `docs`. See the section above. |
+| **https://grab.js.org** (Vercel) | `grab-help-docs/vercel.json` → `turbo run build --filter=grab-help-docs` | The full app — middleware, a Server Action and a POST route handler all work. **Currently failing**: Root Directory is still `docs`, which no longer exists. See the section above. |
 | **GitHub Pages** | `.github/workflows/pages.yml` → `grab-help-docs/scripts/build-static-pages.mjs` → `actions/deploy-pages@v5` | A static export, served from `grab-help-docs/out`. `output: 'export'` supports none of those three server pieces, so the script **prunes them from the working tree** before building. It is destructive by design and refuses to run outside CI without `--force`. Green on `master`. |
 
 The Pages workflow uses `npm ci`, not a floating install: `package-lock.json`

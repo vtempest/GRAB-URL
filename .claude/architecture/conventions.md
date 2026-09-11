@@ -72,10 +72,11 @@ will be missing for consumers while working locally.
 
 ## Agent-specific rules
 
-- Do not put documentation in the root `docs/` folder; it is vestigial and on its
-  way out — see [documentation.md](documentation.md).
-- A red Vercel check here is a project misconfiguration, not your diff — every
-  deployment has failed for months. Check before chasing it.
+- Do not recreate the root `docs/` folder; it was vestigial and PR #47 deleted
+  it — see [documentation.md](documentation.md).
+- A red Vercel check here is a project misconfiguration, not your diff — the
+  project's Root Directory is `docs`, a folder that no longer exists, so every
+  deployment fails at the clone. Check before chasing it.
 - Do not edit `grab-help-docs/content/docs/claude-skill.mdx` by hand; edit the
   skill and regenerate.
 - Do not add an import to `grab-api/src/` that is not a Node builtin.

@@ -76,7 +76,7 @@ npm run test:cli            # a real download, end to end
 | --- | --- |
 | [overview.md](.claude/architecture/overview.md) | What each package does and how a request flows through `grab()` |
 | [build.md](.claude/architecture/build.md) | The single root build, entries, externals, and the traps in it |
-| [documentation.md](.claude/architecture/documentation.md) | The Fumadocs site, the two deployments, the vestigial root `docs/`, and the broken Vercel setting |
+| [documentation.md](.claude/architecture/documentation.md) | The Fumadocs site, the two deployments, the deleted root `docs/`, and the broken Vercel setting |
 | [conventions.md](.claude/architecture/conventions.md) | Code style, commits, PRs, CI, publishing |
 | [monorepo.md](.claude/architecture/monorepo.md) | Workspaces, npm vs pnpm, which packages actually publish, where the tests live |
 
