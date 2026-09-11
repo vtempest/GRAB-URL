@@ -17,6 +17,7 @@
   <img src="https://img.shields.io/badge/Claude-D97757?logo=claude&logoColor=fff" alt="Claude AI">
   <a href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome" /></a>
   <a href="https://codespaces.new/vtempest/GRAB-URL"><img src="https://github.com/codespaces/badge.svg" width="150" height="20" alt="GitHub Codespaces" /></a>
+  <a href="https://stackblitz.com/github/OpenSourceAGI/GRAB-URL/tree/master/packages/quantum-sphere-loading-animation"><img height="20px" src="https://developer.stackblitz.com/img/open_in_stackblitz.svg" alt="Open in StackBlitz" /></a>
 </p>
 
 # Quantum Sphere Loading

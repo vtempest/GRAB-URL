@@ -17,6 +17,7 @@
   <a href="https://npmjs.org/package/grab-url"><img alt="NPM Version" src="https://img.shields.io/npm/v/grab-url" /></a>
   <a href="https://github.com/vtempest/GRAB-URL/discussions"><img alt="GitHub Discussions" src="https://img.shields.io/github/discussions/vtempest/GRAB-URL" /></a>
   <a href="https://codespaces.new/vtempest/GRAB-URL"><img src="https://github.com/codespaces/badge.svg" width="150" height="20" alt="GitHub Codespaces" /></a>
+  <a href="https://stackblitz.com/github/OpenSourceAGI/GRAB-URL/tree/master/examples/basic-request"><img height="20px" src="https://developer.stackblitz.com/img/open_in_stackblitz.svg" alt="Open in StackBlitz" /></a>
 <br />
    <img  src="https://i.imgur.com/xzFQmrD.jpeg" />
 </p>
