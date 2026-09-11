@@ -8,7 +8,7 @@
   "license": "rights.institute/prosper",
   "repository": {
     "type": "git",
-    "url": "https://github.com/vtempest/GRAB-URL"
+    "url": "https://github.com/OpenSourceAGI/GRAB-URL"
   },
   "workspaces": [
     "packages/*",

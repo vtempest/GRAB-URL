@@ -60,11 +60,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vtempest/GRAB-URL.git",
+    "url": "git+https://github.com/OpenSourceAGI/GRAB-URL.git",
     "directory": "packages/api2client"
   },
   "bugs": {
-    "url": "https://github.com/vtempest/GRAB-URL/issues"
+    "url": "https://github.com/OpenSourceAGI/GRAB-URL/issues"
   },
-  "homepage": "https://github.com/vtempest/GRAB-URL/tree/master/packages/api2client#readme"
+  "homepage": "https://github.com/OpenSourceAGI/GRAB-URL/tree/master/packages/api2client#readme"
 }
