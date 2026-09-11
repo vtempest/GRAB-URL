@@ -48,7 +48,7 @@ consumer receives your change.
 | `skills/use-grab-request/` | The agent skill — the source of truth for the docs page about it |
 | `examples/` | Runnable examples: basic request, cookbook, reactive React/Svelte/Vue, api2client |
 | `scripts/` | `install-yt-dlp.mjs` (postinstall), `sync-skill-docs.mjs` |
-| `docs/` | A small static landing page (`index.html`, `_config.yml`) — not the docs site |
+| `docs/` | A GitHub Pages Jekyll stub — `_config.yml` plus an `index.html` redirect. No documentation; see [documentation.md](documentation.md), which also explains why it is what breaks the Vercel deploy. |
 | `dist/` | Build output. Generated; never hand-edited, never a source of truth. |
 
 ## Optional peers, loaded at runtime

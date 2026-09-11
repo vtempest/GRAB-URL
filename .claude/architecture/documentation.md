@@ -37,7 +37,27 @@ static export path is the one that ships.
 npm run make:docs     # turbo run build --filter=grab-help-docs
 ```
 
-## `docs/` is not the docs site
+## `docs/` is not the docs site — and it is what breaks Vercel
 
-The root `docs/` directory is a small static landing page (`index.html`,
-`_config.yml`, `README.md`) for grab.js.org. Do not put documentation there.
+The root `docs/` directory holds no documentation. It is a **GitHub Pages
+Jekyll stub**: a `_config.yml` and an `index.html` that redirects to
+grab.js.org, kept because `/docs` is the only folder name Pages accepts besides
+the repository root. Its own `README.md` says so. Do not put documentation
+there.
+
+It matters for one operational reason. **The Vercel project's Root Directory
+must be `grab-help-docs`.** Left pointing at `docs/`, every deploy fails the
+same way: turbo resolves no package from `docs/` (it matches neither
+`packages/*` nor `grab-help-docs` in the workspace globs), so no `.next` is
+produced and Vercel reports
+
+```
+The file "/vercel/path0/docs/.next/routes-manifest.json" couldn't be found.
+```
+
+With the Root Directory set correctly, `grab-help-docs/vercel.json` supplies
+the framework, install command and build command — so the project's own
+Install/Build Command overrides should be left unset.
+
+**This is a dashboard setting, not a diff.** No commit in this repository can
+fix it, so do not go looking for the bug in `turbo.json` or `vercel.json`.
