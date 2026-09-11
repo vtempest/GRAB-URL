@@ -8,6 +8,12 @@ So its public API is `grab-url`'s public API. There is no separate
 `@grab-url/grab-api` for anyone to install, and a breaking change here is a
 breaking change to the published package.
 
+## Zero runtime dependencies
+
+That is the product claim for `grab()`, and it is a repo-wide ground rule. An
+import added to this package's `src/` that is not a Node builtin breaks it —
+check before reaching for a helper library.
+
 ## Two entries, and the difference is the point
 
 | Source | Ships as | Difference |

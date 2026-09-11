@@ -21,9 +21,9 @@ generator, loading animations, and a Tauri wrapper.
 3. **Zero runtime dependencies in `grab-api`.** That is the product claim. Adding
    an import to `packages/grab-api/src/` that is not a Node builtin breaks it.
 4. **Documentation goes in the user guide**, `grab-help-docs/content/docs`.
-   The root `docs/` folder holds no documentation — it is a vestigial Jekyll stub
-   from before GitHub Pages switched to deploying via Actions, and PR #47 removes
-   it. Put nothing there, and do not recreate it. See
+   The root `docs/` folder is gone — it was a vestigial Jekyll stub from before
+   GitHub Pages switched to deploying via Actions, and #47 deleted it. Put
+   nothing there, and do not recreate it. See
    [`architecture/documentation.md`](.claude/architecture/documentation.md).
 5. **The skill is generated.** `grab-help-docs/content/docs/claude-skill.mdx` is
    written from `skills/use-grab-request/SKILL.md` — edit the skill, then run
@@ -78,3 +78,7 @@ npm run test:cli            # a real download, end to end
 | [build.md](.claude/architecture/build.md) | The single root build, entries, externals, and the traps in it |
 | [documentation.md](.claude/architecture/documentation.md) | The Fumadocs site, the two deployments, the vestigial root `docs/`, and the broken Vercel setting |
 | [conventions.md](.claude/architecture/conventions.md) | Code style, commits, PRs, CI, publishing |
+| [monorepo.md](.claude/architecture/monorepo.md) | Workspaces, npm vs pnpm, which packages actually publish, where the tests live |
+
+Each `packages/*` folder and `grab-help-docs` also has its own `CLAUDE.md` with
+the rules and traps specific to working in it.
