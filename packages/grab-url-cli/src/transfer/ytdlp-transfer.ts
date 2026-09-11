@@ -12,7 +12,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import { spawn, type ChildProcess } from 'child_process';
+import { spawn, spawnSync, type ChildProcess } from 'child_process';
 
 import cliProgress from 'cli-progress';
 
@@ -30,6 +30,9 @@ import {
 
 import { isCancelInProgress } from '../cancel-state.js';
 import { findYtDlp, ytDlpInstallHint } from './ytdlp-binary.js';
+// Re-exported so a caller that only speaks in transfers — archive-page, say —
+// does not need to know which of the two yt-dlp modules owns each helper.
+export { findYtDlp, ytDlpInstallHint } from './ytdlp-binary.js';
 import { hostnameOf, matchMediaDomain } from './media-domains.js';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -454,4 +457,145 @@ export async function runYtDlpTransfer(
         console.log(colors.info('💾 Partial data kept in .part files. Run the same command to resume.'));
     }
     throw new Error(`yt-dlp ${describeYtDlpExit(exitCode)}`);
+}
+
+// ─── Metadata probe and quiet download ────────────────────────────────────────
+
+/**
+ * The handful of `yt-dlp -J` fields the archiver actually reads.
+ *
+ * yt-dlp's JSON dump carries a few hundred keys; naming only these keeps the
+ * shape stable when yt-dlp renames something deeper in the payload.
+ */
+export interface YtDlpMetadata {
+    /** Extractor id for the media, e.g. a YouTube video id. */
+    id: string;
+    /** Human title, empty when the extractor does not supply one. */
+    title: string;
+    /** Container yt-dlp would write, e.g. `mp4`. */
+    ext: string;
+    /** Length in seconds, 0 when unknown (a live stream, say). */
+    duration: number;
+    /** Channel or account the media belongs to, empty when unknown. */
+    uploader: string;
+}
+
+/**
+ * Ask yt-dlp whether a URL holds media, without downloading anything.
+ *
+ * Returns null for an ordinary page — the common case when archiving an
+ * article — so the caller can skip the video step silently rather than treat a
+ * non-video URL as an error. Synchronous: archiving is a linear script, and the
+ * probe is a sub-second `--skip-download` call.
+ *
+ * @param target - URL to inspect
+ */
+export function probeYtDlp(target: string): YtDlpMetadata | null {
+    const ytdlp = findYtDlp();
+    if (!ytdlp) return null;
+
+    const result = spawnSync(
+        ytdlp.path,
+        [
+            '--dump-single-json',
+            '--skip-download',
+            '--no-warnings',
+            '--no-playlist',
+            '--quiet',
+            target,
+        ],
+        { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 },
+    );
+
+    if (result.status !== 0 || !result.stdout?.trim()) return null;
+
+    try {
+        const meta = JSON.parse(result.stdout);
+        // A playlist page dumps entries instead of a single medium; the archiver
+        // saves one video per page, so treat that as "no video here".
+        if (!meta || meta._type === 'playlist') return null;
+        return {
+            id: String(meta.id ?? ''),
+            title: String(meta.title ?? ''),
+            ext: String(meta.ext ?? ''),
+            duration: Number(meta.duration) || 0,
+            uploader: String(meta.uploader ?? meta.channel ?? ''),
+        };
+    } catch {
+        return null;
+    }
+}
+
+/**
+ * Download media into a directory and return the files yt-dlp actually wrote.
+ *
+ * The quiet counterpart to {@link runYtDlpTransfer}: no progress bar and no
+ * console output, because it runs inside a larger archive run that prints its
+ * own report. Paths come from yt-dlp's own `after_move:filepath` print, so a
+ * title sanitised or de-duplicated by yt-dlp is still reported correctly.
+ *
+ * @param target - Media page URL
+ * @param opts   - Transfer options; `dir` defaults to cwd
+ * @returns Absolute paths of the saved files, in the order yt-dlp wrote them
+ */
+export async function runYtDlpDownload(
+    target: string,
+    opts: YtDlpOptions = {},
+): Promise<string[]> {
+    const ytdlp = findYtDlp();
+    if (!ytdlp) {
+        throw new Error(`yt-dlp not found. Install it with:\n${ytDlpInstallHint()}`);
+    }
+
+    const dir = opts.dir || process.cwd();
+    try {
+        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    } catch (e: any) {
+        throw new Error(`Could not create output directory ${dir}: ${e.message}`);
+    }
+
+    // The progress template and `--progress` only feed the bar this caller does
+    // not draw, so build the args without them and add the filepath print.
+    const args = buildYtDlpArgs(target, { ...opts, dir })
+        .filter((arg, i, all) =>
+            arg !== '--progress'
+            && arg !== '--progress-template'
+            && arg !== YTDLP_PROGRESS_TEMPLATE
+            && all[i - 1] !== '--progress-template');
+    args.unshift('--no-simulate', '--print', 'after_move:filepath', '--quiet');
+
+    const child = spawn(ytdlp.path, args, { stdio: ['ignore', 'pipe', 'pipe'] });
+
+    const saved: string[] = [];
+    const messages: string[] = [];
+    let stdout = '';
+    let stderr = '';
+
+    child.stdout?.on('data', (chunk) => {
+        stdout += chunk.toString();
+        const lines = stdout.split('\n');
+        stdout = lines.pop() ?? '';
+        lines.map((l) => l.trim()).filter(Boolean).forEach((l) => saved.push(l));
+    });
+    child.stderr?.on('data', (chunk) => {
+        stderr += chunk.toString();
+        const lines = stderr.split('\n');
+        stderr = lines.pop() ?? '';
+        lines.map((l) => l.trim()).filter(Boolean).forEach((l) => messages.push(l));
+    });
+
+    const exitCode: number | null = await new Promise((resolve, reject) => {
+        child.on('error', reject);
+        child.on('close', resolve);
+    });
+
+    if (stdout.trim()) saved.push(stdout.trim());
+    if (stderr.trim()) messages.push(stderr.trim());
+
+    if (exitCode !== 0) {
+        const cause = messages.filter((m) => /^ERROR/i.test(m)).slice(-1)[0];
+        throw new Error(cause || `yt-dlp ${describeYtDlpExit(exitCode)}`);
+    }
+
+    return saved.filter((file) => fs.existsSync(file));
 }

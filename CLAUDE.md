@@ -28,8 +28,12 @@ generator, loading animations, and a Tauri wrapper.
 5. **The skill is generated.** `grab-help-docs/content/docs/claude-skill.mdx` is
    written from `skills/use-grab-request/SKILL.md` — edit the skill, then run
    `npm run make:skill`.
-6. **Never commit secrets**, credentials, API keys, or `dist/` changes that did
-   not come from a build.
+6. **`dist/` is never committed.** It is gitignored everywhere and rebuilt on
+   demand; npm still ships it, because a `files` whitelist beats `.gitignore`
+   and `prepublishOnly` runs the build. The one exception is
+   `packages/native-app-wrapper/dist/`, which is hand-written Tauri source, not
+   build output. See [`architecture/build.md`](.claude/architecture/build.md).
+7. **Never commit secrets**, credentials, or API keys.
 
 ## Where things live
 
