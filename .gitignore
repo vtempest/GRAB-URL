@@ -50,3 +50,10 @@ build.log
 pnpm-lock.yaml
 .turbo
 grab-help-docs/.next_old
+
+.claude/*
+# Agent docs for Claude Code — checked in on purpose (see CLAUDE.md)
+!.claude/architecture
+!.claude/settings.json
+.claude/settings.local.json
+CLAUDE.local.md
