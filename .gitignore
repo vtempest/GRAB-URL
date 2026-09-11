@@ -43,7 +43,9 @@ test/test-downloads
 .vercel
 .grab-downloads/
 grab-help-docs/dist/
-.claude
+.claude/*
+# Architecture notes for Claude agents — checked in on purpose (see CLAUDE.md)
+!.claude/architecture
 build.log
 pnpm-lock.yaml
 .turbo
