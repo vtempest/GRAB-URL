@@ -26,7 +26,13 @@ npm run make:docs     # turbo run build --filter=grab-help-docs
 in a comment at the top. Edit the skill, then `npm run make:skill`.
 `node scripts/sync-skill-docs.mjs --check` fails when it is stale.
 
-## Not to be confused with
+## The root `docs/` folder is gone
 
-The root `docs/` directory — a small static landing page for grab.js.org
-(`index.html`, `_config.yml`). Documentation does not go there.
+It was a vestigial Jekyll stub from before GitHub Pages switched to deploying
+via Actions, and #47 deleted it. **Do not recreate it** — documentation belongs
+here, in `content/docs/`.
+
+It is still worth knowing about, because the Vercel project's Root Directory
+points at that now-missing folder and every deploy fails as a result. See
+[`../.claude/architecture/documentation.md`](../.claude/architecture/documentation.md);
+it is a dashboard setting, so no commit here can fix it.
