@@ -37,6 +37,7 @@
   "scripts": {
     "ship": "npx standard-version --release-as patch; npm publish",
     "build": "tsup",
+    "prepublishOnly": "npm run build",
     "dev": "tsup --watch",
     "publish": "npm publish"
   },
