@@ -1,9 +1,0 @@
-# Leftover from when GitHub Pages built this folder with Jekyll (Settings ->
-# Pages -> "Deploy from a branch", folder /docs). That is no longer how the site
-# is published: Pages now deploys the static export from
-# .github/workflows/pages.yml, and nothing reads this file.
-#
-# The documentation site is the Next.js + Fumadocs app in `grab-help-docs/`.
-# See README.md in this folder before deleting it.
-exclude:
-  - node_modules
