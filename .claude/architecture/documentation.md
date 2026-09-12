@@ -22,49 +22,61 @@ Source is "GitHub Actions"**, and it is green on `master`.
 
 So: put no documentation here, and do not recreate the folder.
 
-## The Vercel deploy is broken, and `docs/` is still why
+## The Vercel deploy, and the root `vercel.json` that drives it
 
-Every deployment of the `grab-url` Vercel project is failing, production
-included, and has been since the docs app was renamed `docs/` →
-`grab-help-docs/`.
+The `grab-url` Vercel project builds the docs app, not the library. Getting
+there took two wrong Root Directory settings, and the history explains the
+shape of the config that is there now.
 
-The project's **Root Directory is still `docs`**. While the folder existed,
-turbo resolved no package from there (`docs/` matched neither `packages/*` nor
-`grab-help-docs` in the workspace globs), so it reported `No tasks were
-executed as part of this run`, never wrote a `.next`, and Vercel failed with:
+**First it pointed at `docs/`.** While that folder existed turbo resolved no
+package from it (`docs/` matched neither `packages/*` nor `grab-help-docs` in
+the workspace globs), so it reported `No tasks were executed as part of this
+run`, never wrote a `.next`, and Vercel failed with:
 
 ```
 The file "/vercel/path0/docs/.next/routes-manifest.json" couldn't be found.
 ```
 
-Now that the folder is deleted the build fails one step earlier, immediately
-after the clone:
+**Then #47 deleted the folder** and the build failed one step earlier, right
+after the clone — same cause, louder error:
 
 ```
 The specified Root Directory "docs" does not exist. Please update your Project Settings.
 ```
 
-Same cause, louder error. **This is a dashboard setting, not a diff — no commit
-can fix it**, and deleting `docs/` did not fix it either. In Vercel → the
-`grab-url` project → Settings → Build and Deployment:
+**Then the Root Directory was cleared to the repository root.** That gets past
+the clone, but with no override Vercel runs the root `npm run build`, which is
+`vite build` — it builds the library bundle and never touches Next.js:
 
-1. Set **Root Directory** to `grab-help-docs` (it is `docs`).
-2. Leave **Include source files outside of the Root Directory in the Build
-   Step** enabled — the install and the turbo build both reach up to the repo
-   root.
-3. Clear the **Install Command** override (`npm install --prefix=..`), and
-   leave **Build Command** and **Output Directory** unset.
+```
+The Next.js output directory ".next" was not found at "/vercel/path0/.next".
+```
 
-`grab-help-docs/vercel.json` supplies all three itself:
+### What fixes it
 
-| Setting | Value |
-| --- | --- |
-| `installCommand` | `npm install --prefix=..` |
-| `buildCommand` | `npx turbo run build --filter=grab-help-docs` |
-| `outputDirectory` | `.next` |
+`vercel.json` **at the repository root** — the file Vercel reads when the Root
+Directory is the repo root — now supplies the three settings that were missing:
 
-Until that setting changes, a red Vercel check on a PR here says nothing about
-that PR.
+| Setting | Value | Why |
+| --- | --- | --- |
+| `installCommand` | `npm ci` | Same reason as the Pages workflow: the lockfile pins a compatible `fumadocs-openapi` / `fumadocs-ui` pair and a floating resolve does not. |
+| `buildCommand` | `npx turbo run build --filter=grab-help-docs` | The root `build` script is `vite build`; only this reaches the Next.js app. |
+| `outputDirectory` | `grab-help-docs/.next` | Where that build actually writes, relative to the repo root. |
+
+So the deploy is config-in-the-repo now, and no dashboard visit is needed as
+long as **Root Directory stays empty (the repository root)**. Two settings
+still have to stay as they are, and both are dashboard-only:
+
+1. **Root Directory** — empty. Setting it back to a subdirectory makes Vercel
+   read that subdirectory's `vercel.json` instead of this one.
+2. **Install Command / Build Command / Output Directory overrides** — unset. A
+   dashboard override beats `vercel.json`; the old `npm install --prefix=..`
+   override in particular resolves above `/vercel/path0` from the repo root.
+
+`grab-help-docs/vercel.json` is kept as the equivalent config for the other
+arrangement — Root Directory `grab-help-docs`, paths relative to it. It is
+inert while the Root Directory is the repo root. Whichever directory Vercel is
+pointed at, one of the two files describes the build.
 
 ## Adding a page
 
@@ -95,7 +107,7 @@ the next `npm run make`.
 
 | Target | Built by | Notes |
 | --- | --- | --- |
-| **https://grab.js.org** (Vercel) | `grab-help-docs/vercel.json` → `turbo run build --filter=grab-help-docs` | The full app — middleware, a Server Action and a POST route handler all work. **Currently failing**: Root Directory is still `docs`, which no longer exists. See the section above. |
+| **https://grab.js.org** (Vercel) | root `vercel.json` → `turbo run build --filter=grab-help-docs`, output `grab-help-docs/.next` | The full app — middleware, a Server Action and a POST route handler all work. Depends on the project's Root Directory staying empty; see the section above. |
 | **GitHub Pages** | `.github/workflows/pages.yml` → `grab-help-docs/scripts/build-static-pages.mjs` → `actions/deploy-pages@v5` | A static export, served from `grab-help-docs/out`. `output: 'export'` supports none of those three server pieces, so the script **prunes them from the working tree** before building. It is destructive by design and refuses to run outside CI without `--force`. Green on `master`. |
 
 The Pages workflow uses `npm ci`, not a floating install: `package-lock.json`
