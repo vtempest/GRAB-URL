@@ -55,13 +55,13 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vtempest/GRAB-URL.git",
+    "url": "git+https://github.com/OpenSourceAGI/GRAB-URL.git",
     "directory": "packages/quantum-sphere-loading-animation"
   },
   "bugs": {
-    "url": "https://github.com/vtempest/GRAB-URL/issues"
+    "url": "https://github.com/OpenSourceAGI/GRAB-URL/issues"
   },
-  "homepage": "https://github.com/vtempest/GRAB-URL/tree/master/packages/quantum-sphere-loading-animation#readme",
+  "homepage": "https://github.com/OpenSourceAGI/GRAB-URL/tree/master/packages/quantum-sphere-loading-animation#readme",
   "peerDependencies": {
     "react": ">=16.8.0",
     "react-dom": ">=16.8.0",
