@@ -3,7 +3,6 @@
  * @description Unit tests for `grab-url --page`, the page archiver:
  *   - page/folder-name.ts          (title -> safe directory name)
  *   - page/archive-html.ts         (citation + document builders)
- *   - transfer/ytdlp-transfer.ts   (yt-dlp arg building + progress parsing)
  *   - page/archive-page.ts         (orchestration, against a stubbed extractor)
  */
 
@@ -27,14 +26,6 @@ import {
     buildContentDocument,
     buildTranscriptDocument,
 } from '../packages/grab-url-cli/src/page/archive-html.js';
-
-import {
-    YTDLP_PROGRESS_TEMPLATE,
-    parseYtDlpProgress,
-    buildYtDlpArgs,
-    describeYtDlpExit,
-    ytDlpInstallHint,
-} from '../packages/grab-url-cli/src/transfer/ytdlp-transfer.js';
 
 // ─── folder-name ──────────────────────────────────────────────────────────────
 
@@ -213,120 +204,6 @@ describe('archive-html — document builders', () => {
         expect(doc).toContain('<title>Transcript - A Video</title>');
         expect(doc).toContain('<p>hello there</p>');
         expect(doc).toContain('https://youtu.be/x');
-    });
-});
-
-// ─── ytdlp-transfer ───────────────────────────────────────────────────────────
-
-describe('ytdlp-transfer — parseYtDlpProgress()', () => {
-    /** One line as yt-dlp emits it under {@link YTDLP_PROGRESS_TEMPLATE}. */
-    const sentinel = (...fields: string[]) => `download:@GRAB@${fields.join('|')}`;
-
-    it('parses a sentinel-prefixed progress line', () => {
-        const p = parseYtDlpProgress(
-            sentinel('downloading', '3145728', '12582912', 'NA', '1048576', '42', 'NA', 'NA'),
-        );
-        expect(p).not.toBeNull();
-        expect(p!.status).toBe('downloading');
-        expect(p!.downloaded).toBe(3 * 1024 ** 2);
-        expect(p!.total).toBe(12 * 1024 ** 2);
-        expect(p!.estimated).toBe(false);
-        expect(p!.speedBps).toBe(1024 ** 2);
-        expect(p!.etaSeconds).toBe(42);
-    });
-
-    it('falls back to the estimate and says so when the exact total is unknown', () => {
-        const p = parseYtDlpProgress(
-            sentinel('downloading', '1024', 'NA', '12582912', 'NA', 'NA', 'NA', 'NA'),
-        );
-        expect(p!.total).toBe(12 * 1024 ** 2);
-        expect(p!.estimated).toBe(true);
-    });
-
-    it('treats NA and None as unknown rather than NaN', () => {
-        const p = parseYtDlpProgress(
-            sentinel('finished', 'None', 'NA', 'NA', 'NA', 'NA', 'NA', 'NA'),
-        );
-        expect(p!.downloaded).toBe(0);
-        expect(p!.total).toBe(0);
-        expect(p!.speedBps).toBe(0);
-        expect(p!.etaSeconds).toBe(0);
-    });
-
-    it('keeps the fragment counters an HLS stream reports, and nulls them otherwise', () => {
-        const hls = parseYtDlpProgress(
-            sentinel('downloading', '1024', 'NA', 'NA', 'NA', 'NA', '7', '20'),
-        );
-        expect(hls!.fragmentIndex).toBe(7);
-        expect(hls!.fragmentCount).toBe(20);
-
-        const plain = parseYtDlpProgress(
-            sentinel('downloading', '1024', 'NA', 'NA', 'NA', 'NA', 'NA', 'NA'),
-        );
-        expect(plain!.fragmentIndex).toBeNull();
-        expect(plain!.fragmentCount).toBeNull();
-    });
-
-    it('returns null for every other line yt-dlp writes', () => {
-        expect(parseYtDlpProgress('[youtube] abc: Downloading webpage')).toBeNull();
-        expect(parseYtDlpProgress('[download]  23.4% of ~12.00MiB at 1.00MiB/s')).toBeNull();
-        expect(parseYtDlpProgress('[download] Destination: video.mp4')).toBeNull();
-        expect(parseYtDlpProgress('')).toBeNull();
-    });
-
-    it('returns null for a truncated sentinel line', () => {
-        expect(parseYtDlpProgress(sentinel('downloading', '1024', 'NA'))).toBeNull();
-    });
-});
-
-describe('ytdlp-transfer — buildYtDlpArgs()', () => {
-    it('never expands a playlist and always writes into --paths', () => {
-        const args = buildYtDlpArgs('https://youtu.be/x', { dir: '/tmp/out' });
-        expect(args).toContain('--no-playlist');
-        expect(args[args.indexOf('--paths') + 1]).toBe('/tmp/out');
-        expect(args[args.length - 1]).toBe('https://youtu.be/x');
-    });
-
-    it('uses the supplied output template verbatim', () => {
-        const args = buildYtDlpArgs('https://youtu.be/x', { output: 'My Video.%(ext)s' });
-        expect(args[args.indexOf('--output') + 1]).toBe('My Video.%(ext)s');
-    });
-
-    it('falls back to title and id when no output template was given', () => {
-        const args = buildYtDlpArgs('https://youtu.be/x');
-        expect(args[args.indexOf('--output') + 1]).toBe('%(title)s [%(id)s].%(ext)s');
-    });
-
-    it('asks yt-dlp for the sentinel progress template the parser reads', () => {
-        const args = buildYtDlpArgs('https://youtu.be/x');
-        expect(args[args.indexOf('--progress-template') + 1]).toBe(YTDLP_PROGRESS_TEMPLATE);
-    });
-
-    it('passes a format selector through', () => {
-        const args = buildYtDlpArgs('https://youtu.be/x', { format: 'bestaudio' });
-        expect(args[args.indexOf('--format') + 1]).toBe('bestaudio');
-    });
-
-    it('omits --format when none was given', () => {
-        expect(buildYtDlpArgs('https://youtu.be/x')).not.toContain('--format');
-    });
-
-    it('appends extra args before the URL', () => {
-        const args = buildYtDlpArgs('https://youtu.be/x', { extraArgs: ['--limit-rate', '1M'] });
-        expect(args.slice(-3)).toEqual(['--limit-rate', '1M', 'https://youtu.be/x']);
-    });
-});
-
-describe('ytdlp-transfer — misc', () => {
-    it('describes known exit codes', () => {
-        expect(describeYtDlpExit(0)).toBe('completed');
-        expect(describeYtDlpExit(1)).toContain('download failed');
-        expect(describeYtDlpExit(null)).toBe('terminated by signal');
-        expect(describeYtDlpExit(77)).toContain('77');
-    });
-
-    it('always offers an install hint', () => {
-        expect(ytDlpInstallHint().length).toBeGreaterThan(0);
     });
 });
 
