@@ -22,11 +22,16 @@ Source is "GitHub Actions"**, and it is green on `master`.
 
 So: put no documentation here, and do not recreate the folder.
 
-## The Vercel deploy is broken, and `docs/` is still why
+## grab.js.org is down, and `docs/` is still why
 
-Every deployment of the `grab-url` Vercel project is failing, production
+Every deployment of the `grab-url` Vercel project
+(`prj_sZH39yA62rJ7ZKn3pjFpLVYH1320`, team `vtempest-apps`) is failing, production
 included, and has been since the docs app was renamed `docs/` →
-`grab-help-docs/`.
+`grab-help-docs/`. Because production never built, **https://grab.js.org serves
+Vercel's `DEPLOYMENT_NOT_FOUND` 404** — the DNS is fine, there is simply nothing
+behind it. `js-org/js.org`'s `cnames_active.js` maps
+`"grab": "cname.vercel-dns.com"`, so the hostname resolves into Vercel and
+nowhere else.
 
 The project's **Root Directory is still `docs`**. While the folder existed,
 turbo resolved no package from there (`docs/` matched neither `packages/*` nor
@@ -46,16 +51,23 @@ The specified Root Directory "docs" does not exist. Please update your Project S
 
 Same cause, louder error. **This is a dashboard setting, not a diff — no commit
 can fix it**, and deleting `docs/` did not fix it either. In Vercel → the
-`grab-url` project → Settings → Build and Deployment:
+`grab-url` project → Settings:
 
-1. Set **Root Directory** to `grab-help-docs` (it is `docs`).
+1. Build and Deployment → set **Root Directory** to `grab-help-docs` (it is
+   `docs`).
 2. Leave **Include source files outside of the Root Directory in the Build
    Step** enabled — the install and the turbo build both reach up to the repo
    root.
 3. Clear the **Install Command** override (`npm install --prefix=..`), and
    leave **Build Command** and **Output Directory** unset.
+4. Domains → check that **`grab.js.org` is attached to this project** and
+   assigned to production. The API lists only the two generated hostnames
+   (`grab-url-vtempest-apps.vercel.app`,
+   `grab-url-git-master-vtempest-apps.vercel.app`), so it probably is not; a
+   green build alone will not put the site back on grab.js.org.
+5. Redeploy `master`.
 
-`grab-help-docs/vercel.json` supplies all three itself:
+`grab-help-docs/vercel.json` supplies the three build settings itself:
 
 | Setting | Value |
 | --- | --- |
@@ -65,6 +77,15 @@ can fix it**, and deleting `docs/` did not fix it either. In Vercel → the
 
 Until that setting changes, a red Vercel check on a PR here says nothing about
 that PR.
+
+The GitHub Pages deploy of the same docs is **green** and unaffected — it is the
+working copy of the site while Vercel is broken. It is not a drop-in
+replacement for grab.js.org, though: moving the hostname there means adding the
+custom domain in Settings → Pages (so `configure-pages` stops emitting the
+`/GRAB-URL` base path) *and* a PR against `js-org/js.org` repointing the CNAME
+at `opensourceagi.github.io`, and it costs the middleware, the Server Action and
+the POST route handler that `build-static-pages.mjs` prunes. Fixing the Vercel
+project is the smaller change.
 
 ## Adding a page
 
@@ -95,7 +116,7 @@ the next `npm run make`.
 
 | Target | Built by | Notes |
 | --- | --- | --- |
-| **https://grab.js.org** (Vercel) | `grab-help-docs/vercel.json` → `turbo run build --filter=grab-help-docs` | The full app — middleware, a Server Action and a POST route handler all work. **Currently failing**: Root Directory is still `docs`, which no longer exists. See the section above. |
+| **https://grab.js.org** (Vercel) | `grab-help-docs/vercel.json` → `turbo run build --filter=grab-help-docs` | The full app — middleware, a Server Action and a POST route handler all work. **Currently down**: Root Directory is still `docs`, which no longer exists, so production never built and the hostname answers `DEPLOYMENT_NOT_FOUND`. See [the section above](#grabjsorg-is-down-and-docs-is-still-why). |
 | **GitHub Pages** | `.github/workflows/pages.yml` → `grab-help-docs/scripts/build-static-pages.mjs` → `actions/deploy-pages@v5` | A static export, served from `grab-help-docs/out`. `output: 'export'` supports none of those three server pieces, so the script **prunes them from the working tree** before building. It is destructive by design and refuses to run outside CI without `--force`. Green on `master`. |
 
 The Pages workflow uses `npm ci`, not a floating install: `package-lock.json`
