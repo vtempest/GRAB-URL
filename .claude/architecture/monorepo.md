@@ -83,7 +83,7 @@ part of the suite — don't wire it into CI.
 
 ## `postinstall` downloads yt-dlp
 
-`scripts/install-yt-dlp.mjs --postinstall` runs on every install. If an install
+`.github/scripts/install-yt-dlp.mjs --postinstall` runs on every install. If an install
 appears to hang or fails behind a proxy, that is where to look:
 
 ```bash

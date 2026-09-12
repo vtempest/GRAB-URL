@@ -166,19 +166,19 @@ to opt out of the `postinstall` download entirely.
 
 ### Bundling yt-dlp in a Tauri app
 
-`scripts/install-yt-dlp.mjs --sidecar` writes the binary under Tauri's target-triple naming, which
+`.github/scripts/install-yt-dlp.mjs --sidecar` writes the binary under Tauri's target-triple naming, which
 is what `bundle.externalBin` expects:
 
 ```bash
-node scripts/install-yt-dlp.mjs --sidecar --out-dir src-tauri/binaries
+node .github/scripts/install-yt-dlp.mjs --sidecar --out-dir src-tauri/binaries
 # → src-tauri/binaries/yt-dlp-x86_64-unknown-linux-gnu
 ```
 
 Cross-compiling? Pass the triple you are building for:
 
 ```bash
-node scripts/install-yt-dlp.mjs --sidecar --target aarch64-apple-darwin
-node scripts/install-yt-dlp.mjs --sidecar --target x86_64-pc-windows-msvc
+node .github/scripts/install-yt-dlp.mjs --sidecar --target aarch64-apple-darwin
+node .github/scripts/install-yt-dlp.mjs --sidecar --target x86_64-pc-windows-msvc
 ```
 
 Then declare it in `src-tauri/tauri.conf.json`, and run the fetch from `beforeBuildCommand` so a
@@ -187,7 +187,7 @@ clean checkout builds without a manual step:
 ```json
 {
   "build": {
-    "beforeBuildCommand": "node ../scripts/install-yt-dlp.mjs --sidecar"
+    "beforeBuildCommand": "node ../.github/scripts/install-yt-dlp.mjs --sidecar"
   },
   "bundle": {
     "externalBin": ["binaries/yt-dlp"]

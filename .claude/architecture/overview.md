@@ -70,4 +70,4 @@ src/display/, download-spinners.ts, cancel-state.ts
 it drags in jsdom/linkedom. `extract-webpage-loader.ts` exists to keep that
 boundary; do not turn it into a static import.
 
-yt-dlp is installed by `scripts/install-yt-dlp.mjs`, which runs on `postinstall`.
+yt-dlp is installed by `.github/scripts/install-yt-dlp.mjs`, which runs on `postinstall`.

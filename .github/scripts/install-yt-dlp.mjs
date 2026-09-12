@@ -26,12 +26,12 @@
  * output exists. Keep the two in step.
  *
  * Usage:
- *   node scripts/install-yt-dlp.mjs                     # into ~/.grab-url/bin
- *   node scripts/install-yt-dlp.mjs --force             # redownload
- *   node scripts/install-yt-dlp.mjs --dir ./vendor      # somewhere else
- *   node scripts/install-yt-dlp.mjs --sidecar           # Tauri externalBin name
- *   node scripts/install-yt-dlp.mjs --sidecar --target aarch64-apple-darwin
- *   node scripts/install-yt-dlp.mjs --sidecar --out path/to/yt-dlp-<triple>
+ *   node .github/scripts/install-yt-dlp.mjs                     # into ~/.grab-url/bin
+ *   node .github/scripts/install-yt-dlp.mjs --force             # redownload
+ *   node .github/scripts/install-yt-dlp.mjs --dir ./vendor      # somewhere else
+ *   node .github/scripts/install-yt-dlp.mjs --sidecar           # Tauri externalBin name
+ *   node .github/scripts/install-yt-dlp.mjs --sidecar --target aarch64-apple-darwin
+ *   node .github/scripts/install-yt-dlp.mjs --sidecar --out path/to/yt-dlp-<triple>
  */
 
 import { spawnSync } from 'node:child_process';

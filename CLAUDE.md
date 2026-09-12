@@ -84,5 +84,20 @@ npm run test:cli            # a real download, end to end
 | [conventions.md](.claude/architecture/conventions.md) | Code style, commits, PRs, CI, publishing |
 | [monorepo.md](.claude/architecture/monorepo.md) | Workspaces, npm vs pnpm, which packages actually publish, where the tests live |
 
-Each `packages/*` folder and `grab-help-docs` also has its own `CLAUDE.md` with
-the rules and traps specific to working in it.
+Each `packages/*` folder and `grab-help-docs` also has its own note, carrying
+the rules and traps specific to working in it. They live under `.claude/`
+mirroring the folder path — `packages/grab-api` is documented in
+`.claude/packages/grab-api/CLAUDE.md` — so every agent instruction in the repo
+sits in one tree rather than beside the source.
+
+| Folder | Note |
+| --- | --- |
+| `grab-help-docs` | [.claude/grab-help-docs/CLAUDE.md](.claude/grab-help-docs/CLAUDE.md) |
+| `packages/api2client` | [.claude/packages/api2client/CLAUDE.md](.claude/packages/api2client/CLAUDE.md) |
+| `packages/archiver-web` | [.claude/packages/archiver-web/CLAUDE.md](.claude/packages/archiver-web/CLAUDE.md) |
+| `packages/grab-api` | [.claude/packages/grab-api/CLAUDE.md](.claude/packages/grab-api/CLAUDE.md) |
+| `packages/grab-url-cli` | [.claude/packages/grab-url-cli/CLAUDE.md](.claude/packages/grab-url-cli/CLAUDE.md) |
+| `packages/loading-animations` | [.claude/packages/loading-animations/CLAUDE.md](.claude/packages/loading-animations/CLAUDE.md) |
+| `packages/log-json` | [.claude/packages/log-json/CLAUDE.md](.claude/packages/log-json/CLAUDE.md) |
+| `packages/native-app-wrapper` | [.claude/packages/native-app-wrapper/CLAUDE.md](.claude/packages/native-app-wrapper/CLAUDE.md) |
+| `packages/quantum-sphere-loading-animation` | [.claude/packages/quantum-sphere-loading-animation/CLAUDE.md](.claude/packages/quantum-sphere-loading-animation/CLAUDE.md) |

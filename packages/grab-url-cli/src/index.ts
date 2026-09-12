@@ -362,8 +362,16 @@ if (__isMain) {
     // dist/grab-url-cli.es.js and packages/grab-url-cli/src/index.ts sit at
     // different depths, so look for the script from both.
     const installer = [
-      path.resolve(__dirname, "..", "scripts", "install-yt-dlp.mjs"),
-      path.resolve(__dirname, "..", "..", "..", "scripts", "install-yt-dlp.mjs"),
+      path.resolve(__dirname, "..", ".github", "scripts", "install-yt-dlp.mjs"),
+      path.resolve(
+        __dirname,
+        "..",
+        "..",
+        "..",
+        ".github",
+        "scripts",
+        "install-yt-dlp.mjs",
+      ),
     ].find((candidate) => fs.existsSync(candidate));
 
     if (!installer) {

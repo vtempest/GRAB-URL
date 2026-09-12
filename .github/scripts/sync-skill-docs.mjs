@@ -10,7 +10,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const root = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const SKILL = resolve(root, "skills/use-grab-request/SKILL.md");
 const PAGE = resolve(root, "grab-help-docs/content/docs/claude-skill.mdx");
 
@@ -19,7 +19,7 @@ title: Claude Skill & AI Code Editors
 icon: Bot
 ---
 
-{/* Generated from skills/use-grab-request/SKILL.md by scripts/sync-skill-docs.mjs — edit the skill, not this file. */}
+{/* Generated from skills/use-grab-request/SKILL.md by .github/scripts/sync-skill-docs.mjs — edit the skill, not this file. */}
 
 **Install in one command** into any agent (Claude, Cursor, Gemini, Codex, Antigravity, etc.):
 

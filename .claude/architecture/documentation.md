@@ -80,12 +80,12 @@ that PR.
 ## The generated skill page
 
 `content/docs/claude-skill.mdx` is **generated**. The source of truth is
-`skills/use-grab-request/SKILL.md`; `scripts/sync-skill-docs.mjs` regenerates the
+`skills/use-grab-request/SKILL.md`; `.github/scripts/sync-skill-docs.mjs` regenerates the
 page and writes the header telling you so.
 
 ```bash
 npm run make:skill            # regenerate
-node scripts/sync-skill-docs.mjs --check   # fail if stale, instead of writing
+node .github/scripts/sync-skill-docs.mjs --check   # fail if stale, instead of writing
 ```
 
 Edit the skill, regenerate, commit both. Editing the `.mdx` directly is undone by

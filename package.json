@@ -58,18 +58,18 @@
   "files": [
     "dist",
     "src",
-    "scripts/install-yt-dlp.mjs",
+    ".github/scripts/install-yt-dlp.mjs",
     "src/loading-animations/cli/loading-animations-emojis.js"
   ],
   "scripts": {
     "build": "vite build --config vite.config.ts",
     "make": "npm run make:icons && npm run make:skill && npm run make:docs && npm run build",
     "make:docs": "npx turbo run build --filter=grab-help-docs",
-    "make:skill": "node ./scripts/sync-skill-docs.mjs",
+    "make:skill": "node ./.github/scripts/sync-skill-docs.mjs",
     "make:icons": "npx export-svg-typescript@latest -i ./packages/loading-animations/src/svg -o ./packages/loading-animations/src/svg/index.ts",
-    "postinstall": "node ./scripts/install-yt-dlp.mjs --postinstall",
-    "ytdlp": "node ./scripts/install-yt-dlp.mjs --force",
-    "ytdlp:sidecar": "node ./scripts/install-yt-dlp.mjs --sidecar",
+    "postinstall": "node ./.github/scripts/install-yt-dlp.mjs --postinstall",
+    "ytdlp": "node ./.github/scripts/install-yt-dlp.mjs --force",
+    "ytdlp:sidecar": "node ./.github/scripts/install-yt-dlp.mjs --sidecar",
     "prepublishOnly": "npm run build",
     "ship": "bun x standard-version --release-as patch;rm CHANGELOG.md; npm publish",
     "test:ui": "vitest --ui",

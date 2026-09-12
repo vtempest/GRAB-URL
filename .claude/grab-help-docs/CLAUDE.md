@@ -22,9 +22,9 @@ npm run make:docs     # turbo run build --filter=grab-help-docs
 ## One page is generated — don't edit it
 
 `content/docs/claude-skill.mdx` is generated from
-`skills/use-grab-request/SKILL.md` by `scripts/sync-skill-docs.mjs`, and says so
+`skills/use-grab-request/SKILL.md` by `.github/scripts/sync-skill-docs.mjs`, and says so
 in a comment at the top. Edit the skill, then `npm run make:skill`.
-`node scripts/sync-skill-docs.mjs --check` fails when it is stale.
+`node .github/scripts/sync-skill-docs.mjs --check` fails when it is stale.
 
 ## The root `docs/` folder is gone
 
@@ -34,5 +34,5 @@ here, in `content/docs/`.
 
 It is still worth knowing about, because the Vercel project's Root Directory
 points at that now-missing folder and every deploy fails as a result. See
-[`../.claude/architecture/documentation.md`](../.claude/architecture/documentation.md);
+[`../architecture/documentation.md`](../architecture/documentation.md);
 it is a dashboard setting, so no commit here can fix it.
