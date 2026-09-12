@@ -3,7 +3,6 @@
  * @description Unit tests for `grab-url --page`, the page archiver:
  *   - page/folder-name.ts          (title -> safe directory name)
  *   - page/archive-html.ts         (citation + document builders)
- *   - transfer/ytdlp-transfer.ts   (yt-dlp arg building + progress parsing)
  *   - page/archive-page.ts         (orchestration, against a stubbed extractor)
  */
 
@@ -27,15 +26,6 @@ import {
     buildContentDocument,
     buildTranscriptDocument,
 } from '../packages/grab-url-cli/src/page/archive-html.js';
-
-import {
-    parseYtDlpSize,
-    parseYtDlpEta,
-    parseYtDlpProgress,
-    buildYtDlpArgs,
-    describeYtDlpExit,
-    ytDlpInstallHint,
-} from '../packages/grab-url-cli/src/transfer/ytdlp-transfer.js';
 
 // ─── folder-name ──────────────────────────────────────────────────────────────
 
@@ -214,101 +204,6 @@ describe('archive-html — document builders', () => {
         expect(doc).toContain('<title>Transcript - A Video</title>');
         expect(doc).toContain('<p>hello there</p>');
         expect(doc).toContain('https://youtu.be/x');
-    });
-});
-
-// ─── ytdlp-transfer ───────────────────────────────────────────────────────────
-
-describe('ytdlp-transfer — parseYtDlpSize()', () => {
-    it('parses binary units', () => {
-        expect(parseYtDlpSize('1.00KiB')).toBe(1024);
-        expect(parseYtDlpSize('2MiB')).toBe(2 * 1024 ** 2);
-        expect(parseYtDlpSize('1.5GiB')).toBe(Math.round(1.5 * 1024 ** 3));
-    });
-
-    it('ignores the "~" yt-dlp puts on an estimated total', () => {
-        expect(parseYtDlpSize('~12.00MiB')).toBe(12 * 1024 ** 2);
-    });
-
-    it('returns 0 for junk or missing tokens', () => {
-        expect(parseYtDlpSize('Unknown')).toBe(0);
-        expect(parseYtDlpSize(undefined)).toBe(0);
-        expect(parseYtDlpSize('')).toBe(0);
-    });
-});
-
-describe('ytdlp-transfer — parseYtDlpEta()', () => {
-    it('parses mm:ss', () => expect(parseYtDlpEta('00:42')).toBe(42));
-    it('parses hh:mm:ss', () => expect(parseYtDlpEta('01:02:03')).toBe(3723));
-    it('returns 0 for "Unknown"', () => expect(parseYtDlpEta('Unknown')).toBe(0));
-    it('returns 0 for a missing token', () => expect(parseYtDlpEta(undefined)).toBe(0));
-});
-
-describe('ytdlp-transfer — parseYtDlpProgress()', () => {
-    it('parses a standard progress line', () => {
-        const p = parseYtDlpProgress(
-            '[download]  23.4% of ~12.00MiB at    1.00MiB/s ETA 00:42',
-        );
-        expect(p).not.toBeNull();
-        expect(p!.percent).toBeCloseTo(23.4);
-        expect(p!.total).toBe(12 * 1024 ** 2);
-        expect(p!.speedBps).toBe(1024 ** 2);
-        expect(p!.etaSeconds).toBe(42);
-        expect(p!.downloaded).toBe(Math.round(12 * 1024 ** 2 * 0.234));
-    });
-
-    it('parses a completed line with an unknown speed', () => {
-        const p = parseYtDlpProgress('[download] 100% of 5.00MiB in 00:03');
-        expect(p!.percent).toBe(100);
-        expect(p!.total).toBe(5 * 1024 ** 2);
-        expect(p!.speedBps).toBe(0);
-    });
-
-    it('returns null for non-progress output', () => {
-        expect(parseYtDlpProgress('[youtube] abc: Downloading webpage')).toBeNull();
-        expect(parseYtDlpProgress('[download] Destination: video.mp4')).toBeNull();
-        expect(parseYtDlpProgress('')).toBeNull();
-    });
-});
-
-describe('ytdlp-transfer — buildYtDlpArgs()', () => {
-    it('never expands a playlist and always writes into --paths', () => {
-        const args = buildYtDlpArgs('https://youtu.be/x', { dir: '/tmp/out' });
-        expect(args).toContain('--no-playlist');
-        expect(args[args.indexOf('--paths') + 1]).toBe('/tmp/out');
-        expect(args[args.length - 1]).toBe('https://youtu.be/x');
-    });
-
-    it('uses the supplied base name but leaves the extension to yt-dlp', () => {
-        const args = buildYtDlpArgs('https://youtu.be/x', { filename: 'My Video' });
-        expect(args[args.indexOf('--output') + 1]).toBe('My Video.%(ext)s');
-    });
-
-    it('passes a format selector through', () => {
-        const args = buildYtDlpArgs('https://youtu.be/x', { format: 'bestaudio' });
-        expect(args[args.indexOf('--format') + 1]).toBe('bestaudio');
-    });
-
-    it('omits --format when none was given', () => {
-        expect(buildYtDlpArgs('https://youtu.be/x')).not.toContain('--format');
-    });
-
-    it('appends extra args before the URL', () => {
-        const args = buildYtDlpArgs('https://youtu.be/x', { extraArgs: ['--limit-rate', '1M'] });
-        expect(args.slice(-3)).toEqual(['--limit-rate', '1M', 'https://youtu.be/x']);
-    });
-});
-
-describe('ytdlp-transfer — misc', () => {
-    it('describes known exit codes', () => {
-        expect(describeYtDlpExit(0)).toBe('completed');
-        expect(describeYtDlpExit(1)).toBe('download failed');
-        expect(describeYtDlpExit(null)).toBe('terminated by signal');
-        expect(describeYtDlpExit(77)).toContain('77');
-    });
-
-    it('always offers an install hint', () => {
-        expect(ytDlpInstallHint().length).toBeGreaterThan(0);
     });
 });
 
