@@ -31,6 +31,8 @@ import {
   getRandomBarGlueColor,
 } from "../display/spinner-config.js";
 
+import { isCancelInProgress } from "../cancel-state.js";
+
 import {
   checkServerSupport,
   resolveResumeDecision,
@@ -288,6 +290,7 @@ export async function downloadFile(
     );
   } catch (e: any) {
     if (ctx.progressBar) ctx.progressBar.stop();
+    if (isCancelInProgress()) throw e;
     console.error(
       colors.error.bold("💥 Download failed: ") + colors.warning(e.message),
     );

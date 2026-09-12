@@ -1,0 +1,288 @@
+---
+title: OpenAPI SDKs
+description: Turn any OpenAPI spec into a typed client SDK or an MCP server, both powered by grab.
+icon: FileCode
+---
+
+import { InlineTOC } from 'fumadocs-ui/components/inline-toc';
+
+<InlineTOC items={toc} defaultOpen="true" />
+
+# OpenAPI SDKs
+
+If your API has an OpenAPI (Swagger) spec, you don't need to hand-write a client or a tool integration for it. GRAB ships two generators that read the same spec:
+
+```bash
+# Typed TypeScript client, requests sent through grab
+npx api2client ./openapi.yaml ./src/client
+
+# MCP server exposing every endpoint as a tool for AI agents
+npx api2ai ./openapi.yaml ./my-mcp-server
+```
+
+Every endpoint from either tool inherits grab's caching, retries, rate limiting, request deduplication and mock server — no extra wiring, and no axios or raw `fetch` calls to maintain.
+
+|                          | `api2client` | [`api2ai`](/docs/openapi-services/api2ai-mcp-server) |
+| ------------------------ | -------------------- | ---------------------------------------------------- |
+| Produces                 | A typed TypeScript SDK (`getPet()`, `createPet()`, …) | A standalone MCP server |
+| Consumed by              | Your app's code      | AI agents — Claude Desktop, ChatGPT Apps, any MCP client |
+| Transport                | `grab-url`           | Hardened HTTP client generated alongside the server |
+| Caching, retries, rate limiting, dedupe, mocks | ✅ Per request, via grab options | ✅ Built into the generated server |
+| Auth                     | Same `auth`/`security` options as the official Hey API clients | Bearer tokens, API keys, custom headers via env vars |
+| Extra safety             | —                    | Risk classification, approval gates, host allowlist |
+| Built on                 | [Hey API](https://heyapi.dev) | [mcp-use](https://mcp-use.com) |
+
+Use `api2client` when you call the API from your own code, `api2ai` when you want an AI agent to call it as a tool. Nothing stops you from generating both from one spec.
+
+---
+
+# Hey API: typed SDK powered by GRAB
+
+[Hey API](https://heyapi.dev) turns an OpenAPI spec into a fully typed SDK — one function and one set of types per endpoint. It ships clients built on fetch, axios and ky; [`api2client`](https://github.com/vtempest/GRAB-URL/tree/master/packages/api2client) adds one built on grab. The generated code is unchanged — same functions, same types — only the transport is swapped.
+
+## Set up
+
+```bash npm2yarn
+npm i grab-url api2client
+npm i -D @hey-api/openapi-ts
+
+npx api2client https://petstore3.swagger.io/api/v3/openapi.json ./src/client
+```
+
+`api2client` is both the runtime client and the CLI command. `@hey-api/openapi-ts` is Hey API's generator — install it as a dev dependency, or the CLI falls back to `npx -y @hey-api/openapi-ts` and refetches it on every run. Requires Node 18+ and `grab-url` ≥ 1.6.22.
+
+The command generates the SDK, then rewires it to grab:
+
+<Files>
+  <Folder name="src/client" defaultOpen>
+    <File name="client.gen.ts" />
+    <File name="sdk.gen.ts" />
+    <File name="types.gen.ts" />
+    <File name="index.ts" />
+  </Folder>
+</Files>
+
+| File | What's in it |
+| --- | --- |
+| `client.gen.ts` | The shared `client` every SDK function calls — where the grab transport is wired in |
+| `sdk.gen.ts` | One exported function per operation: `getPetById()`, `addPet()`, … |
+| `types.gen.ts` | Request and response types for every operation and schema |
+
+<StackBlitzExample
+  title="Run the generated SDK"
+  description="The Petstore SDK from the command above, already generated and wired to grab — cached reads, an error returned as data, and an endpoint stubbed with grab.mock."
+  github="OpenSourceAGI/GRAB-URL/tree/master/examples/api2client-petstore"
+  openFile="src/main.ts"
+/>
+
+### CLI options
+
+| Option | Purpose |
+| --- | --- |
+| `-i, --input <path\|url>` | OpenAPI spec to generate from |
+| `-o, --output <dir>` | Where to write the SDK — default `./src/client` |
+| `-c, --client <name>` | Hey API client to generate against — default `@hey-api/client-fetch` |
+| `--rewire-only` | Skip generation, rewire an SDK you already generated |
+| `--no-rewire` | Generate without swapping in the grab client |
+
+Anything else is forwarded to the `openapi-ts` CLI, so `--plugins`, `--dry-run` and friends work as Hey API documents them. Already have an `openapi-ts.config.ts`? Keep it and rewire afterwards:
+
+```json title="package.json"
+{
+  "scripts": {
+    "codegen": "openapi-ts && api2client --rewire-only ./src/client"
+  }
+}
+```
+
+Rewiring handles both output shapes Hey API produces: package imports of `@hey-api/client-fetch` (or `-axios`, `-ky`, `-next`, `-nuxt`, `-ofetch`) are repointed at `api2client`, and a client bundled into `<output>/client/` is replaced with a shim re-exporting the grab client. `sdk.gen.ts` and `types.gen.ts` are untouched either way. The same is available from Node as `generateFromOpenAPI({ input, output })` and `rewireGeneratedClient(output)`.
+
+Commit the generated directory and regenerate as a script, so a spec change shows up as a reviewable diff. In CI, fail the build when it drifts:
+
+```yaml title=".github/workflows/codegen.yml"
+- run: npm run codegen
+- run: git diff --exit-code src/client
+```
+
+## Configure
+
+`client.gen.ts` exports a `client` that configures the whole SDK at once. Import it once at startup, before the first SDK call:
+
+```ts title="src/api.ts"
+import { client } from "./client/client.gen";
+
+client.setConfig({
+  baseUrl: "https://api.example.com",
+  auth: () => localStorage.getItem("token"),
+
+  // grab options — applied to every request the SDK makes
+  cache: true,
+  cacheForTime: 60,
+  retryAttempts: 2,
+  rateLimit: 1,
+  timeout: 15,
+});
+```
+
+Or build clients yourself — for a second API, or one per tenant. The SDK falls back to the shared client when you don't pass one:
+
+```ts
+import { createClient, createConfig } from "api2client";
+
+const admin = createClient(createConfig({ baseUrl: "https://admin.example.com" }));
+
+await getPetById({ path: { petId: 42 }, client: admin });
+```
+
+### GRAB options
+
+Accepted client-wide in `createConfig()`/`setConfig()` and per request. Full reference: [grab options](/docs/grab-options).
+
+| Option | Effect |
+| --- | --- |
+| `cache`, `cacheForTime` | Serve repeated requests from grab's frontend cache |
+| `retryAttempts` | Retry failed requests |
+| `rateLimit` | Minimum seconds between requests to the same path |
+| `timeout` | Seconds before the request is aborted |
+| `cancelOngoingIfNew`, `cancelNewIfOngoing` | Deduplicate concurrent requests to the same path |
+| `debug`, `logger` | Log requests and responses |
+| `unzip`, `parseDOM`, `unescapeHTML` | Opt back into grab's ZIP/HTML post-processing |
+| `grab` | Use a custom instance, e.g. `grab.instance({ ... })` |
+
+Everything Hey API's own clients accept — `auth`/`security`, `interceptors`, `bodySerializer`, `querySerializer`, `parseAs`, `responseStyle`, `throwOnError`, `responseValidator`, `responseTransformer`, `buildUrl()` — behaves exactly as it does there.
+
+## Call an endpoint
+
+grab options can be set per call, overriding the client-wide defaults. The result is the standard Hey API shape — `{ data, error, request, response }`, or just `data` with `responseStyle: "data"`, or a thrown error with `throwOnError: true`:
+
+```ts
+import { findPetsByStatus, getPetById } from "./client/sdk.gen";
+
+const { data: pets } = await findPetsByStatus({
+  query: { status: "available" },
+  cache: true,
+  cacheForTime: 60,   // the next identical call skips the network
+});
+
+const { data, error, response } = await getPetById({ path: { petId: 99 }, retryAttempts: 3 });
+
+if (error) console.log(response.status, error);  // 404 { message: "Pet not found" }
+```
+
+### Mock any endpoint
+
+`grab.mock` is keyed by request path relative to `baseUrl`, so an endpoint can be stubbed without a mock server and without touching the calling code. Path parameters are substituted before the lookup, so `getPetById({ path: { petId: 42 } })` matches `grab.mock["/pet/42"]`; a leading slash is optional. This is the fastest way to test a generated SDK — see [testing](/docs/testing).
+
+```ts
+import { grab } from "grab-url";
+
+grab.mock["/pet"] = {
+  method: "POST",
+  response: { id: 42, name: "Rex", status: "available", photoUrls: [] },
+};
+
+const { data } = await addPet({ body: { name: "Rex", photoUrls: [] } });
+// { id: 42, name: "Rex", ... } — nothing went over the wire
+```
+
+## Wiring it into a framework
+
+The SDK is plain async functions, so it drops into whatever data layer you already use.
+
+<Tabs groupId="framework" items={['React', 'TanStack Query', 'Node']}>
+<Tab value="React">
+
+```tsx
+// cancelOngoingIfNew drops the in-flight request when petId changes
+useEffect(() => {
+  getPetById({ path: { petId }, cache: true, cancelOngoingIfNew: true })
+    .then(({ data }) => setPet(data));
+}, [petId]);
+```
+
+</Tab>
+<Tab value="TanStack Query">
+
+```ts
+// grab's retries and rate limiting still apply underneath Query's own
+const usePet = (petId: number) =>
+  useQuery({
+    queryKey: ["pet", petId],
+    queryFn: async () => {
+      const { data, error } = await getPetById({ path: { petId } });
+      if (error) throw error;
+      return data;
+    },
+  });
+```
+
+</Tab>
+<Tab value="Node">
+
+```ts
+client.setConfig({
+  baseUrl: process.env.API_URL,
+  auth: () => process.env.API_TOKEN,
+  rateLimit: 0.2,     // stay under the upstream quota
+  retryAttempts: 3,
+});
+```
+
+</Tab>
+</Tabs>
+
+## Compared to the official clients
+
+| Feature | `api2client` | `@hey-api/client-fetch` | `@hey-api/client-axios` |
+| --- | --- | --- | --- |
+| Typed generated SDK | ✅ Same codegen | ✅ Yes | ✅ Yes |
+| Caching | ✅ Built-in | ❌ No | ❌ No |
+| Automatic retry | ✅ `retryAttempts` | ❌ Manual | ⚠️ Via interceptors |
+| Rate limiting | ✅ `rateLimit` | ❌ Manual | ❌ Manual |
+| Request deduplication | ✅ Built-in | ❌ No | ❌ No |
+| Mock server | ✅ `grab.mock` | ❌ Needs MSW/etc | ❌ Needs MSW/etc |
+| Request log | ✅ `grab.log` | ❌ No | ❌ No |
+| Interceptors | ✅ Yes | ✅ Yes | ✅ Yes |
+| Server-sent events | ❌ Use fetch client | ✅ Yes | ❌ No |
+
+Behavioral differences:
+
+- **Transport failures are returned, not thrown.** A timeout or connection failure comes back as `{ error }` — grab's "errors are data" behavior. Set `throwOnError: true` for exceptions. HTTP error statuses behave as in the official clients.
+- **Bodies are parsed by grab.** `parseAs: "stream"` hands you the raw stream, and an explicit `parseAs` still decides the empty-response shape, but otherwise grab's content-type detection reads the body.
+- **grab sets JSON `Content-Type`/`Accept` defaults** on requests that don't specify their own, including body-less ones.
+- **Response interceptors run before parsing**, on a response whose body grab has already read.
+- **No `sse` helpers.** Server-sent event endpoints need the fetch client.
+
+## Troubleshooting
+
+**Generation stalls or fails with a network error** — install the generator locally: `npm i -D @hey-api/openapi-ts`. Otherwise it's refetched from the registry on every run.
+
+**`No generated output found at …`** — `--rewire-only` was pointed at a directory that doesn't exist yet. Run generation first, or drop the flag.
+
+**The SDK still imports `@hey-api/client-fetch`** — generation ran with `--no-rewire`, or the output directory moved. Re-run `api2client --rewire-only ./src/client`.
+
+**`response.status` is always 200 on failures** — the installed `grab-url` predates 1.6.23, so the client can't read the raw response through `onRawResponse`. Upgrade `grab-url`; the client detects support and never sends options an older grab would turn into query parameters.
+
+---
+
+# MCP server
+
+```bash
+npx api2ai https://petstore3.swagger.io/api/v3/openapi.json ./petstore-mcp --name petstore-api
+
+cd petstore-mcp && npm install && npm start
+```
+
+Every operation in the spec becomes an MCP tool, classified by risk (`low`/`medium`/`high`) so mutating or sensitive endpoints stay behind an approval gate by default. The generated server includes a built-in inspector at `/inspector`, HTTP/SSE transports, Zod-validated parameters, and a hardened HTTP client (timeouts, response size caps, no redirects, credential header protection, host allowlist).
+
+```json
+{
+  "mcpServers": {
+    "petstore-api": {
+      "url": "http://localhost:3000/mcp"
+    }
+  }
+}
+```
+
+Full reference: [API2AI: OpenAPI to MCP-Use Server](/docs/openapi-services/api2ai-mcp-server).

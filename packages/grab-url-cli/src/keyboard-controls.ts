@@ -19,18 +19,37 @@ export interface KeyboardCallbacks {
     hasMultiBar: () => boolean;
     addToMultipleDownloads: (url: string, outputPath: string, filename: string) => Promise<void>;
     downloadFile: (url: string, outputPath: string) => Promise<void>;
+    /**
+     * Called on Ctrl+C instead of exiting outright — the CLI uses it to offer
+     * handing the transfer off to a background process. It is expected to end
+     * the process itself.
+     */
+    onCancel?: () => Promise<void> | void;
 }
+
+/**
+ * True while a nested prompt (cancel confirmation) owns stdin, so the main
+ * listener stops interpreting keystrokes as download controls.
+ */
+let promptActive = false;
 
 // ─── Keyboard listener ────────────────────────────────────────────────────────
 
+/** Tracks whether this module already attached its stdin listener. */
+let listenerAttached = false;
+
 /**
  * Attach a raw-mode stdin listener.
- * - Ctrl+C → exit
+ * - Ctrl+C → run `onCancel` (offer a background handoff) or exit
  * - p      → toggle pause/resume
  * - a      → prompt to add a URL
+ *
+ * Calling this more than once is a no-op, so several transfers can share one
+ * listener.
  */
 export function setupKeyboardListener(callbacks: KeyboardCallbacks): void {
-    if (!process.stdin.isTTY) return;
+    if (!process.stdin.isTTY || listenerAttached) return;
+    listenerAttached = true;
 
     process.stdin.setRawMode(true);
     process.stdin.resume();
@@ -38,9 +57,17 @@ export function setupKeyboardListener(callbacks: KeyboardCallbacks): void {
 
     process.stdin.on('data', async (str: string) => {
         if (str === '\u0003') {
+            // A confirmation prompt owns stdin — let it consume this keystroke.
+            if (promptActive) return;
+            if (callbacks.onCancel) {
+                promptActive = true;
+                try { await callbacks.onCancel(); } finally { promptActive = false; }
+                return;
+            }
             console.log(colors.warning.bold('\n🛑 Downloads cancelled by user'));
             process.exit(0);
         }
+        if (promptActive) return;
         if (str.toLowerCase() === 'p') {
             if (!callbacks.isPaused()) callbacks.pauseAll();
             else callbacks.resumeAll();
@@ -59,6 +86,7 @@ export function teardownKeyboardListener(): void {
         process.stdin.setRawMode(false);
         process.stdin.pause();
     }
+    listenerAttached = false;
 }
 
 // ─── URL prompt ───────────────────────────────────────────────────────────────

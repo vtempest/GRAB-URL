@@ -1,0 +1,20 @@
+{
+  "name": "grab-url-example-api2client-petstore",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "codegen": "api2client https://petstore3.swagger.io/api/v3/openapi.json ./src/client"
+  },
+  "dependencies": {
+    "grab-url": "^1.6.22",
+    "api2client": "^1.0.0"
+  },
+  "devDependencies": {
+    "@hey-api/openapi-ts": "^0.60.0",
+    "typescript": "latest",
+    "vite": "latest"
+  }
+}

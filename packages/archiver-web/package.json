@@ -22,7 +22,7 @@
     "jszip": "^3.10.1"
   },
   "devDependencies": {
-    "tsx": "^4.7.0",
+    "tsx": "^4.23.13",
     "typescript": "^5.4.0",
     "vite": "^7.3.1",
     "vite-plugin-dts": "^4.5.4"
@@ -30,11 +30,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vtempest/GRAB-URL.git",
+    "url": "git+https://github.com/OpenSourceAGI/GRAB-URL.git",
     "directory": "packages/archiver-web"
   },
   "bugs": {
-    "url": "https://github.com/vtempest/GRAB-URL/issues"
+    "url": "https://github.com/OpenSourceAGI/GRAB-URL/issues"
   },
-  "homepage": "https://github.com/vtempest/GRAB-URL/tree/master/packages/archiver-web#readme"
+  "homepage": "https://github.com/OpenSourceAGI/GRAB-URL/tree/master/packages/archiver-web#readme"
 }

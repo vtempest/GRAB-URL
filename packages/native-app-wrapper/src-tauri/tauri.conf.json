@@ -1,0 +1,64 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Grab URL",
+  "version": "1.6.22",
+  "identifier": "org.grab.url",
+  "build": {
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "label": "main",
+        "title": "Grab URL",
+        "url": "index.html",
+        "width": 760,
+        "height": 560,
+        "minWidth": 420,
+        "minHeight": 420,
+        "resizable": true,
+        "fullscreen": false,
+        "center": true
+      }
+    ],
+    "security": {
+      "capabilities": [
+        "default"
+      ]
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "publisher": "grab-url contributors",
+    "copyright": "grab-url contributors",
+    "category": "Utility",
+    "shortDescription": "Download video and audio from 720+ media sites.",
+    "longDescription": "A window over yt-dlp: paste a link from YouTube, Twitch, Vimeo, SoundCloud or any of ~720 other sites and the media lands in your Downloads folder. The downloader ships inside the app, so nothing needs installing first.",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "windows": {
+      "nsis": {
+        "installMode": "currentUser"
+      }
+    },
+    "macOS": {
+      "minimumSystemVersion": "10.15"
+    },
+    "linux": {
+      "deb": {
+        "depends": []
+      }
+    },
+    "externalBin": [
+      "binaries/yt-dlp"
+    ]
+  },
+  "plugins": {}
+}

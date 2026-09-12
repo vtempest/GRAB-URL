@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="200" height="200" fill="#71717a" style="shape-rendering: auto; display: block;"><g>
+  <circle cx="4" cy="12" r="2">
+    <animate id="dotsBounce1" begin="0;dotsBounce3.end+0.25s" attributeName="cy" calcMode="spline" dur="0.6s" values="12;6;12" keySplines=".33,.66,.66,1;.33,0,.66,.33"></animate>
+  </circle>
+  <circle cx="12" cy="12" r="2">
+    <animate begin="dotsBounce1.begin+0.1s" attributeName="cy" calcMode="spline" dur="0.6s" values="12;6;12" keySplines=".33,.66,.66,1;.33,0,.66,.33"></animate>
+  </circle>
+  <circle cx="20" cy="12" r="2">
+    <animate id="dotsBounce3" begin="dotsBounce1.begin+0.2s" attributeName="cy" calcMode="spline" dur="0.6s" values="12;6;12" keySplines=".33,.66,.66,1;.33,0,.66,.33"></animate>
+  </circle>
+</g></svg>

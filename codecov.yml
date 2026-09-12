@@ -17,6 +17,7 @@ comment:
 ignore:
   - "dist"
   - "docs"
+  - "grab-help-docs"
   - "test"
   - "**/*.test.ts"
   - "**/svg/**"

@@ -1,0 +1,5 @@
+{
+  "title": "OpenAPI SDKs",
+  "icon": "FileCode",
+  "pages": ["index", "api2ai-mcp-server"]
+}

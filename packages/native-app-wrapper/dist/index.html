@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Grab URL</title>
+    <!--
+      The whole UI of the local-mode app, bundled into the binary. Plain
+      content, so `window.__TAURI__.core.invoke` is available directly (the
+      profile sets withGlobalTauri) with no build step and no npm dependency.
+
+      Two commands back it, both defined in ../src-tauri/src/lib.rs:
+        sidecar_output  — fixed args, used here to read the bundled yt-dlp version
+        download_media  — takes the one thing a downloader needs, a URL
+    -->
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #0b1220;
+        --panel: #141d31;
+        --line: #24314d;
+        --text: #e6ebf5;
+        --muted: #93a1bd;
+        --accent: #5b8cff;
+        --ok: #4ade80;
+        --err: #f87171;
+      }
+      * { box-sizing: border-box; }
+      html, body { height: 100%; margin: 0; }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+        display: flex;
+        flex-direction: column;
+        padding: 24px;
+        gap: 18px;
+      }
+      h1 { font-size: 20px; margin: 0; letter-spacing: -0.01em; }
+      p.sub { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+      form { display: flex; flex-direction: column; gap: 12px; }
+      .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+      input[type="url"] {
+        flex: 1 1 320px;
+        min-width: 0;
+        padding: 11px 13px;
+        border-radius: 9px;
+        border: 1px solid var(--line);
+        background: var(--panel);
+        color: var(--text);
+        font: inherit;
+      }
+      input[type="url"]:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+      button {
+        padding: 11px 18px;
+        border-radius: 9px;
+        border: 0;
+        background: var(--accent);
+        color: #050d22;
+        font: inherit;
+        font-weight: 620;
+        cursor: pointer;
+      }
+      button:disabled { opacity: 0.55; cursor: progress; }
+      label.check { display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: 14px; }
+      #status {
+        flex: 1;
+        min-height: 90px;
+        padding: 13px;
+        border-radius: 9px;
+        border: 1px solid var(--line);
+        background: var(--panel);
+        color: var(--muted);
+        font: 12.5px/1.55 ui-monospace, SFMono-Regular, Menlo, monospace;
+        white-space: pre-wrap;
+        overflow: auto;
+        margin: 0;
+      }
+      #status.ok { color: var(--ok); }
+      #status.err { color: var(--err); }
+      footer { color: var(--muted); font-size: 12px; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Grab URL</h1>
+      <p class="sub">Paste a link from YouTube, Twitch, Vimeo, SoundCloud or ~720 other sites.</p>
+    </header>
+
+    <form id="form">
+      <div class="row">
+        <input
+          id="url"
+          type="url"
+          required
+          placeholder="https://www.youtube.com/watch?v=…"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <button id="go" type="submit">Download</button>
+      </div>
+      <div class="row">
+        <label class="check">
+          <input id="audio" type="checkbox" />
+          Audio only
+        </label>
+      </div>
+    </form>
+
+    <pre id="status">Ready. Files land in your Downloads folder.</pre>
+    <footer id="version">Checking the bundled downloader…</footer>
+
+    <script>
+      const invoke = window.__TAURI__?.core?.invoke;
+      const form = document.getElementById("form");
+      const urlField = document.getElementById("url");
+      const audioField = document.getElementById("audio");
+      const button = document.getElementById("go");
+      const status = document.getElementById("status");
+      const version = document.getElementById("version");
+
+      /** Writes one message to the status pane, colored by outcome. */
+      function report(text, kind) {
+        status.textContent = text;
+        status.className = kind || "";
+      }
+
+      if (!invoke) {
+        // Opened in a plain browser rather than the app — say so instead of
+        // failing on the first click with a bare TypeError.
+        report("This page is the Grab URL app's UI. Run it with `npm run dev`.", "err");
+        button.disabled = true;
+      } else {
+        invoke("sidecar_output")
+          .then((out) => {
+            version.textContent = "Bundled yt-dlp " + out.trim();
+          })
+          .catch((error) => {
+            version.textContent = "Bundled downloader unavailable: " + error;
+          });
+      }
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        if (!invoke) return;
+
+        const url = urlField.value.trim();
+        if (!url) return;
+
+        button.disabled = true;
+        // download_media resolves only when yt-dlp exits, so this is a
+        // working-state message, not a progress bar — saying otherwise would
+        // promise an update that never arrives.
+        report("Downloading " + url + "\nThis stays open until the file is finished.");
+
+        try {
+          const output = await invoke("download_media", {
+            url,
+            audioOnly: audioField.checked,
+          });
+          const lines = output.trim().split("\n").filter(Boolean);
+          const destination = lines
+            .reverse()
+            .find((line) => /Destination:|Merging formats into|has already been downloaded/.test(line));
+          report("Done.\n" + (destination || output.trim() || "Saved to your Downloads folder."), "ok");
+          urlField.value = "";
+        } catch (error) {
+          report(String(error), "err");
+        } finally {
+          button.disabled = false;
+        }
+      });
+    </script>
+  </body>
+</html>

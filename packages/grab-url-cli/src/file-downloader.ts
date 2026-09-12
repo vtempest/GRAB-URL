@@ -63,6 +63,8 @@ export class MultiColorFileDownloaderCLI {
     resumeCallback: (() => void) | null = null;
     isAddingUrl = false;
     stateDir: string;
+    /** Ctrl+C handler — when set it replaces the default "exit now" behavior. */
+    cancelHandler: (() => Promise<void> | void) | null = null;
 
     // Column constants (kept for backward compat)
     readonly COL_FILENAME = COL_FILENAME;
@@ -108,6 +110,12 @@ export class MultiColorFileDownloaderCLI {
     setPauseCallback(cb: () => void) { this.pauseCallback = cb; }
     setResumeCallback(cb: () => void) { this.resumeCallback = cb; }
 
+    /**
+     * Register what happens on Ctrl+C. The CLI uses it to ask whether the
+     * transfer should carry on in a detached background process.
+     */
+    setCancelHandler(cb: (() => Promise<void> | void) | null) { this.cancelHandler = cb; }
+
     pauseAll() {
         this.isPaused = true;
         console.log(colors.warning('⏸️  Pausing all downloads...'));
@@ -125,6 +133,7 @@ export class MultiColorFileDownloaderCLI {
         if (this.progressBar) this.progressBar.stop();
         if (this.multiBar) this.multiBar.stop();
         if (this.abortController) this.abortController.abort();
+        this.abortControllers.forEach(c => { try { c.abort(); } catch { } });
         teardownKeyboardListener();
     }
 
@@ -140,6 +149,7 @@ export class MultiColorFileDownloaderCLI {
             hasMultiBar: () => !!this.multiBar,
             addToMultipleDownloads: (u, o, f) => this.addToMultipleDownloads(u, o, f),
             downloadFile: (u, o) => this.downloadFile(u, o),
+            ...(this.cancelHandler ? { onCancel: () => this.cancelHandler!() } : {}),
         };
         setupKeyboardListener(cbs);
     }
