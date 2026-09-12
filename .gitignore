@@ -60,6 +60,8 @@ grab-help-docs/.next_old
 
 .claude/*
 # Agent docs for Claude Code — checked in on purpose (see CLAUDE.md)
+!.claude/packages
+!.claude/grab-help-docs
 !.claude/architecture
 !.claude/settings.json
 .claude/settings.local.json
