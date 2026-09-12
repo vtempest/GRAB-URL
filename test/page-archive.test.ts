@@ -29,8 +29,7 @@ import {
 } from '../packages/grab-url-cli/src/page/archive-html.js';
 
 import {
-    parseYtDlpSize,
-    parseYtDlpEta,
+    YTDLP_PROGRESS_TEMPLATE,
     parseYtDlpProgress,
     buildYtDlpArgs,
     describeYtDlpExit,
@@ -219,55 +218,64 @@ describe('archive-html — document builders', () => {
 
 // ─── ytdlp-transfer ───────────────────────────────────────────────────────────
 
-describe('ytdlp-transfer — parseYtDlpSize()', () => {
-    it('parses binary units', () => {
-        expect(parseYtDlpSize('1.00KiB')).toBe(1024);
-        expect(parseYtDlpSize('2MiB')).toBe(2 * 1024 ** 2);
-        expect(parseYtDlpSize('1.5GiB')).toBe(Math.round(1.5 * 1024 ** 3));
-    });
-
-    it('ignores the "~" yt-dlp puts on an estimated total', () => {
-        expect(parseYtDlpSize('~12.00MiB')).toBe(12 * 1024 ** 2);
-    });
-
-    it('returns 0 for junk or missing tokens', () => {
-        expect(parseYtDlpSize('Unknown')).toBe(0);
-        expect(parseYtDlpSize(undefined)).toBe(0);
-        expect(parseYtDlpSize('')).toBe(0);
-    });
-});
-
-describe('ytdlp-transfer — parseYtDlpEta()', () => {
-    it('parses mm:ss', () => expect(parseYtDlpEta('00:42')).toBe(42));
-    it('parses hh:mm:ss', () => expect(parseYtDlpEta('01:02:03')).toBe(3723));
-    it('returns 0 for "Unknown"', () => expect(parseYtDlpEta('Unknown')).toBe(0));
-    it('returns 0 for a missing token', () => expect(parseYtDlpEta(undefined)).toBe(0));
-});
-
 describe('ytdlp-transfer — parseYtDlpProgress()', () => {
-    it('parses a standard progress line', () => {
+    /** One line as yt-dlp emits it under {@link YTDLP_PROGRESS_TEMPLATE}. */
+    const sentinel = (...fields: string[]) => `download:@GRAB@${fields.join('|')}`;
+
+    it('parses a sentinel-prefixed progress line', () => {
         const p = parseYtDlpProgress(
-            '[download]  23.4% of ~12.00MiB at    1.00MiB/s ETA 00:42',
+            sentinel('downloading', '3145728', '12582912', 'NA', '1048576', '42', 'NA', 'NA'),
         );
         expect(p).not.toBeNull();
-        expect(p!.percent).toBeCloseTo(23.4);
+        expect(p!.status).toBe('downloading');
+        expect(p!.downloaded).toBe(3 * 1024 ** 2);
         expect(p!.total).toBe(12 * 1024 ** 2);
+        expect(p!.estimated).toBe(false);
         expect(p!.speedBps).toBe(1024 ** 2);
         expect(p!.etaSeconds).toBe(42);
-        expect(p!.downloaded).toBe(Math.round(12 * 1024 ** 2 * 0.234));
     });
 
-    it('parses a completed line with an unknown speed', () => {
-        const p = parseYtDlpProgress('[download] 100% of 5.00MiB in 00:03');
-        expect(p!.percent).toBe(100);
-        expect(p!.total).toBe(5 * 1024 ** 2);
+    it('falls back to the estimate and says so when the exact total is unknown', () => {
+        const p = parseYtDlpProgress(
+            sentinel('downloading', '1024', 'NA', '12582912', 'NA', 'NA', 'NA', 'NA'),
+        );
+        expect(p!.total).toBe(12 * 1024 ** 2);
+        expect(p!.estimated).toBe(true);
+    });
+
+    it('treats NA and None as unknown rather than NaN', () => {
+        const p = parseYtDlpProgress(
+            sentinel('finished', 'None', 'NA', 'NA', 'NA', 'NA', 'NA', 'NA'),
+        );
+        expect(p!.downloaded).toBe(0);
+        expect(p!.total).toBe(0);
         expect(p!.speedBps).toBe(0);
+        expect(p!.etaSeconds).toBe(0);
     });
 
-    it('returns null for non-progress output', () => {
+    it('keeps the fragment counters an HLS stream reports, and nulls them otherwise', () => {
+        const hls = parseYtDlpProgress(
+            sentinel('downloading', '1024', 'NA', 'NA', 'NA', 'NA', '7', '20'),
+        );
+        expect(hls!.fragmentIndex).toBe(7);
+        expect(hls!.fragmentCount).toBe(20);
+
+        const plain = parseYtDlpProgress(
+            sentinel('downloading', '1024', 'NA', 'NA', 'NA', 'NA', 'NA', 'NA'),
+        );
+        expect(plain!.fragmentIndex).toBeNull();
+        expect(plain!.fragmentCount).toBeNull();
+    });
+
+    it('returns null for every other line yt-dlp writes', () => {
         expect(parseYtDlpProgress('[youtube] abc: Downloading webpage')).toBeNull();
+        expect(parseYtDlpProgress('[download]  23.4% of ~12.00MiB at 1.00MiB/s')).toBeNull();
         expect(parseYtDlpProgress('[download] Destination: video.mp4')).toBeNull();
         expect(parseYtDlpProgress('')).toBeNull();
+    });
+
+    it('returns null for a truncated sentinel line', () => {
+        expect(parseYtDlpProgress(sentinel('downloading', '1024', 'NA'))).toBeNull();
     });
 });
 
@@ -279,9 +287,19 @@ describe('ytdlp-transfer — buildYtDlpArgs()', () => {
         expect(args[args.length - 1]).toBe('https://youtu.be/x');
     });
 
-    it('uses the supplied base name but leaves the extension to yt-dlp', () => {
-        const args = buildYtDlpArgs('https://youtu.be/x', { filename: 'My Video' });
+    it('uses the supplied output template verbatim', () => {
+        const args = buildYtDlpArgs('https://youtu.be/x', { output: 'My Video.%(ext)s' });
         expect(args[args.indexOf('--output') + 1]).toBe('My Video.%(ext)s');
+    });
+
+    it('falls back to title and id when no output template was given', () => {
+        const args = buildYtDlpArgs('https://youtu.be/x');
+        expect(args[args.indexOf('--output') + 1]).toBe('%(title)s [%(id)s].%(ext)s');
+    });
+
+    it('asks yt-dlp for the sentinel progress template the parser reads', () => {
+        const args = buildYtDlpArgs('https://youtu.be/x');
+        expect(args[args.indexOf('--progress-template') + 1]).toBe(YTDLP_PROGRESS_TEMPLATE);
     });
 
     it('passes a format selector through', () => {
@@ -302,7 +320,7 @@ describe('ytdlp-transfer — buildYtDlpArgs()', () => {
 describe('ytdlp-transfer — misc', () => {
     it('describes known exit codes', () => {
         expect(describeYtDlpExit(0)).toBe('completed');
-        expect(describeYtDlpExit(1)).toBe('download failed');
+        expect(describeYtDlpExit(1)).toContain('download failed');
         expect(describeYtDlpExit(null)).toBe('terminated by signal');
         expect(describeYtDlpExit(77)).toContain('77');
     });
