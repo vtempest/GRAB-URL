@@ -62,6 +62,7 @@ Directory is the repo root — now supplies the three settings that were missing
 | `installCommand` | `npm ci` | Same reason as the Pages workflow: the lockfile pins a compatible `fumadocs-openapi` / `fumadocs-ui` pair and a floating resolve does not. |
 | `buildCommand` | `npx turbo run build --filter=grab-help-docs` | The root `build` script is `vite build`; only this reaches the Next.js app. |
 | `outputDirectory` | `grab-help-docs/.next` | Where that build actually writes, relative to the repo root. |
+| `build.env.VERCEL_PREVIEW_FEEDBACK_ENABLED` | `0` | Turns the preview toolbar's comments off. Next 16 uploads static files as immutable, which the comment injector cannot patch, so with it on every *preview* deployment dies after a successful build on `Cannot patch preview comments when immutable static file upload is enabled`. Production never patched them, so this changes nothing there. |
 
 So the deploy is config-in-the-repo now, and no dashboard visit is needed as
 long as **Root Directory stays empty (the repository root)**. Two settings
