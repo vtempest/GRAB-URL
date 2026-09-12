@@ -296,7 +296,10 @@ describe('yt-dlp — isYtDlpNoise()', () => {
 describe('yt-dlp — describeYtDlpExit()', () => {
     it('names the common exit codes', () => {
         expect(describeYtDlpExit(0)).toBe('completed');
+        expect(describeYtDlpExit(1)).toContain('download failed');
         expect(describeYtDlpExit(2)).toBe('bad command-line option');
+        expect(describeYtDlpExit(100)).toContain('Python');
+        expect(describeYtDlpExit(101)).toContain('stopped early');
         expect(describeYtDlpExit(null)).toBe('terminated by signal');
     });
     it('falls back to the raw code', () => {
