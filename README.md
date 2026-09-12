@@ -6,8 +6,9 @@
 <p align="center">
     <a href="https://deepwiki.com/OpenSourceAGI/GRAB-URL"><img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki" /></a>
     <a href="https://grab.js.org"><img src="https://img.shields.io/badge/Docs-blue?logo=ReadTheDocs&logoColor=white" alt="Documentation" /></a>
+    <a href="https://stackblitz.com/github/OpenSourceAGI/GRAB-URL/tree/master/examples/basic-request"><img height="20px" src="https://developer.stackblitz.com/img/open_in_stackblitz.svg" alt="Open in StackBlitz" /></a>
+    <a href="https://codespaces.new/OpenSourceAGI/GRAB-URL"><img height="20px" src="https://github.com/codespaces/badge.svg" alt="Open in GitHub Codespaces" /></a>
     <br />
-    <a href="https://github.com/OpenSourceAGI/GRAB-URL/stargazers"><img src="https://img.shields.io/github/stars/OpenSourceAGI/GRAB-URL" alt="GitHub Stars" /></a>
     <a href="https://www.npmjs.com/package/grab-url"><img src="https://img.shields.io/npm/dm/grab-url.svg" alt="NPM Monthly Downloads" /></a>
     <a href="https://www.npmjs.com/package/grab-url"><img src="https://img.shields.io/npm/v/grab-url.svg" alt="npm version" /></a>
     <a href="https://www.npmjs.com/package/grab-url"><img src="https://img.shields.io/npm/dt/grab-url.svg" alt="NPM Total Downloads" /></a>
@@ -16,8 +17,9 @@
     <a href="https://codecov.io/gh/OpenSourceAGI/GRAB-URL"><img src="https://codecov.io/gh/OpenSourceAGI/GRAB-URL/graph/badge.svg" alt="Coverage" /></a>
     <a href="https://github.com/OpenSourceAGI/GRAB-URL/actions/workflows/tests.yml"><img src="https://github.com/OpenSourceAGI/GRAB-URL/actions/workflows/tests.yml/badge.svg?branch=master" alt="CI status" /></a>
     <br />
-    <a href="https://github.com/OpenSourceAGI/GRAB-URL/graphs/contributors"><img src="https://img.shields.io/github/contributors/OpenSourceAGI/GRAB-URL" alt="Contributors" /></a>
+    <a href="https://github.com/OpenSourceAGI/GRAB-URL/stargazers"><img src="https://img.shields.io/github/stars/OpenSourceAGI/GRAB-URL" alt="GitHub Stars" /></a>
     <a href="https://github.com/OpenSourceAGI/GRAB-URL/forks"><img src="https://img.shields.io/github/forks/OpenSourceAGI/GRAB-URL" alt="GitHub Forks" /></a>
+    <a href="https://github.com/OpenSourceAGI/GRAB-URL/graphs/contributors"><img src="https://img.shields.io/github/contributors/OpenSourceAGI/GRAB-URL" alt="Contributors" /></a>
     <a href="https://github.com/OpenSourceAGI/GRAB-URL/issues"><img src="https://img.shields.io/github/issues/OpenSourceAGI/GRAB-URL?logo=github" alt="GitHub Issues" /></a>
     <a href="https://github.com/OpenSourceAGI/GRAB-URL/pulls"><img src="https://img.shields.io/github/issues-pr/OpenSourceAGI/GRAB-URL?logo=github&label=PRs" alt="Open Pull Requests" /></a>
     <a href="https://github.com/OpenSourceAGI/GRAB-URL/pulls?q=is%3Apr+is%3Aclosed"><img src="https://img.shields.io/github/issues-pr-closed/OpenSourceAGI/GRAB-URL?logo=github&label=PRs%20merged&color=8957e5" alt="Merged Pull Requests" /></a>
@@ -25,17 +27,15 @@
     <a href="https://github.com/OpenSourceAGI/GRAB-URL/graphs/contributors"><img src="https://img.shields.io/github/commit-activity/m/OpenSourceAGI/GRAB-URL" alt="Commit activity" /></a>
     <a href="https://github.com/OpenSourceAGI/GRAB-URL/commits/master/"><img src="https://img.shields.io/github/last-commit/OpenSourceAGI/GRAB-URL.svg" alt="GitHub last commit" /></a>
     <a href="https://discord.gg/SJdBqBz3tV"><img src="https://img.shields.io/discord/1110227955554209923.svg?label=Chat&logo=Discord&colorB=7289da&style=flat" alt="Join Discord" /></a>
-    <br />
-    <a href="https://stackblitz.com/github/OpenSourceAGI/GRAB-URL/tree/master/examples/basic-request"><img height="20px" src="https://developer.stackblitz.com/img/open_in_stackblitz.svg" alt="Open in StackBlitz" /></a>
-    <a href="https://codespaces.new/OpenSourceAGI/GRAB-URL"><img height="20px" src="https://github.com/codespaces/badge.svg" alt="Open in GitHub Codespaces" /></a>
     <a href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request"><img src="https://img.shields.io/badge/PRs--welcome-brightgreen" alt="PRs Welcome" /></a>
     <a href="https://github.com/OpenSourceAGI/GRAB-URL/blob/master/LICENSE.md"><img src="https://img.shields.io/github/license/OpenSourceAGI/GRAB-URL" alt="License" /></a>
-    <img src="https://img.shields.io/badge/Claude-D97757?logo=claude&logoColor=white" alt="Claude" /> <img src="https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white" alt="TypeScript" /> <img src="https://img.shields.io/badge/npm-CB3837?logo=npm&logoColor=white" alt="npm" /> <img src="https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=white" alt="Vite" /> <img src="https://img.shields.io/badge/Vitest-6E9F18?logo=vitest&logoColor=white" alt="Vitest" /> <img src="https://img.shields.io/badge/Tauri-24C8D8?logo=tauri&logoColor=white" alt="Tauri" /> <img src="https://img.shields.io/badge/Fumadocs-000000" alt="Fumadocs" />
+    <br />
+    <img src="https://img.shields.io/badge/Claude-D97757?logo=claude&logoColor=white" alt="Claude" /> <img src="https://img.shields.io/badge/npm-CB3837?logo=npm&logoColor=white" alt="npm" /> <img src="https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white" alt="TypeScript" /> <img src="https://img.shields.io/badge/React-20232A?logo=react&logoColor=white" alt="React" /> <img src="https://img.shields.io/badge/Svelte-FF3E00?logo=svelte&logoColor=white" alt="Svelte" /> <img src="https://img.shields.io/badge/Tauri-24C8D8?logo=tauri&logoColor=white" alt="Tauri" /> <img src="https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=white" alt="Vite" /> <img src="https://img.shields.io/badge/Turborepo-EF4444?logo=turborepo&logoColor=white" alt="Turborepo" /> <img src="https://img.shields.io/badge/Vitest-6E9F18?logo=vitest&logoColor=white" alt="Vitest" />
 </p>
 <!-- template-git-repo:badges:end -->
 
 <p align="center">
-    <img  src="https://i.imgur.com/xzFQmrD.jpeg" />
+    <img src="https://i.imgur.com/xzFQmrD.jpeg" />
 </p>
 
 ```bash
