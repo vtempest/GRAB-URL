@@ -1,16 +1,16 @@
-# Universal Archive Extractor & Creator for Web
+# archiver-web
 
-TypeScript library using **libarchive.js (WASM)** for ZIP/7z/RAR/TAR.GZ extract/create with folder filtering and compression. Works in Node.js/browser/Cloudflare/CLI.
-
-## 🚀 Quick Start
+Universal archive **extractor and creator** for the web. TypeScript, frontend-friendly, uses [JSZip](https://stuk.github.io/jszip/) under the hood and runs in Node.js, the browser, Cloudflare Workers, and the CLI.
 
 ```bash
 npm i archiver-web
 ```
 
-**Extract folder:**
+## Quick Start
 
-```typescript
+**Extract a folder out of a remote archive:**
+
+```ts
 import { extractFolder } from "archiver-web";
 
 const files = await extractFolder({
@@ -20,9 +20,9 @@ const files = await extractFolder({
 // [{ path: 'main.ts', size: 2048, content: '...', mime: 'text/typescript' }]
 ```
 
-**Create archive:**
+**Create an archive from in-memory files:**
 
-```typescript
+```ts
 import { createArchive, ArchiveCompression, ArchiveFormat } from "archiver-web";
 
 const archive = await createArchive({
@@ -32,7 +32,7 @@ const archive = await createArchive({
 });
 ```
 
-## 📊 Format Comparison
+## Format Comparison
 
 | Format      | Compression | Speed      | Size       | % Reduction (10MB) | Use Case         |
 | ----------- | ----------- | ---------- | ---------- | ------------------ | ---------------- |
@@ -42,36 +42,61 @@ const archive = await createArchive({
 | **TAR.BZ2** | BZIP2 1-9   | ⭐⭐       | ⭐⭐⭐⭐   | **82%**            | Medium Unix      |
 | **TAR**     | None        | ⭐⭐⭐⭐⭐ | ⭐         | **0%**             | Bundling         |
 
-## 📖 API
+## API
 
-```typescript
-// Extract
-extractFolder({ archiveUrl: string, folderPath?: string, password?: string })
+```ts
+// Extract a folder (or single file path) out of a remote archive
+extractFolder({
+  archiveUrl: string,
+  folderPath?: string,
+  password?: string,
+});
 
-// Create
+// Create an archive from a list of files
 createArchive({
-  files: Array<{path: string, content: string|Uint8Array|Blob}>,
+  files: Array<{ path: string; content: string | Uint8Array | Blob }>,
   outputName: string,
   format?: ArchiveFormat,
   compression?: ArchiveCompression,
-  compressionLevel?: 1|3|6|9  // Fastest=1, Best=9
-})
+  compressionLevel?: 1 | 3 | 6 | 9, // 1 = fastest, 9 = best
+});
 ```
 
-## 💾 Usage
+## Usage Recipes
 
-```typescript
-// Extract React src only
+```ts
+// Extract just the React `packages/react` source from upstream
 const reactSrc = await extractFolder({
   archiveUrl: "https://github.com/facebook/react/archive/main.zip",
   folderPath: "react-*/packages/react",
 });
 
-// Repackage as 7z (max compression)
+// Repackage it as 7z at max compression
 const tiny7z = await createArchive({
   files: reactSrc,
   outputName: "react.7z",
   compression: ArchiveCompression.LZMA,
-  compressionLevel: 9, // 88% reduction
+  compressionLevel: 9, // ~88% reduction
 });
 ```
+
+## CLI
+
+The package exposes two bins for one-off use:
+
+```bash
+npx extract <archiveUrl> [folderPath]
+npx compress <inputDir> <outputName>
+```
+
+## Development
+
+```bash
+bun install
+bun run build     # vite build
+bun test          # tsx test.ts
+```
+
+## License
+
+MIT
