@@ -1,0 +1,203 @@
+---
+title: CLI Usage
+description: Command-line interface usage examples
+icon: Terminal
+---
+
+### Command Line Usage Examples
+
+```bash
+## install for CLI testing of your APIs
+npm i -g grab-url
+
+# use "grab" (or "g") if installed, or "npx grab-url" if not
+g https://api.example.com/data
+
+# Basic request — parses JSON and writes output.json
+npx grab-url https://api.example.com/data
+
+# Request with query params as JSON
+npx grab-url https://api.example.com/search -p '{"q":"hello","limit":10}'
+
+# Print the response instead of saving it
+npx grab-url https://api.example.com/data --no-save
+
+# Download a file, or several concurrently
+npx grab-url https://releases.ubuntu.com/24.04.2/ubuntu-24.04.2-live-server-amd64.iso
+npx grab-url https://example.com/a.zip https://example.com/b.zip -d ./downloads
+```
+
+### SFTP, torrents and magnet links
+
+`fetch()` speaks neither SFTP nor BitTorrent, so those targets are handed to
+[`aria2c`](https://aria2.github.io/) and its progress is parsed into the same progress bar as
+every other transfer. Anything `sftp://`, `magnet:?xt=urn:btih:…`, or ending in `.torrent`
+takes that route; everything else keeps the built-in downloader, and one command can mix both.
+
+```bash
+# Pull a file over SFTP (credentials inline, or as flags to keep them out of shell history)
+npx grab-url sftp://user@host/srv/backup.tar.gz --password hunter2
+npx grab-url sftp://host:2222/srv/db.tar.zst --user alice --password hunter2 -o backup.tar.zst
+
+# Pin the host key — the transfer aborts if the server presents a different one
+npx grab-url sftp://host/srv/db.tar.zst --user alice --password hunter2 \
+  --ssh-host-key sha-1=b030503bb45f9f0e0a1e9c4a1e0b8f4c3d2e1f00
+
+# Torrent file or magnet link, with optional seeding after it completes
+npx grab-url ./ubuntu.torrent -d ./downloads
+npx grab-url "magnet:?xt=urn:btih:HASH" -d ./downloads --seed
+
+# Throttle, or pass any other aria2c flag straight through
+npx grab-url ./ubuntu.torrent --aria2-args "--max-overall-download-limit=2M --enable-dht=false"
+```
+
+`aria2c` must be installed for these three kinds — the CLI prints the install command for your
+platform when it is missing, and `GRAB_ARIA2_PATH` points at a binary that is not on `PATH`.
+Passwords are redacted everywhere a URI is echoed, and interrupted transfers resume from
+aria2c's `.aria2` control file.
+
+### Background transfers
+
+```bash
+# Detach at once — prints the PID and log path, then returns
+npx grab-url https://example.com/big.iso --background
+
+# List background transfers still running (dead jobs are pruned automatically)
+npx grab-url --jobs
+```
+
+Press **Ctrl+C** during any transfer and the CLI offers the same handoff
+(`🛑 Cancel — keep transferring in the background? [Y/n]`), auto-accepting after 15 seconds so a
+disconnected terminal does not strand a download. Answer `n`, or pass `--no-bg-prompt`, to stop
+instead — the partial file and its resume state stay on disk either way. Jobs and logs live
+under `.grab-downloads/`, or `GRAB_DOWNLOAD_STATE_DIR`.
+
+### Options
+
+| Flag                 | Alias | Description                                                                 |
+| -------------------- | ----- | --------------------------------------------------------------------------- |
+| `--output <file>`    | `-o`  | Output filename — default `output.json` for APIs, derived from the URL for files |
+| `--params <json>`    | `-p`  | JSON string of query parameters                                             |
+| `--no-save`          |       | Print to the console instead of writing a file                              |
+| `--dir <path>`       | `-d`  | Destination directory for downloads and sftp / torrent / magnet transfers   |
+| `--background`       | `-b`  | Detach at once and keep transferring in the background, logging to a file   |
+| `--jobs`             |       | List background transfers still running, then exit                          |
+| `--log <file>`       |       | Log file for background transfers                                           |
+| `--no-bg-prompt`     |       | On Ctrl+C, cancel right away instead of offering the background handoff     |
+| `--seed`             |       | Keep seeding a torrent after it completes                                   |
+| `--connections <n>`  | `-c`  | Connections per server for SFTP transfers, 1–16 — default 8                 |
+| `--user <name>`      |       | Username for SFTP transfers                                                 |
+| `--password <pw>`    |       | Password for SFTP transfers                                                 |
+| `--ssh-host-key <d>` |       | Expected SFTP host key digest — aborts on mismatch                          |
+| `--aria2-args <s>`   |       | Extra space-separated flags passed straight to `aria2c`                     |
+| `--help`             | `-h`  | Show help                                                                   |
+| `--version`          |       | Show version                                                                |
+
+---
+
+### Programmatic Usage
+
+The file downloader can be imported directly into your own Node.js projects,
+bypassing the CLI argument parsing entirely.
+
+```ts
+import { MultiColorFileDownloaderCLI } from "grab-url/cli";
+
+const downloader = new MultiColorFileDownloaderCLI();
+
+// Download a single file
+await downloader.downloadFile(
+  "https://example.com/archive.tar.gz",
+  "./downloads/archive.tar.gz",
+);
+
+// Download multiple files concurrently with progress bars
+await downloader.downloadMultipleFiles([
+  {
+    url: "https://example.com/a.zip",
+    outputPath: "./a.zip",
+    filename: "a.zip",
+  },
+  {
+    url: "https://example.com/b.zip",
+    outputPath: "./b.zip",
+    filename: "b.zip",
+  },
+]);
+
+// Clean up listeners and abort controllers when done
+downloader.cleanup();
+```
+
+#### Adding Downloads Dynamically
+
+Start a multi-file session, then add more files while it's running:
+
+```ts
+import { MultiColorFileDownloaderCLI, generateFilename } from "grab-url/cli";
+
+const downloader = new MultiColorFileDownloaderCLI();
+
+// Start with one file (runs in background)
+const initialDownload = downloader.downloadMultipleFiles([
+  {
+    url: "https://example.com/large-file.iso",
+    outputPath: "./large-file.iso",
+    filename: "large-file.iso",
+  },
+]);
+
+// Later, add another file to the running session
+setTimeout(async () => {
+  const url = "https://example.com/extra-data.zip";
+  const filename = generateFilename(url); // => 'extra-data.zip'
+  await downloader.addToMultipleDownloads(url, `./${filename}`, filename);
+}, 5000);
+
+// Wait for all downloads to finish
+await initialDownload;
+downloader.cleanup();
+```
+
+#### Available Exports
+
+| Export                        | Description                                                             |
+| ----------------------------- | ----------------------------------------------------------------------- |
+| `MultiColorFileDownloaderCLI` | Orchestrator class with progress bars, pause/resume, and resume support |
+| `Download`                    | TypeScript type for download objects (`{ url, outputPath, filename }`)  |
+| `generateFilename(url)`       | Derive a local filename from a URL                                      |
+| `getFileExtension(url)`       | Extract the file extension from a URL                                   |
+| `isValidUrl(url)`             | Check whether a string is a valid URL                                   |
+| `isFileUrl(url)`              | Detect whether a URL points to a downloadable file                      |
+| `ArgParser`                   | Lightweight CLI argument parser (if you need it)                        |
+
+#### Key Features
+
+- **Resume support** — interrupted downloads pick up where they left off via `.download-state` sidecar files
+- **Concurrent downloads** — multiple files download in parallel with a shared multi-progress bar
+- **Keyboard controls** — press `p` to pause/resume, `a` to add a URL mid-session
+- **Randomized spinners** — each session gets a unique spinner and color scheme
+
+---
+
+### Feature Comparison: grab-url vs wget vs curl
+
+| Feature                               |    grab-url     |      wget       |          curl          |
+| ------------------------------------- | :-------------: | :-------------: | :--------------------: |
+| **Resume interrupted downloads**      | ✅ (automatic)   | ✅ (`-c`)       | ✅ (`-C -`)            |
+| **Multi-file concurrent downloads**   | ✅ (built-in)    | ❌ (sequential) | ❌ (sequential)        |
+| **Multi-progress bar**                | ✅               | ❌               | ✅ (`--progress-bar`) |
+| **Pause / resume mid-download**       | ✅ (`p` key)     | ❌               | ❌                     |
+| **Add URLs mid-session**              | ✅ (`a` key)     | ❌               | ❌                     |
+| **Keyboard controls**                 | ✅               | ❌               | ❌                     |
+| **Detachable background jobs**        | ✅ (`--background`) | ❌            | ❌                     |
+| **JSON params shorthand**             | ✅ (`-p`)        | ❌               | ✅ (`-d`)              |
+| **Programmatic Node.js API**          | ✅               | ❌               | ❌                     |
+| **SFTP support**                      | ✅ (via aria2c)  | ✅               | ✅                     |
+| **Torrent / magnet support**          | ✅ (via aria2c)  | ❌               | ❌                     |
+| **Custom headers**                    | ✅       | ✅               | ✅                     |
+| **Cookie handling**                   | ✅       | ✅               | ✅                     |
+| **Proxy support**                     | ✅  Via env       | ✅               | ✅                     |
+| **HTTP/2 & HTTP/3**                   | ✅ (Node.js)     | ❌               | ✅                     |
+| **Runs without install**              | ✅ (`npx`)       | ❌ Needs install | ❌ Needs install       |
+| **Cross-platform (no native deps)**   | ✅               | ⚙️ Varies        | ⚙️ Varies              |

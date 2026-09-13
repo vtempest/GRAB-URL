@@ -1,0 +1,39 @@
+{
+  "appName": "Grab URL",
+  "productName": "Grab URL",
+  "identifier": "org.grab.url",
+  "version": "1.6.22",
+  "mode": "local",
+  "copyright": "grab-url contributors",
+  "category": "Utility",
+  "shortDescription": "Download video and audio from 720+ media sites.",
+  "longDescription": "A window over yt-dlp: paste a link from YouTube, Twitch, Vimeo, SoundCloud or any of ~720 other sites and the media lands in your Downloads folder. The downloader ships inside the app, so nothing needs installing first.",
+  "iconSource": "../assets/icon-source.png",
+  "placeholderIcon": {
+    "background": ["#1e293b", "#0b1220"],
+    "accent": "#f8fafc"
+  },
+  "window": {
+    "title": "Grab URL",
+    "width": 760,
+    "height": 560,
+    "minWidth": 420,
+    "minHeight": 420
+  },
+  "sidecar": {
+    "name": "yt-dlp",
+    "args": ["--version"],
+    "downloadArgs": [
+      "--newline",
+      "--color",
+      "never",
+      "--no-warnings",
+      "--no-playlist",
+      "--continue",
+      "--output",
+      "%(title)s [%(id)s].%(ext)s"
+    ],
+    "build": "node ../../scripts/install-yt-dlp.mjs --sidecar --out {out}",
+    "buildCwd": "."
+  }
+}

@@ -1,0 +1,72 @@
+# Builds the Fumadocs docs site and publishes it to GitHub Pages.
+#
+# Settings -> Pages -> Source is "GitHub Actions", so this workflow is what publishes
+# the site. The /docs folder Pages used to build from with Jekyll is gone -- nothing
+# reads it any more, and the docs app lives in grab-help-docs/.
+#
+# The site is a full Next.js app, so it is exported statically here: see
+# grab-help-docs/scripts/build-static-pages.mjs for the server-only pieces that are pruned and
+# what each costs. https://grab.js.org builds from the same source without this flag
+# and keeps all of them.
+name: Deploy docs to Pages
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - grab-help-docs/**
+      - packages/**
+      - package.json
+      - package-lock.json
+      - .github/workflows/pages.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+  pages: write
+
+# Let an in-flight deploy finish rather than cancelling it half-published.
+concurrency:
+  cancel-in-progress: false
+  group: pages
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          cache: npm
+          node-version: 22
+
+      - name: Configure Pages
+        id: pages
+        uses: actions/configure-pages@v5
+
+      # npm ci, not a floating install: package-lock.json pins fumadocs-openapi and
+      # fumadocs-ui to a compatible pair, and a fresh resolve picks versions that
+      # fail the build.
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build static export
+        env:
+          NEXT_PUBLIC_BASE_PATH: ${{ steps.pages.outputs.base_path }}
+        run: node grab-help-docs/scripts/build-static-pages.mjs
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: grab-help-docs/out
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

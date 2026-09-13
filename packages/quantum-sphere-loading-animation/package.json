@@ -4,24 +4,24 @@
   "description": "Parabolic spherical orbital loading component for React and Svelte, inspired by quantum superposition of atomic orbitals.",
   "type": "module",
   "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "svelte": "./src/svelte/QuantumOrbital.svelte",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
     },
     "./react": {
-      "types": "./dist/react/QuantumOrbital.d.ts",
+      "types": "./src/react/index.ts",
       "import": "./src/react/index.ts",
       "require": "./src/react/index.ts"
     },
     "./icons": {
       "types": "./dist/icons.d.ts",
-      "import": "./dist/icons.mjs",
-      "require": "./dist/icons.js"
+      "import": "./dist/icons.js",
+      "require": "./dist/icons.cjs"
     },
     "./svelte": {
       "types": "./src/types/QuantumOrbital.d.ts",
@@ -37,6 +37,7 @@
   "scripts": {
     "ship": "npx standard-version --release-as patch; npm publish",
     "build": "tsup",
+    "prepublishOnly": "npm run build",
     "dev": "tsup --watch",
     "publish": "npm publish"
   },
@@ -54,13 +55,13 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vtempest/GRAB-URL.git",
+    "url": "git+https://github.com/OpenSourceAGI/GRAB-URL.git",
     "directory": "packages/quantum-sphere-loading-animation"
   },
   "bugs": {
-    "url": "https://github.com/vtempest/GRAB-URL/issues"
+    "url": "https://github.com/OpenSourceAGI/GRAB-URL/issues"
   },
-  "homepage": "https://github.com/vtempest/GRAB-URL/tree/master/packages/quantum-sphere-loading-animation#readme",
+  "homepage": "https://github.com/OpenSourceAGI/GRAB-URL/tree/master/packages/quantum-sphere-loading-animation#readme",
   "peerDependencies": {
     "react": ">=16.8.0",
     "react-dom": ">=16.8.0",

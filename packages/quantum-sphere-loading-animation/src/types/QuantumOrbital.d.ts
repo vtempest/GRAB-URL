@@ -84,8 +84,9 @@ export interface OrbitalLine {
   /** Speed multiplier for this line's rotation (0.5-1.5) */
   speed: number;
 
-  /** Lightness in monochrome scheme */
-  customLightness: number;
+  /** Lightness in monochrome scheme; unset for every other scheme, which falls
+   * back to the sphere-wide lightness. */
+  customLightness?: number;
 }
 
 /**

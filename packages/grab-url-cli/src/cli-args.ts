@@ -38,7 +38,11 @@ export class ArgParser {
         for (let i = 0; i < args.length; i++) {
             const arg = args[i];
             if (arg.startsWith('--')) {
-                const [key, value] = arg.split('=');
+                // Split on the FIRST '=' only, so values may contain '='
+                // (e.g. --aria2-args=--max-download-limit=1M)
+                const eq = arg.indexOf('=');
+                const key = eq === -1 ? arg : arg.slice(0, eq);
+                const value = eq === -1 ? undefined : arg.slice(eq + 1);
                 const optName = key.slice(2);
                 if (value !== undefined) {
                     result[optName] = this.coerceValue(optName, value);
@@ -46,7 +50,8 @@ export class ArgParser {
                     result[optName] = true;
                 } else {
                     const nextArg = args[i + 1];
-                    if (nextArg && !nextArg.startsWith('-')) {
+                    // `greedy` options (e.g. --aria2-args) accept dash-leading values
+                    if (nextArg !== undefined && (!nextArg.startsWith('-') || this.options[optName]?.greedy)) {
                         result[optName] = this.coerceValue(optName, nextArg);
                         i++;
                     } else {
@@ -61,7 +66,7 @@ export class ArgParser {
                         result[longName] = true;
                     } else {
                         const nextArg = args[i + 1];
-                        if (nextArg && !nextArg.startsWith('-')) {
+                        if (nextArg !== undefined && (!nextArg.startsWith('-') || this.options[longName]?.greedy)) {
                             result[longName] = this.coerceValue(longName, nextArg);
                             i++;
                         }
@@ -80,7 +85,11 @@ export class ArgParser {
             }
         });
 
-        if ((!result.urls || result.urls.length === 0) && this.commands.url?.required) {
+        // Options marked `standalone` (e.g. --jobs) run without any URL
+        const standaloneUsed = Object.keys(this.options)
+            .some(key => this.options[key].standalone && result[key]);
+
+        if ((!result.urls || result.urls.length === 0) && this.commands.url?.required && !standaloneUsed) {
             console.error('Error: Missing required argument: url');
             this.showHelp();
             process.exit(1);
@@ -113,6 +122,7 @@ export class ArgParser {
         console.log('\nOptions:');
         Object.keys(this.options).forEach(key => {
             const opt = this.options[key];
+            if (opt.hidden) return;
             const flags = opt.alias ? `-${opt.alias}, --${key}` : `--${key}`;
             console.log(`  ${flags.padEnd(20)} ${opt.describe || ''}`);
         });

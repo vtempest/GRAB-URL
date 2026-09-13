@@ -1,6 +1,16 @@
 # dependencies (bun install)
 node_modules
 
+# build output — `npm run build` writes it, git never tracks it.
+# npm still ships it: each package.json's "files" whitelist names dist, and a
+# "files" entry cannot be excluded by .gitignore, so `npm publish` (which runs
+# the build first via prepublishOnly) packs a freshly built dist every time.
+dist
+# ...except the Tauri wrapper's dist/, which is hand-written source served as
+# frontendDist (see packages/native-app-wrapper/src-tauri/tauri.conf.json),
+# not build output.
+!packages/native-app-wrapper/dist/
+
 # output
 out
 *.tgz
@@ -42,9 +52,15 @@ test/test-downloads
 .next/
 .vercel
 .grab-downloads/
-docs/dist/
-.claude
+grab-help-docs/dist/
 build.log
 pnpm-lock.yaml
 .turbo
-docs/.next_old
+grab-help-docs/.next_old
+
+.claude/*
+# Agent docs for Claude Code — checked in on purpose (see CLAUDE.md)
+!.claude/architecture
+!.claude/settings.json
+.claude/settings.local.json
+CLAUDE.local.md

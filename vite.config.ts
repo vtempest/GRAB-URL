@@ -29,7 +29,14 @@ const nodeBuiltins = [
   "worker_threads",
 ];
 
-const externalPkgs = ["chalk", "cli-table3", "cli-progress", "cli-spinners"];
+// `extract-webpage` is the qwksearch content extractor behind `grab-url --page`.
+// It is an optional peer dependency loaded through a runtime `import()`, and it
+// drags in jsdom/linkedom, so it must never be pulled into the CLI bundle.
+const externalPkgs = ["chalk", "cli-table3", "cli-progress", "cli-spinners", "extract-webpage"];
+// React must never be bundled into `dist/quantum-sphere.*`: the host app already
+// has its own copy, and a second one makes every hook in QuantumOrbital throw
+// "Invalid hook call". No other entry imports React, so this is a no-op for them.
+const reactExternals = ["react", "react-dom", "react/jsx-runtime", "react/jsx-dev-runtime"];
 const slimExternalPkgs = [...externalPkgs, "archiver-web", "linkedom"];
 
 const sharedAlias = {
@@ -40,7 +47,29 @@ const sharedAlias = {
   "grab-url": resolve(__dirname, "packages/grab-api/src/index.ts"),
 };
 
+/**
+ * Restores the `"use client"` directive on the quantum-sphere bundles.
+ *
+ * Rollup drops the source file's own module-level directive when bundling, and
+ * a `banner` does not survive either — terser re-parses the chunk afterwards
+ * and discards a directive it reads as dead code in an ES module. Writing it in
+ * `generateBundle`, which runs after minification, is the one point where it
+ * sticks. Without it a React Server Component importing the sphere fails on the
+ * first hook.
+ */
+const useClientDirective = {
+  name: "use-client-directive",
+  generateBundle(_options: unknown, bundle: Record<string, { type: string; name?: string; code?: string }>) {
+    for (const chunk of Object.values(bundle)) {
+      if (chunk.type === "chunk" && chunk.name === "quantum-sphere" && chunk.code) {
+        chunk.code = `"use client";\n${chunk.code}`;
+      }
+    }
+  },
+};
+
 const sharedPlugins = [
+  useClientDirective,
   dts({
     insertTypesEntry: true,
     include: ["packages/**/*.ts", "packages/**/*.tsx"],
@@ -100,6 +129,7 @@ export default defineConfig({
       external: (id, importer) => {
         if (id.startsWith("node:") || nodeBuiltins.includes(id)) return true;
         if (externalPkgs.includes(id)) return true;
+        if (reactExternals.includes(id)) return true;
         if (id === "jszip") return true;
         // Externalize heavy deps for slim build entry
         if (slimExternalPkgs.includes(id) && importer?.includes("index.slim")) return true;

@@ -1,3 +1,3 @@
-export { default as QuantumOrbital } from "./QuantumOrbital.tsx";
+export { default as QuantumOrbital } from "./QuantumOrbital";
 export type * from "../types/QuantumOrbital";
-export { default } from "./QuantumOrbital.tsx";
+export { default } from "./QuantumOrbital";

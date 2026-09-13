@@ -1,6 +1,6 @@
 # Runnable Examples
 
-Each folder here is a self-contained project that demonstrates one usage pattern from [`grab-url`](https://github.com/vtempest/grab-url). They're linked from the docs (`docs/content/docs/`) via the `<StackBlitzExample>` component, which opens a fresh, editable StackBlitz fork of the folder for the reader.
+Each folder here is a self-contained project that demonstrates one usage pattern from [`grab-url`](https://github.com/vtempest/grab-url). They're linked from the docs (`grab-help-docs/content/docs/`) via the `<StackBlitzExample>` component, which opens a fresh, editable StackBlitz fork of the folder for the reader.
 
 | Example | Demonstrates |
 |---|---|

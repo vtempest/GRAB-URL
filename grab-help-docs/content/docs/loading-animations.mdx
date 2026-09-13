@@ -1,0 +1,252 @@
+---
+title: Loading Animations
+description: Every loading icon in the repo — the quantum sphere orbital, eight React Spinner variants and 25 zero-dependency SVG animations — rendered live, with size and color controls.
+icon: Loader
+---
+
+The repo ships three collections that cover both ends of a download UI:
+
+- **Quantum sphere** — an interactive 3D orbital loader for React and Svelte, from
+  [`quantum-sphere-loading-icon`](https://github.com/vtempest/GRAB-URL/tree/master/packages/quantum-sphere-loading-animation).
+  The showpiece: it randomizes itself and reacts to the pointer.
+- **`<Spinner>`** — a shadcn/ui-style React component with eight variants, from
+  [`loading-animations`](https://github.com/vtempest/GRAB-URL/tree/master/packages/loading-animations).
+  Draws with `currentColor`, so a text color class is all it takes to restyle.
+- **SVG functions** — 25 animated SVGs returned as strings from a single function call.
+  Zero dependencies, framework-free, and tree-shakable: bundlers drop anything you don't import.
+
+Every animation below is live. Drag the size slider, load a preset theme or build your own
+palette one color at a time, then click any label to copy the exact call that produces what
+you see.
+
+## Quantum sphere
+
+A parabolic spherical orbital, inspired by the quantum superposition of atomic orbitals.
+Each ring spins in its own 3D plane and holds a superposed state until it is observed —
+hover a ring and it collapses onto a fresh hue, glow and rotation speed. Every few seconds
+the whole sphere re-rolls its color scheme from 24 presets (Neon, Galaxy, Cyberpunk, …).
+
+<QuantumSpherePreview />
+
+It is the one loader here that is a component rather than a string, so it is also the only
+one that responds to the pointer. Give the wrapper a height — the sphere centers itself in
+whatever box it is handed.
+
+**Full demo:** every setting is on a slider at
+[grab.js.org/loaders/quantum-sphere](/loaders/quantum-sphere), which prints the matching
+`config` ready to copy.
+
+### Install
+
+Already included if you have `grab-url` — it re-exports the sphere from
+`grab-url/icons/quantum-sphere`. Standalone, it is its own package:
+
+```sh
+npm install quantum-sphere-loading-icon
+```
+
+### Usage
+
+```tsx
+// Bundled with grab-url:
+import QuantumOrbital from 'grab-url/icons/quantum-sphere';
+// Or standalone:
+import QuantumOrbital from 'quantum-sphere-loading-icon/react';
+
+export function Loading() {
+  return (
+    <div style={{ height: 400 }}>
+      <QuantumOrbital autoRandomize />
+    </div>
+  );
+}
+```
+
+```svelte
+<script>
+  import QuantumOrbital from 'quantum-sphere-loading-icon/svelte';
+</script>
+
+<div style="height: 400px">
+  <QuantumOrbital autoRandomize={true} />
+</div>
+```
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `config` | `OrbitalSphereConfig` | preset | Min/max bounds for line count, sphere size, line width, glow, rotation speed, saturation and lightness |
+| `autoRandomize` | `boolean` | `true` | Re-rolls the color scheme and shifts hue every 5–12s |
+| `className` | `string` | `""` | Extra classes on the wrapper |
+| `onSphereClick` | `() => void` | `null` | Fired when the sphere is clicked |
+
+`config` is expressed as ranges, and the component draws each value from its range on every
+re-roll. Setting a `min` equal to its `max` pins that dimension instead — which is how the
+demo page turns a randomizer into a picker:
+
+```tsx
+import { DEFAULT_ORBITAL_SPHERE_CONFIG } from 'grab-url/icons/quantum-sphere';
+
+// A fixed 9-ring, 180px sphere that still re-rolls its colors.
+<QuantumOrbital
+  config={{
+    ...DEFAULT_ORBITAL_SPHERE_CONFIG,
+    minLines: 9,
+    maxLines: 9,
+    minSphereSize: 180,
+    maxSphereSize: 180,
+  }}
+/>
+```
+
+## React `<Spinner>`
+
+<SpinnerVariants />
+
+### Install
+
+The component is a single file with no runtime dependency beyond `lucide-react`. Copy
+[`components/ui/spinner.tsx`](https://github.com/vtempest/GRAB-URL/blob/master/grab-help-docs/components/ui/spinner.tsx)
+into your own `components/ui` folder — the folder shadcn/ui writes to, so the component
+sits alongside `button`, `badge` and the rest and stays overwritable by the shadcn CLI.
+
+```sh
+npm install lucide-react
+```
+
+If your project has no shadcn/ui setup yet, scaffold one first — it creates
+`components/ui`, `lib/utils.ts` (the `cn` helper the component imports) and the Tailwind
+theme tokens:
+
+```sh
+npx shadcn@latest init
+```
+
+### Usage
+
+```tsx
+import { Spinner } from '@/components/ui/spinner';
+
+export function SaveButton({ pending }: { pending: boolean }) {
+  return (
+    <button type="submit" disabled={pending}>
+      {pending ? <Spinner variant="circle" size={16} /> : null}
+      Save
+    </button>
+  );
+}
+```
+
+`SpinnerProps` extends `LucideProps`, so `size`, `className`, `strokeWidth` and any SVG
+attribute pass straight through:
+
+```tsx
+<Spinner />                                          // spokes (default)
+<Spinner variant="circle" size={48} />
+<Spinner variant="bars" className="text-fd-primary" />
+<Spinner variant="ring" size={64} strokeWidth={1} />
+```
+
+| Variant | Look |
+| --- | --- |
+| `default` | 8 radiating spokes, rotating |
+| `circle` | Open circular arc, rotating |
+| `pinwheel` | Three interlocking arcs inside a circle |
+| `circle-filled` | Rotating arc over a dimmed full-circle track |
+| `ellipsis` | Three dots bouncing in sequence |
+| `ring` | Two rings expanding and fading outward |
+| `bars` | Three bars pulsing like an equalizer |
+| `infinite` | Dash travelling around an infinity loop |
+
+## SVG animations
+
+Call a function, get an SVG string. Nothing here depends on React, so the same icons work
+in vanilla DOM, Svelte, Vue, or an email template.
+
+<LoadingSvgGallery />
+
+### Usage
+
+```ts
+import { loadingSpokes, loadingPacman } from 'loading-animations/svg';
+
+// Default: an <img> tag wrapping a data URI — safe to drop anywhere.
+element.innerHTML = loadingSpokes({ size: 48 });
+
+// raw: true returns the <svg> markup itself, so it inherits page styles.
+element.innerHTML = loadingPacman({ size: 64, colors: ['#0099e5', '#ff4c4c'], raw: true });
+```
+
+```ts
+type LoadingOptions = {
+  /** Hex colors substituted into the SVG, in source order. */
+  colors?: string[];
+  /** Width in px. */
+  width?: number;
+  /** Height in px. */
+  height?: number;
+  /** Shorthand that sets both width and height. */
+  size?: number;
+  /** Return raw `<svg>` markup instead of an `<img>` data URI. */
+  raw?: boolean;
+};
+```
+
+### Colors
+
+`colors` is substituted into the SVG in source order: the first entry replaces the first
+color in the markup, the second the second, and so on. Anything the array doesn't reach
+keeps its original color, so the list only needs to be as long as the icon is colorful.
+
+The eight animations badged **new** above are the SVG twins of the `<Spinner>` variants.
+Each contains exactly one color, so a single entry restyles the whole animation. The older
+spinners hold more — two in `loadingDoubleRing`, `loadingFloatingSearch`, `loadingOrbital`,
+`loadingReloadArrow` and `loadingRipple`, three in `loadingPulseBars` and
+`loadingRedBlueBall`, six in `loadingPacman`, eight in `loadingSpinner`, ten in
+`loadingEllipsis`, twelve in `loadingSpinnerOval` and thirty-two in
+`loadingSquareBlocks` — and take that many entries to recolor completely.
+
+Use the **Theme** row in the gallery to load a ready-made palette, then **Add color** to
+extend it. The copied call always matches whatever the swatch row holds:
+
+```ts
+loadingDoubleRing({ size: 64, colors: ['#7c3aed', '#ec4899'] });
+
+// Three entries against six colors: the first three are replaced, the rest stay as drawn.
+loadingPacman({ size: 64, colors: ['#0099e5', '#38bdf8', '#a5f3fc'] });
+```
+
+| SVG export | `<Spinner>` variant |
+| --- | --- |
+| `loadingSpokes` | `default` |
+| `loadingCircleNotch` | `circle` |
+| `loadingPinwheel` | `pinwheel` |
+| `loadingCircleTrack` | `circle-filled` |
+| `loadingDotsBounce` | `ellipsis` |
+| `loadingPulseRing` | `ring` |
+| `loadingEqualizerBars` | `bars` |
+| `loadingInfiniteDash` | `infinite` |
+
+### Adding your own
+
+Drop an `.svg` file into
+[`packages/loading-animations/src/svg/`](https://github.com/vtempest/GRAB-URL/tree/master/packages/loading-animations/src/svg)
+and regenerate the barrel — the export name is the filename in camelCase, and this page
+picks it up automatically:
+
+```sh
+npm run make:icons
+```
+
+## Terminal spinners
+
+For CLI progress there is one more collection, of Unicode frame data, used by
+[`grab-url-cli`](/docs/cli):
+
+```js
+import { dots, bouncingBar } from 'loading-animations';
+
+const frames = [...dots]; // ["⠋", "⠙", "⠹", …]
+```
+
+Each entry is either a plain string (one character per frame) or a `[string, n]` tuple
+where `n` is the character width of each frame.

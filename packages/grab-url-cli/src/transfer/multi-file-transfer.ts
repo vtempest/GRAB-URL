@@ -30,6 +30,8 @@ import {
     getRandomBarColor, getRandomBarGlueColor,
 } from '../display/spinner-config.js';
 
+import { isCancelInProgress } from '../cancel-state.js';
+
 import {
     checkServerSupport, resolveResumeDecision,
     loadDownloadState, saveDownloadState,
@@ -215,6 +217,9 @@ export async function downloadMultipleFiles(
         clearInterval(speedInterval);
         ctx.multiBar.stop();
 
+        // A cancellation aborts every request; the handoff message reports it.
+        if (isCancelInProgress()) return;
+
         const ok = results.filter((r: any) => r.status === 'fulfilled' && r.value.success).length;
         const fail = results.length - ok;
         if (fail > 0) {
@@ -356,6 +361,7 @@ export async function downloadSingleFileWithBar(
         });
 
     } catch (e: any) {
+        if (isCancelInProgress()) throw e;
         bar.update(bar.total, {
             spinner: '❌', speed: formatSpeed('FAILED'),
             downloadedDisplay: formatBytesCompact(0), totalDisplay: formatTotalDisplay(0),
